@@ -209,6 +209,13 @@ details .inner{padding:0 18px 14px;display:flex;flex-direction:column;gap:10px}
 .altwarn small{font-size:12px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .altwarn{background:#173322;color:#c8f0d4}}
 :root[data-theme="dark"] .altwarn{background:#173322;color:#c8f0d4}
+.badge.via{background:var(--panel-2);color:var(--ink);border:2px dashed var(--muted);font-size:14px}
+.stop.via .stop-line input{font-style:italic}
+.mk-via{width:20px;height:20px;border-radius:50%;background:#fff;color:#1c232a;border:3px solid #1f5fbf;font-size:11px}
+.avoid{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.ralt-mk{width:auto;height:22px;padding:0 7px;border-radius:11px;background:#5b6570;white-space:nowrap;font-weight:600}
+.ralt-mk.faster{background:#1e8e3e}
+.ghost-mk{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #1f5fbf;box-shadow:0 1px 6px rgba(0,0,0,.4)}
 .mk-cam{width:auto;height:22px;padding:0 6px;border-radius:4px;background:#6b3fa0;white-space:nowrap}
 .tl li.cam .dot{border-color:#6b3fa0;background:#6b3fa0;border-radius:3px}
 .camwarn{font-size:14px;font-weight:600;padding:7px 10px;border-radius:8px;background:#6b3fa0;color:#fff}
@@ -260,6 +267,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
       <div class="stops" id="stops"></div>
       <div class="row">
         <button id="addStop" type="button">+ Zwischenstopp</button>
+        <button id="addVia" type="button" title="Route über einen bestimmten Ort führen, ohne dort anzuhalten">+ Über …</button>
         <button id="reverse" type="button" class="ghost">⇅ Umkehren</button>
       </div>
       <div class="grid2">
@@ -269,9 +277,15 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
         <label>Fahrverbots-Hinweise<select id="banMode">
           <option value="on">anzeigen</option><option value="off">aus</option></select></label>
       </div>
-      <button class="primary" id="calc" type="button">Route berechnen</button>
+      <div class="avoid"><span>Meiden:</span><span class="chips" id="avoidChips" role="group" aria-label="Straßen meiden">
+        <button type="button" data-av="motorways" aria-pressed="false">Autobahn</button><button type="button" data-av="toll" aria-pressed="false">Maut</button><button type="button" data-av="ferry" aria-pressed="false">Fähren</button></span></div>
+      <div class="row">
+        <button class="primary" id="calc" type="button" style="flex:1">Route berechnen</button>
+        <button id="altRoutesBtn" type="button">🛣 Alternativen</button>
+      </div>
+      <div id="routeAltBox" class="plist" hidden></div>
       <div class="status" id="status"></div>
-      <p class="hint">Tipp: Klick auf die Karte setzt Start, Ziel oder Zwischenstopp. Klick auf die blaue Route fügt dort eine Pause ein.</p>
+      <p class="hint">Route ändern: Am PC die blaue Route mit der Maus auf eine andere Straße ziehen. Am Handy auf die Route tippen → „Wegpunkt hier“ und den weißen Punkt verschieben. Oder „🛣 Alternativen“ bzw. „+ Über …“ nutzen. Klick auf die Route fügt dort auch Pausen ein.</p>
     </section>
 
     <details id="vehDetails">
@@ -342,7 +356,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>Version 10 · 18.10.2026</b> – Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>Version 11 · 18.10.2026</b> – Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -407,13 +421,13 @@ function defaultState(){
       {id:uid(),name:"Salzburg (Beispiel)",lat:47.8095,lng:13.0550,dwell:0,pause:0},
       {id:uid(),name:"München (Beispiel)",lat:48.1351,lng:11.5820,dwell:0,pause:0}
     ],
-    pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on",
+    pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on", avoid:{motorways:false,toll:false,ferry:false},
     v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false},
     spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, orsKey:"", ttKey:""
   };
 }
 function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
-function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
 let S=load()||defaultState();
 // Keys per Link übernehmen (?tt=…&ors=…), danach aus der Adresszeile entfernen
@@ -453,14 +467,17 @@ let routeLine=null;
 
 function mkIcon(cls,txt,w,h){return L.divIcon({className:"",html:`<div class="mk ${cls}">${txt}</div>`,iconSize:w?[w,h]:null,iconAnchor:w?[w/2,h/2]:[12,11]})}
 function letter(i){return String.fromCharCode(65+i)}
+function stopLabel(i){const s=S.stops[i];if(!s)return"?";if(s.via)return"↪";let n=0;for(let k=0;k<i;k++)if(!S.stops[k].via)n++;return letter(n)}
 
 map.on("click",e=>{
+  if(Date.now()-lastRouteDrag<400)return;
   const ll=e.latlng;
   const div=document.createElement("div");div.className="pop";
-  div.innerHTML=`<h4>Punkt setzen</h4><div class="coords">${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}</div><div class="btns"><button data-a="start">Als Start</button><button data-a="via">Als Zwischenstopp</button><button data-a="end">Als Ziel</button></div>`;
+  div.innerHTML=`<h4>Punkt setzen</h4><div class="coords">${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}</div><div class="btns"><button data-a="start">Als Start</button><button data-a="via">Als Zwischenstopp</button><button data-a="over">Route über hier</button><button data-a="end">Als Ziel</button></div>`;
   const pop=L.popup().setLatLng(ll).setContent(div).openOn(map);
   div.addEventListener("click",async ev=>{
     const a=ev.target.dataset.a;if(!a)return;map.closePopup(pop);
+    if(a==="over"){insertVia(ll);return}
     const st={id:uid(),name:`${ll.lat.toFixed(4)}, ${ll.lng.toFixed(4)}`,lat:ll.lat,lng:ll.lng,dwell:0,pause:0};
     if(a==="start")S.stops[0]=Object.assign(S.stops[0],{name:st.name,lat:st.lat,lng:st.lng});
     else if(a==="end")S.stops[S.stops.length-1]=Object.assign(S.stops[S.stops.length-1],{name:st.name,lat:st.lat,lng:st.lng});
@@ -503,18 +520,18 @@ function renderStops(){
   const box=$("#stops");box.innerHTML="";
   S.stops.forEach((s,i)=>{
     const first=i===0,last=i===S.stops.length-1;
-    const el=document.createElement("div");el.className="stop";
-    el.innerHTML=`<div class="badge ${first?"start":last?"end":""}">${letter(i)}</div>
+    const el=document.createElement("div");el.className="stop"+(s.via?" via":"");
+    el.innerHTML=`<div class="badge ${s.via?"via":first?"start":last?"end":""}">${stopLabel(i)}</div>
       <div class="stop-main">
         <div class="stop-line">
-          <input type="text" id="q_${s.id}" value="${esc(s.name||"")}" placeholder="${first?"Start":last?"Ziel":"Zwischenstopp"} – Ort oder Adresse">
+          <input type="text" id="q_${s.id}" value="${esc(s.name||"")}" placeholder="${s.via?"Über (ohne Halt)":first?"Start":last?"Ziel":"Zwischenstopp"} – Ort oder Adresse">
           <button class="icon" data-a="search" title="Suchen" type="button">🔍</button>
           ${!first?`<button class="icon ghost" data-a="up" title="Nach oben" type="button">↑</button>`:""}
           ${S.stops.length>2?`<button class="icon ghost" data-a="del" title="Entfernen" type="button">✕</button>`:""}
         </div>
-        ${!first&&!last?`<div class="stop-extra"><label>Aufenthalt <input type="number" id="dw_${s.id}" min="0" step="5" value="${s.dwell||0}"> min</label>
+        ${!first&&!last&&!s.via?`<div class="stop-extra"><label>Aufenthalt <input type="number" id="dw_${s.id}" min="0" step="5" value="${s.dwell||0}"> min</label>
           <span>Pause</span><span class="chips" role="group" aria-label="Pause an diesem Stopp">${[0,15,30,45].map(v=>`<button type="button" data-p="${v}" aria-pressed="${(s.pause||0)===v}">${v?v+" min":"keine"}</button>`).join("")}</span></div>`:""}
-        ${s.lat!=null?`<div class="coords">${s.lat.toFixed(4)}, ${s.lng.toFixed(4)}</div>`:`<div class="coords">noch nicht gefunden</div>`}
+        ${s.via?`<div class="coords">Wegpunkt – die Route führt hier durch, ohne Halt${s.lat!=null?"":" (noch nicht gefunden)"}</div>`:s.lat!=null?`<div class="coords">${s.lat.toFixed(4)}, ${s.lng.toFixed(4)}</div>`:`<div class="coords">noch nicht gefunden</div>`}
       </div>`;
     const inp=el.querySelector("input[type=text]");
     const doSearch=async()=>{
@@ -552,13 +569,14 @@ function drawStops(){
   layers.stops.clearLayers();
   S.stops.forEach((s,i)=>{if(s.lat==null)return;
     const first=i===0,last=i===S.stops.length-1;
-    L.marker([s.lat,s.lng],{icon:mkIcon(`mk-stop ${first?"mk-start":last?"mk-end":""}`,letter(i),26,26),draggable:true,zIndexOffset:1000})
-      .bindTooltip(esc(s.name||letter(i)))
-      .on("dragend",async ev=>{const p=ev.target.getLatLng();s.lat=p.lat;s.lng=p.lng;s.name=(await reverseGeocode(p.lat,p.lng))||s.name;renderStops();calcRoute();})
+    L.marker([s.lat,s.lng],{icon:s.via?mkIcon("mk-via","",20,20):mkIcon(`mk-stop ${first?"mk-start":last?"mk-end":""}`,stopLabel(i),26,26),draggable:true,zIndexOffset:1000})
+      .bindTooltip(s.via?`Wegpunkt: ${esc(s.name||"")} – zum Ändern verschieben`:esc(s.name||stopLabel(i)))
+      .on("dragend",async ev=>{const p=ev.target.getLatLng();s.lat=p.lat;s.lng=p.lng;renderStops();routeChanged();const nm=await reverseGeocode(p.lat,p.lng);if(nm){s.name=s.via?"über "+nm:nm;renderStops()}})
       .addTo(layers.stops);
   });
 }
 
+$("#addVia").onclick=()=>{S.stops.splice(S.stops.length-1,0,{id:uid(),name:"",lat:null,lng:null,dwell:0,pause:0,via:true});renderStops();const ins=document.querySelectorAll("#stops input[type=text]");ins[ins.length-2].focus();};
 $("#addStop").onclick=()=>{S.stops.splice(S.stops.length-1,0,{id:uid(),name:"",lat:null,lng:null,dwell:0,pause:0});renderStops();const ins=document.querySelectorAll("#stops input[type=text]");ins[ins.length-2].focus();};
 $("#reverse").onclick=()=>{S.stops.reverse();S.pauses=[];renderStops();drawStops();calcRoute();};
 
@@ -596,7 +614,7 @@ async function calcRoute(opts){
     if(my!==reqId)return;
     try{await detectCountries(r)}catch(e){r.cc=new Array(r.dist.length).fill("??");r.geoErr=true}
     if(my!==reqId)return;
-    r.stops=list;r.lbl=list.map(x=>x.virtual?"◉":letter(S.stops.indexOf(x)));
+    r.stops=list;r.lbl=list.map(x=>x.virtual?"◉":stopLabel(S.stops.indexOf(x)));
     if(opts.kmShift){S.pauses=S.pauses.filter(p=>p.km>opts.kmShift+0.05).map(p=>Object.assign({},p,{km:p.km-opts.kmShift}));save();}
     R=r;applySpeeds(R);
     const delay=R.trafficDelay?` · Verkehrsverzögerung aktuell +${Math.round(R.trafficDelay/60)} min`:"";
@@ -607,7 +625,8 @@ async function calcRoute(opts){
     if(R.src==="tomtom"){const rr=R;enrichTraffic(rr).then(()=>{if(R===rr){resim();if(!LIVE.active)planDetours()}})}
     if(!LIVE.active||!opts.live){ALTS=[];showAlts()}
     if(S.camMode!=="off"){const rc=R;loadCams(rc).then(()=>{if(R===rc){drawCams();resim()}})}else drawCams();
-    if(!opts.live)map.fitBounds(routeLine.getBounds(),{padding:[30,30]});
+    if(!opts.live&&!opts.keepView)map.fitBounds(routeLine.getBounds(),{padding:[30,30]});
+    closeRouteAlts();
   }catch(e){if(my===reqId)status("Route konnte nicht berechnet werden: "+e.message,"err")}
 }
 function ttParams(live){
@@ -617,6 +636,7 @@ function ttParams(live){
     vehicleWeight:String(Math.round(v.weight*1000)),vehicleAxleWeight:String(Math.round(v.axle*1000)),
     vehicleLength:String(v.length),vehicleWidth:String(v.width),vehicleHeight:String(v.height)});
   if(+v.hazmat)q.set("vehicleLoadType","otherHazmatGeneral");
+  if(S.avoid.motorways)q.append("avoid","motorways");if(S.avoid.toll)q.append("avoid","tollRoads");if(S.avoid.ferry)q.append("avoid","ferries");
   const dep=new Date(S.depart);if(!live&&!LIVE.active&&!isNaN(dep)&&dep.getTime()>Date.now()+60000)q.set("departAt",dep.toISOString().replace(/\.\d+Z$/,"Z"));
   return q;
 }
@@ -793,11 +813,19 @@ async function enrichTraffic(r){
     }catch(e){}
   }));
 }
-async function routeOSRM(pts){
-  const c=pts.map(p=>`${p.lng},${p.lat}`).join(";");
-  const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${c}?overview=full&geometries=geojson&annotations=distance,duration&steps=false`);
-  const j=await r.json();
+function osrmExclude(){const x=[];if(S.avoid.motorways)x.push("motorway");if(S.avoid.toll)x.push("toll");if(S.avoid.ferry)x.push("ferry");return x.join(",")}
+async function osrmFetch(pts,extra){
+  const c=pts.map(p=>`${(+p.lng).toFixed(6)},${(+p.lat).toFixed(6)}`).join(";");
+  const base=`https://router.project-osrm.org/route/v1/driving/${c}?overview=full&geometries=geojson&annotations=distance,duration&steps=false${extra||""}`;
+  const ex=osrmExclude();
+  let j=await (await fetch(base+(ex?"&exclude="+ex:""))).json();
+  if(j.code!=="Ok"&&ex){j=await (await fetch(base)).json();if(j.code==="Ok")j.excludeFailed=true}
   if(j.code!=="Ok")throw new Error(j.message||j.code||"Routingdienst-Fehler");
+  return j;
+}
+async function routeOSRM(pts){
+  const j=await osrmFetch(pts);
+  if(j.excludeFailed)setTimeout(()=>status("Hinweis: „Meiden“ wird vom kostenlosen Routing nicht unterstützt – mit TomTom-Key funktioniert es.","err"),50);
   const rt=j.routes[0];
   const coords=rt.geometry.coordinates.map(p=>[p[1],p[0]]);
   const dist=[],dur=[],legEnd=[0];
@@ -807,6 +835,7 @@ async function routeOSRM(pts){
 async function routeORS(pts){
   const body={coordinates:pts.map(p=>[p.lng,p.lat]),instructions:true,radiuses:pts.map(()=>1000),
     options:{vehicle_type:"hgv",profile_params:{restrictions:{weight:S.v.weight,axleload:S.v.axle,height:S.v.height,width:S.v.width,length:S.v.length,hazmat:!!+S.v.hazmat}}}};
+  const af=[];if(S.avoid.motorways)af.push("highways");if(S.avoid.toll)af.push("tollways");if(S.avoid.ferry)af.push("ferries");if(af.length)body.options.avoid_features=af;
   const r=await fetch("https://api.openrouteservice.org/v2/directions/driving-hgv/geojson",{method:"POST",headers:{"Authorization":S.orsKey,"Content-Type":"application/json","Accept":"application/geo+json"},body:JSON.stringify(body)});
   const j=await r.json();
   if(!r.ok)throw new Error((j.error&&(j.error.message||j.error))||("HTTP "+r.status)+(r.status===403||r.status===401?" – API-Key prüfen":""));
@@ -848,7 +877,8 @@ function drawRoute(){
   L.polyline(R.coords,{color:"#ffffff",weight:9,opacity:.9,interactive:false}).addTo(layers.route);
   routeLine=L.polyline(R.coords,{color:getComputedStyle(document.documentElement).getPropertyValue("--route").trim()||"#1f5fbf",weight:6,opacity:.95}).addTo(layers.route);
   routeLine.on("click",e=>{L.DomEvent.stopPropagation(e);routePopup(e.latlng)});
-  routeLine.bindTooltip("Klicken, um hier eine Pause einzufügen",{sticky:true});
+  routeLine.bindTooltip(L.Browser.mobile?"Tippen für Pause oder Wegpunkt":"Klicken: Pause/Wegpunkt · Ziehen: Route ändern",{sticky:true});
+  routeLine.on("mousedown",startRouteDrag);
   layers.traffic.clearLayers();
   (R.traffic||[]).forEach(x=>{const col=x.cat==="ROAD_WORK"?"#5b6570":x.cat==="ROAD_CLOSURE"||x.mag>=3?"#c8322b":"#e8710a";
     L.polyline(R.coords.slice(x.a,x.b+1),{color:col,weight:7,opacity:.95,dashArray:x.cat==="ROAD_WORK"?"6 6":null,interactive:false}).addTo(layers.traffic)});
@@ -856,14 +886,101 @@ function drawRoute(){
 function nearestVertex(ll){let best=0,bd=Infinity;const p=[ll.lat,ll.lng];for(let i=0;i<R.coords.length;i++){const c=R.coords[i];const d=(c[0]-p[0])**2+((c[1]-p[1])*Math.cos(p[0]*Math.PI/180))**2;if(d<bd){bd=d;best=i}}return best}
 function vertexAtKm(km){const a=R.cumKm;let lo=0,hi=a.length-1;while(lo<hi){const m=(lo+hi)>>1;if(a[m]<km)lo=m+1;else hi=m}if(lo>0&&km-a[lo-1]<a[lo]-km)lo--;return lo}
 function routePopup(ll){
+  if(Date.now()-lastRouteDrag<400)return;
   const vi=nearestVertex(ll);const km=R.cumKm[vi];
   const t=SIM?SIM.timeAt[vi]:null;const ld=SIM?SIM.driveAt[vi]:null;
   const div=document.createElement("div");div.className="pop";
   div.innerHTML=`<h4>km ${km.toFixed(0)}</h4>${t?`<div>Ankunft ca. ${fmtT(t)}</div><div>Lenkzeit seit Pause: ${fmtDur(ld)}</div>`:""}
-    <div style="margin-top:6px">Pause hier einfügen:</div><div class="btns"><button data-d="15">15 min</button><button data-d="30">30 min</button><button data-d="45">45 min</button></div>`;
+    <div style="margin-top:6px">Pause hier einfügen:</div><div class="btns"><button data-d="15">15 min</button><button data-d="30">30 min</button><button data-d="45">45 min</button></div>
+    <div style="margin-top:8px">Route ändern:</div><div class="btns"><button data-r="via">↪ Wegpunkt hier (dann verschieben)</button><button data-r="alt">🛣 Alternativen</button></div>`;
   const pop=L.popup().setLatLng(R.coords[vi]).setContent(div).openOn(map);
-  div.addEventListener("click",e=>{const d=+e.target.dataset.d;if(!d)return;S.pauses.push({id:uid(),km,dur:d});map.closePopup(pop);save();resim();});
+  div.addEventListener("click",e=>{
+    if(e.target.dataset.r==="via"){map.closePopup(pop);insertVia({lat:R.coords[vi][0],lng:R.coords[vi][1]},vi,true);return}
+    if(e.target.dataset.r==="alt"){map.closePopup(pop);showRouteAlts(vi);return}
+    const d=+e.target.dataset.d;if(!d)return;S.pauses.push({id:uid(),km,dur:d});map.closePopup(pop);save();resim();});
 }
+
+/* ---------- Route ändern: Wegpunkte, Ziehen, Alternativen ---------- */
+let lastRouteDrag=0;
+function routeChanged(){
+  if(LIVE.active&&LIVE.fix)liveReroute(true);else calcRoute({keepView:true});
+}
+// Wegpunkt („über“) in die passende Etappe einfügen
+async function insertVia(ll,vi,hint){
+  if(vi==null&&R)vi=nearestVertex(ll);
+  let idx=S.stops.length-1;
+  if(R&&vi!=null){const k=Math.max(1,R.legEnd.findIndex(e=>e>=vi));const tgt=R.stops[k];const j=S.stops.indexOf(tgt);if(j>0)idx=j;}
+  const v={id:uid(),name:"Wegpunkt",lat:ll.lat,lng:ll.lng,dwell:0,pause:0,via:true};
+  S.stops.splice(idx,0,v);renderStops();drawStops();
+  if(hint)status("Wegpunkt gesetzt – verschiebe den weißen Punkt auf die Straße, über die du fahren willst. Entfernen geht in der Stoppliste mit ✕.","info");
+  routeChanged();
+  const nm=await reverseGeocode(ll.lat,ll.lng);if(nm){v.name="über "+nm;renderStops()}
+}
+// Am PC: Route mit der Maus ziehen (wie bei Google Maps)
+function startRouteDrag(e){
+  const oe=e.originalEvent;if(L.Browser.mobile||!oe||oe.button!==0||oe.pointerType==="touch")return;
+  const vi=nearestVertex(e.latlng);const p0=map.latLngToContainerPoint(e.latlng);
+  let ghost=null,moved=false;
+  map.dragging.disable();
+  const mv=ev=>{const p=map.latLngToContainerPoint(ev.latlng);if(!moved&&p.distanceTo(p0)<8)return;moved=true;
+    if(!ghost)ghost=L.marker(ev.latlng,{icon:L.divIcon({className:"",html:'<div class="ghost-mk"></div>',iconSize:[16,16],iconAnchor:[8,8]}),interactive:false}).addTo(map);else ghost.setLatLng(ev.latlng)};
+  const up=ev=>{map.off("mousemove",mv);map.off("mouseup",up);document.removeEventListener("mouseup",docUp);map.dragging.enable();
+    if(ghost){map.removeLayer(ghost)}
+    if(moved){lastRouteDrag=Date.now();insertVia(ev.latlng||ghost.getLatLng(),vi,false)}};
+  const docUp=()=>up({latlng:ghost?ghost.getLatLng():e.latlng});
+  map.on("mousemove",mv);map.on("mouseup",up);document.addEventListener("mouseup",docUp,{once:true});
+  L.DomEvent.stop(e);
+}
+// Alternativrouten je Etappe anzeigen
+const raltLayer=L.layerGroup().addTo(map);let RALTS=[];
+function legTimeKm(a,b){let t=0,d=0;for(let i=a;i<b;i++){t+=R.dur[i]||0;d+=R.dist[i]||0}return{t,d}}
+function maxDivergence(alt,ref){const B=samplePath(ref,1500);let best=null,bd=-1;
+  samplePath(alt,200).forEach(p=>{let md=Infinity;for(const q of B){const d=hav(p,q);if(d<md)md=d}if(md>bd){bd=md;best=p}});return{pt:best,d:bd}}
+async function legAlternatives(k){
+  const a=R.legEnd[k-1],b=R.legEnd[k];if(b-a<2)return[];
+  const A=R.coords[a],B=R.coords[b];const pts=[{lat:A[0],lng:A[1]},{lat:B[0],lng:B[1]}];
+  const ref=R.coords.slice(a,b+1),cur=legTimeKm(a,b);const out=[];
+  if(S.ttKey){
+    const q=ttParams(false);q.set("maxAlternatives","2");q.delete("instructionsType");
+    const j=await ttFetch(pts,q);
+    j.routes.forEach(rt=>{const p=parseTT(rt);out.push({coords:p.coords,t:p.time,d:p.len})});
+  }else{
+    const j=await osrmFetch(pts,"&alternatives=2");
+    const sp=spFor(R.cc[Math.min(a,R.cc.length-1)]);
+    j.routes.forEach(rt=>{const co=rt.geometry.coordinates.map(c=>[c[1],c[0]]);let t=0,d=0;
+      rt.legs.forEach(l=>l.annotation.distance.forEach((x,i)=>{const du=l.annotation.duration[i];d+=x;if(du>0&&x>0){const v=x/du*3.6,cls=v>=88?"ab":v>=55?"land":"ort";t+=x/(Math.min(v,sp[cls])/3.6)}else t+=du||0}));
+      out.push({coords:co,t,d})});
+  }
+  return out.filter(x=>pathDiffers(x.coords,ref)).map(x=>Object.assign(x,{k,dt:x.t-cur.t,dd:(x.d-cur.d)/1000,div:maxDivergence(x.coords,ref)})).filter(x=>x.div.d>300);
+}
+async function showRouteAlts(vi){
+  if(!R){status("Zuerst die Route berechnen.","info");return}
+  const box=$("#routeAltBox");box.hidden=false;box.innerHTML=`<small class="hint">Suche Alternativrouten …</small>`;raltLayer.clearLayers();RALTS=[];
+  const legs=[];if(vi!=null)legs.push(Math.max(1,R.legEnd.findIndex(e=>e>=vi)));else for(let k=1;k<R.legEnd.length&&legs.length<4;k++)legs.push(k);
+  const rr=R;
+  for(const k of legs){try{const l=await legAlternatives(k);if(R!==rr)return;RALTS.push(...l)}catch(e){box.innerHTML=`<small class="hint">${esc(e.message)}</small>`}}
+  RALTS.sort((x,y)=>x.dt-y.dt);RALTS=RALTS.slice(0,4);
+  if(!RALTS.length){box.innerHTML=`<small class="hint">Keine sinnvolle Alternativroute gefunden. Du kannst die Route auch direkt verschieben (Wegpunkt).</small><div class="pbtns"><button type="button" id="raltClose">Schließen</button></div>`;$("#raltClose").onclick=closeRouteAlts;return}
+  const lab=x=>`${x.dt<=0?"−":"+"}${Math.abs(Math.round(x.dt/60))} min · ${x.dd>=0?"+":"−"}${Math.abs(x.dd).toFixed(0)} km`;
+  RALTS.forEach((x,ix)=>{
+    L.polyline(x.coords,{color:x.dt<0?"#1e8e3e":"#5b6570",weight:6,opacity:.85,dashArray:"4 8"}).on("click",ev=>{L.DomEvent.stopPropagation(ev);pickRouteAlt(ix)}).bindTooltip("Diese Route wählen: "+lab(x),{sticky:true}).addTo(raltLayer);
+    L.marker(x.div.pt,{icon:mkIcon("ralt-mk"+(x.dt<0?" faster":""),lab(x))}).on("click",()=>pickRouteAlt(ix)).addTo(raltLayer);
+  });
+  box.innerHTML=`<b>🛣 Alternativrouten</b>`+RALTS.map((x,ix)=>`<div class="pitem"><b>Route ${ix+1}: ${lab(x)}</b><small>${R.stops.length>2?`Etappe ${R.lbl[x.k-1]} → ${R.lbl[x.k]} · `:""}${(x.d/1000).toFixed(0)} km, ca. ${fmtDur(x.t)}${S.ttKey?" inkl. Verkehr":""}</small><div class="pbtns"><button type="button" class="go" data-ralt="${ix}">Diese Route fahren</button></div></div>`).join("")+`<div class="pbtns"><button type="button" id="raltClose">Schließen</button></div>`;
+  $("#raltClose").onclick=closeRouteAlts;
+  map.fitBounds(L.latLngBounds(RALTS.flatMap(x=>[x.coords[0],x.coords[x.coords.length-1],x.div.pt])).pad(0.15));
+}
+function closeRouteAlts(){raltLayer.clearLayers();RALTS=[];const b=$("#routeAltBox");b.hidden=true;b.innerHTML=""}
+function pickRouteAlt(ix){
+  const x=RALTS[ix];if(!x)return;closeRouteAlts();
+  // Wegpunkt an der Stelle, wo die Alternative am weitesten abweicht – so bleibt die Wahl bei jeder Neuberechnung erhalten
+  const vi=R.legEnd[x.k-1]+1;insertVia({lat:x.div.pt[0],lng:x.div.pt[1]},vi,false);
+  status("Alternativroute gewählt – sie ist als Wegpunkt („über …“) gespeichert und lässt sich in der Stoppliste wieder entfernen.","info");
+}
+document.addEventListener("click",e=>{const t=e.target.closest("[data-ralt]");if(t)pickRouteAlt(+t.dataset.ralt)});
+$("#altRoutesBtn").onclick=()=>showRouteAlts();
+$("#avoidChips").addEventListener("click",e=>{const b=e.target.closest("[data-av]");if(!b)return;S.avoid[b.dataset.av]=!S.avoid[b.dataset.av];b.setAttribute("aria-pressed",String(S.avoid[b.dataset.av]));save();routeChanged()});
+function fillAvoid(){document.querySelectorAll("#avoidChips [data-av]").forEach(b=>b.setAttribute("aria-pressed",String(!!S.avoid[b.dataset.av])))}
 
 /* ---------- Simulation: Lenkzeit, Pausen, Fahrverbote ---------- */
 const DEF_SP={ab:80,land:70,ort:50};
@@ -1082,7 +1199,7 @@ function simulate(o){
       const k=stopAt[i],s=R.stops[k],last=k===R.stops.length-1;
       pushDriveItem(km);flushDrive();
       if(last){items.push({type:"end",t,name:s.name,km});}
-      else{
+      else if(!s.via){
         items.push({type:"stop",t,name:s.name,km,dwell:s.dwell||0,letter:R.lbl[k]});
         if(s.dwell>0){shiftCheck(t,t+s.dwell*60000,km,R.coords[i]);t+=s.dwell*60000;totalStop+=s.dwell;bars.push({k:"stop",d:s.dwell*60})}
         if(s.pause>0){const r=doBreak(s.pause);
@@ -1420,7 +1537,11 @@ $("#lvReroute").onclick=()=>liveReroute(true);
 map.on("dragstart",()=>{if(LIVE.active)LIVE.follow=false});
 function liveReroute(manual){
   if(!LIVE.fix||!R)return;
-  const rest=[];R.legEnd.forEach((vi,k)=>{if(k>0&&vi>LIVE.idx&&!R.stops[k].virtual)rest.push(R.stops[k])});
+  const passed=[];R.legEnd.forEach((vi,k)=>{if(k>0&&vi<=LIVE.idx)passed.push(R.stops[k])});
+  const inR=new Set(R.stops);const firstAhead=R.stops.find((x,k)=>k>0&&R.legEnd[k]>LIVE.idx);
+  const startIdx=firstAhead?S.stops.indexOf(firstAhead):S.stops.length-1;
+  // alle Stopps ab dem nächsten noch nicht erreichten Stopp, plus neu eingefügte Wegpunkte davor
+  const rest=S.stops.filter((x,j)=>x.lat!=null&&!passed.includes(x)&&(j>=startIdx||!inR.has(x))&&j>0);
   if(!rest.length)return;
   LIVE.lastReroute=Date.now();LIVE.off=0;
   calcRoute({list:[{name:"Aktuelle Position",lat:LIVE.fix.lat,lng:LIVE.fix.lng,virtual:true},...rest],live:true,silent:!manual,kmShift:R.cumKm[LIVE.idx]});
@@ -1535,7 +1656,7 @@ $("#phoneLink").onclick=()=>{
 $("#qrClose").onclick=()=>{$("#qrModal").hidden=true};
 $("#calc").onclick=calcRoute;
 
-fillForm();renderStops();drawStops();calcRoute();
+fillForm();fillAvoid();renderStops();drawStops();calcRoute();
 })();
 </script>
 </body>

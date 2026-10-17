@@ -1,0 +1,1403 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LKW-Routenplaner</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LKW-Planer">
+<meta name="theme-color" content="#1c232a">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* Layout: Seitenleiste (Route, Fahrzeug, Fahrplan) links, Karte rechts; mobil untereinander */
+:root{
+  --bg:#eef0ec; --panel:#ffffff; --panel-2:#f6f7f4; --ink:#1c232a; --muted:#5b6570; --line:#d7dbd3;
+  --accent:#f2a900; --accent-ink:#1c232a; --danger:#c8322b; --ok:#2e7d4f; --route:#1f5fbf; --warn-bg:#fff4d6; --danger-bg:#fbe5e3;
+  --f-display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12161a; --panel:#1a1f25; --panel-2:#20262d; --ink:#e5e8eb; --muted:#9aa4ae; --line:#2d343c;
+  --accent:#f5b400; --accent-ink:#14181c; --danger:#ff6b5e; --ok:#5cc485; --route:#5aa0ff; --warn-bg:#3a3018; --danger-bg:#3b1f1d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12161a; --panel:#1a1f25; --panel-2:#20262d; --ink:#e5e8eb; --muted:#9aa4ae; --line:#2d343c;
+  --accent:#f5b400; --accent-ink:#14181c; --danger:#ff6b5e; --ok:#5cc485; --route:#5aa0ff; --warn-bg:#3a3018; --danger-bg:#3b1f1d; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 var(--f-body);font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:420px 1fr;height:100%}
+aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;display:flex;flex-direction:column;min-width:0}
+#map{height:100%;min-height:300px}
+header.brand{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:5}
+.sign{width:36px;height:36px;border-radius:50%;border:4px solid var(--danger);display:grid;place-items:center;font:700 13px var(--f-display);background:#fff;color:#1c232a;flex:none}
+.brand h1{font:700 22px/1 var(--f-display);margin:0;letter-spacing:.01em}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+section.blk{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+h2{font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0}
+label{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+input,select{font:inherit;color:var(--ink);background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:7px 9px;min-width:0;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[type=checkbox]{width:auto}
+button{font:600 14px var(--f-body);cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);padding:7px 11px}
+button:hover{border-color:var(--muted)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-family:var(--f-display);font-size:17px;letter-spacing:.02em;padding:9px 14px}
+button.icon{padding:5px 8px;font-size:13px;line-height:1}
+button.ghost{background:transparent}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+
+.stops{display:flex;flex-direction:column;gap:8px}
+.stop{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;position:relative}
+.badge{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--f-display);background:var(--ink);color:var(--panel);margin-top:4px}
+.badge.start{background:var(--ok);color:#fff}.badge.end{background:var(--danger);color:#fff}
+.stop-main{display:flex;flex-direction:column;gap:5px;min-width:0}
+.stop-line{display:flex;gap:5px}
+.stop-extra{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.stop-extra input[type=number]{width:70px;padding:4px 6px}
+.stop-extra label{flex-direction:row;align-items:center;gap:4px}
+.chips{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.chips button{border:0;border-radius:0;border-right:1px solid var(--line);padding:4px 9px;font-size:12.5px;font-weight:500;background:var(--panel-2);color:var(--muted)}
+.chips button:last-child{border-right:0}
+.chips button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.note{display:block;font-size:12px;margin-top:2px;color:var(--muted)}
+.note.reset{color:var(--ok);font-weight:600}
+.note.bad{color:var(--danger)}
+.coords{font:11px var(--f-mono);color:var(--muted)}
+.results{position:absolute;left:36px;right:0;top:40px;background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);z-index:20;max-height:240px;overflow:auto}
+.results button{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);border-radius:0;font-weight:400;font-size:13px;background:var(--panel)}
+.results button:hover{background:var(--panel-2)}
+
+details{border-bottom:1px solid var(--line)}
+details>summary{padding:12px 18px;cursor:pointer;font:600 13px var(--f-display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);list-style:none;display:flex;justify-content:space-between}
+details>summary::after{content:"+";font-size:16px}
+details[open]>summary::after{content:"–"}
+details .inner{padding:0 18px 14px;display:flex;flex-direction:column;gap:10px}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.hint a{color:var(--route)}
+
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.summary div{background:var(--panel-2);padding:8px 8px 7px}
+.summary b{display:block;font:600 17px var(--f-mono)}
+.summary div.alert b{color:var(--danger)}
+.summary span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+.tacho{display:flex;flex-direction:column;gap:4px}
+.tacho-bar{display:flex;height:16px;border-radius:4px;overflow:hidden;background:var(--panel-2);border:1px solid var(--line)}
+.tacho-bar i{display:block;height:100%}
+.k-drive{background:var(--route)}.k-over{background:var(--danger)}.k-pause{background:var(--accent)}.k-stop{background:var(--muted)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+
+.status{font-size:13px;padding:8px 10px;border-radius:6px;display:none}
+.status.show{display:block}
+.status.err{background:var(--danger-bg);color:var(--danger)}
+.status.info{background:var(--panel-2);color:var(--muted)}
+
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl li{display:grid;grid-template-columns:62px 18px 1fr;gap:8px;align-items:start;padding:5px 0}
+.tl .time{font:600 13px var(--f-mono);text-align:right;padding-top:1px}
+.tl .time small{display:block;font-weight:400;font-size:10.5px;color:var(--muted)}
+.tl .dot{width:14px;height:14px;border-radius:50%;margin-top:3px;background:var(--panel);border:3px solid var(--ink)}
+.tl .body{font-size:13.5px;min-width:0}
+.tl .body small{color:var(--muted);display:block;font-size:12px}
+.tl li.drive .dot{width:2px;height:28px;border:0;border-radius:0;background:var(--route);margin:0 auto}
+.tl li.drive .body{color:var(--muted);font-size:12.5px;padding-top:4px}
+.tl li.drive.over .dot{background:var(--danger)}
+.tl li.pause .dot{border-color:var(--accent);background:var(--accent);border-radius:3px}
+.tl li.stop .dot,.tl li.start .dot{border-color:var(--ok)}
+.tl li.end .dot{border-color:var(--danger)}
+.tl li.border .dot{border-style:dashed;border-color:var(--muted)}
+.cty{width:100%;border-collapse:collapse;font-size:13px}
+.cty th{text-align:left;font:600 11px var(--f-display);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:4px 4px}
+.cty td{padding:4px;border-top:1px solid var(--line);vertical-align:top}
+.cty input{width:54px;padding:3px 5px;font-size:12.5px}
+.cty .ban{font-size:11.5px;color:var(--muted)}
+.cc{font:600 11px var(--f-mono);background:var(--panel-2);border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-right:4px}
+.ctywrap{overflow-x:auto}
+.tl li.limit .body{color:var(--danger);font-weight:600}
+.tl li.limit .dot{border-color:var(--danger);background:var(--danger);border-radius:2px;transform:rotate(45deg)}
+.tl li.ban .body,.tl li.shiftWarn .body{color:var(--ink)}
+.tl li.shiftWarn .body{background:var(--warn-bg);padding:5px 8px;border-radius:6px}
+.tl li.shiftWarn .dot{border-color:var(--accent)}
+.tl li.ban .dot{border:0;background:none;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-bottom:14px solid var(--accent);border-radius:0}
+.tl li.ban .body,.tl li.limit .body{background:var(--warn-bg);padding:5px 8px;border-radius:6px}
+.tl li.limit .body{background:var(--danger-bg)}
+.pctl{display:flex;gap:6px;align-items:center;margin-top:3px}
+.pctl select{width:auto;padding:2px 6px;font-size:12.5px}
+.pctl button{padding:2px 7px;font-size:12px}
+.empty{color:var(--muted);font-size:13px}
+.footer{padding:12px 18px 20px;font-size:11.5px;color:var(--muted);margin-top:auto}
+
+/* Leaflet */
+.leaflet-container{font:inherit;background:var(--panel-2)}
+.leaflet-popup-content{margin:10px 12px;font-size:13px}
+.pop h4{margin:0 0 4px;font:600 15px var(--f-display)}
+.pop .btns{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.pop button{padding:4px 9px;font-size:12.5px}
+.mk{display:grid;place-items:center;font:700 12px var(--f-display);color:#fff;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.mk-stop{width:26px;height:26px;border-radius:50%;background:#1c232a}
+.mk-start{background:#2e7d4f}.mk-end{background:#c8322b}
+.mk-pause{width:24px;height:24px;border-radius:5px;background:#f2a900;color:#1c232a}
+.mk-limit{width:auto;height:22px;padding:0 6px;border-radius:4px;background:#c8322b;white-space:nowrap}
+.mk-ban{width:auto;height:22px;padding:0 6px;border-radius:4px;background:#1c232a;color:#f5b400;white-space:nowrap}
+.mapnote{position:absolute;z-index:500;left:50%;transform:translateX(-50%);top:10px;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:20px;padding:5px 14px;font-size:12.5px;box-shadow:0 2px 10px rgba(0,0,0,.15);pointer-events:none}
+.mapwrap{position:relative;min-width:0}
+
+@media (max-width:860px){
+  input,select,textarea{font-size:16px!important}
+  button{min-height:40px}
+  .chips button{min-height:36px;padding:6px 10px;font-size:14px}
+  button.icon{min-width:40px;font-size:15px}
+  .pctl button,.pctl select,.pk-btn,.pitem .pbtns button,.pitem .pbtns a{min-height:36px;font-size:14px;padding:6px 10px;display:inline-flex;align-items:center}
+  .stop-extra input[type=number]{width:76px}
+  .app{grid-template-columns:1fr;grid-template-rows:55vh auto;height:auto}
+  .mapwrap{order:-1;height:55vh}
+  aside{border-right:0;overflow:visible}
+  header.brand{position:static}
+  .summary{grid-template-columns:repeat(2,1fr)}
+}
+.fab{position:absolute;z-index:600;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(28px + env(safe-area-inset-bottom,0px));background:var(--ok);color:#fff;border:0;border-radius:24px;padding:11px 18px;font:700 16px var(--f-display);letter-spacing:.03em;box-shadow:0 3px 12px rgba(0,0,0,.3)}
+.fab.on{background:var(--danger)}
+.me{width:22px;height:22px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 2px rgba(26,115,232,.35),0 2px 6px rgba(0,0,0,.4);position:relative}
+.me i{position:absolute;left:50%;top:-13px;margin-left:-6px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:11px solid #1a73e8;transform-origin:6px 22px}
+.me.noheading i{display:none}
+.live{position:absolute;z-index:650;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100% - 24px));background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.28);padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+.live-top{display:grid;grid-template-columns:auto repeat(3,1fr);gap:8px;align-items:center}
+.vz{width:50px;height:50px;border-radius:50%;background:#fff;border:6px solid #c8322b;display:grid;place-items:center;font:700 19px/1 var(--f-display);color:#1c232a;flex:none}
+.vz.none{border-color:var(--line);color:var(--muted);background:var(--panel-2)}
+.vzwrap{display:flex;flex-direction:column;align-items:center;gap:2px}
+.vzwrap small{font-size:10px;color:var(--muted);white-space:nowrap}
+.live-top .speeding b{color:#fff;background:var(--danger);border-radius:6px;padding:0 4px}
+.live-road{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tdesc{display:block;font-size:12px;color:var(--ink);margin-top:2px}
+.live-top div{display:flex;flex-direction:column}
+.live-top b{font:600 22px/1.1 var(--f-mono)}
+.live-top span{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.live-top .alert b{color:var(--danger)}
+.lbar{height:8px;border-radius:4px;background:var(--panel-2);border:1px solid var(--line);overflow:hidden}
+.lbar i{display:block;height:100%;background:var(--route)}
+.lbar.warn i{background:var(--accent)}.lbar.over i{background:var(--danger)}
+.live-next{font-size:14px;line-height:1.35}
+.live-next small{display:block;color:var(--muted);font-size:12px}
+.live-state{font-size:12.5px;padding:5px 8px;border-radius:6px;background:var(--panel-2)}
+.live-state.pause{background:var(--warn-bg)}
+.live-btns{display:flex;gap:6px;flex-wrap:wrap}
+.live .live-btns.main{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.live .live-btns.main::-webkit-scrollbar{display:none}
+.live .live-btns.main button{flex:none;white-space:nowrap}
+#lvPause{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#lvPause.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.live-next b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.live.mini #lvNext,.live.mini #lvDest,.live.mini .live-road{display:none}
+.grip{width:40px;height:5px;border-radius:3px;background:var(--line);margin:-4px auto 0;cursor:pointer;border:0;padding:0;min-height:0!important}
+.live-btns button{padding:6px 10px;font-size:13px}
+.mk-cam{width:auto;height:22px;padding:0 6px;border-radius:4px;background:#6b3fa0;white-space:nowrap}
+.tl li.cam .dot{border-color:#6b3fa0;background:#6b3fa0;border-radius:3px}
+.camwarn{font-size:14px;font-weight:600;padding:7px 10px;border-radius:8px;background:#6b3fa0;color:#fff}
+.camwarn small{display:block;font-weight:400;font-size:12px;opacity:.9}
+.traffic-mk{width:auto;height:22px;padding:0 6px;border-radius:4px;background:#e8710a;white-space:nowrap}
+.traffic-mk.major{background:#c8322b}.traffic-mk.work{background:#5b6570}
+.tl li.traffic .dot{border-color:#e8710a;background:#e8710a;border-radius:3px}
+.tl li.traffic .body{background:var(--warn-bg);padding:5px 8px;border-radius:6px}
+.plist{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.pitem{border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:var(--panel);font-size:13px;display:flex;flex-direction:column;gap:3px}
+.pitem b{font-size:13.5px}
+.pitem small{color:var(--muted);font-size:12px}
+.pitem .pbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.pitem .pbtns button,.pitem .pbtns a{padding:3px 8px;font-size:12.5px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);text-decoration:none;font-weight:600}
+.pitem .pbtns button.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.side-l{color:var(--danger)}
+.pk-btn{margin-top:4px;padding:3px 8px;font-size:12.5px}
+.mk-park{width:24px;height:24px;border-radius:5px;background:#1f5fbf;color:#fff}
+.live #lvPark{max-height:34vh;overflow:auto}
+.tachoform{display:flex;flex-direction:column;gap:6px;background:var(--panel-2);border-radius:8px;padding:8px}
+.tachoform label{flex-direction:row;align-items:center;gap:6px}
+.tachoform input[type=number]{width:80px}
+.modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px}
+.modal>div{background:var(--panel);color:var(--ink);border-radius:12px;padding:18px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+#qrBox{background:#fff;padding:10px;border-radius:8px}
+body.livemode .app{grid-template-columns:1fr}
+body.livemode aside{display:none}
+body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:min(420px,100%);z-index:1500;box-shadow:0 0 30px rgba(0,0,0,.4)}
+@media (max-width:860px){
+  body.livemode .app{display:block;height:100%}
+  body.livemode .mapwrap{height:100%}
+  .live{left:0;right:0;bottom:0;width:100%;border-radius:14px 14px 0 0;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+  body.livemode .fab{bottom:auto;top:calc(70px + env(safe-area-inset-top,0px))}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media print{.mapwrap{display:none}.app{display:block}aside{border:0}button,details{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <header class="brand">
+      <div class="sign">LKW</div>
+      <div><h1>LKW-Routenplaner</h1><p>Route, Lenkzeit 4,5 h und Pausen auf einen Blick</p></div>
+    </header>
+
+    <section class="blk">
+      <h2>Route</h2>
+      <div class="stops" id="stops"></div>
+      <div class="row">
+        <button id="addStop" type="button">+ Zwischenstopp</button>
+        <button id="reverse" type="button" class="ghost">⇅ Umkehren</button>
+      </div>
+      <div class="grid2">
+        <label>Abfahrt<input type="datetime-local" id="depart"></label>
+        <label>Blitzer &amp; Section Control<select id="camMode">
+          <option value="on">anzeigen (nur Österreich)</option><option value="off">aus</option></select></label>
+        <label>Fahrverbots-Hinweise<select id="banMode">
+          <option value="on">anzeigen</option><option value="off">aus</option></select></label>
+      </div>
+      <button class="primary" id="calc" type="button">Route berechnen</button>
+      <div class="status" id="status"></div>
+      <p class="hint">Tipp: Klick auf die Karte setzt Start, Ziel oder Zwischenstopp. Klick auf die blaue Route fügt dort eine Pause ein.</p>
+    </section>
+
+    <details id="vehDetails">
+      <summary>Fahrzeug, Länder &amp; Tempolimits</summary>
+      <div class="inner">
+        <div class="grid3">
+          <label>Gesamtgewicht t<input type="number" id="v_weight" step="0.5" min="3.5"></label>
+          <label>Achslast t<input type="number" id="v_axle" step="0.5" min="1"></label>
+          <label>Höhe m<input type="number" id="v_height" step="0.05" min="2"></label>
+          <label>Breite m<input type="number" id="v_width" step="0.05" min="2"></label>
+          <label>Länge m<input type="number" id="v_length" step="0.5" min="5"></label>
+          <label>Gefahrgut<select id="v_hazmat"><option value="0">nein</option><option value="1">ja (ADR)</option></select></label>
+        </div>
+        <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="v_quiet"> Lärmarmes Fahrzeug (L-Kennzeichen, vom AT-Nachtfahrverbot ausgenommen)</label>
+        <h2>Länder auf der Route</h2>
+        <div id="ctyTable"><p class="hint">Nach der Routenberechnung erscheinen hier die durchfahrenen Länder mit LKW-Tempolimits (Autobahn / Freiland / Ort) und Fahrverboten. Die Werte sind änderbar.</p></div>
+        <p class="hint">Richtwerte für LKW über 12 t. Abschnittsweise Beschränkungen (Baustellen, Umweltzonen, IG-L) sind nicht berücksichtigt.</p>
+      </div>
+    </details>
+
+    <details id="ldDetails">
+      <summary>Lenkzeit, Einsatzzeit &amp; Routing</summary>
+      <div class="inner">
+        <div class="grid2">
+          <label>Lenkzeit seit letzter Pause (min)<input type="number" id="driveStart" min="0" max="270"></label>
+          <label>Heute schon gelenkt (min)<input type="number" id="dayStart" min="0" max="600"></label>
+        </div>
+        <div class="grid2">
+          <label>Max. Einsatzzeit<select id="shiftMax"><option value="900">15 h (Ruhezeit auf 9 h reduziert)</option><option value="780">13 h (volle Ruhezeit 11 h)</option><option value="720">12 h</option></select></label>
+          <label>Dienstbeginn (leer = Abfahrt)<input type="datetime-local" id="shiftStart"></label>
+          <label>Tageslenkzeit max.<select id="dayMax"><option value="540">9 h</option><option value="600">10 h (2× pro Woche)</option></select></label>
+          <label>Auto-Pause vor Grenze (min)<input type="number" id="buffer" min="0" max="60"></label>
+          <label>Parkplatz-Vorschläge ab … min vor 4,5 h<input type="number" id="parkLead" min="10" max="120" step="5"></label>
+        </div>
+        <label>TomTom API-Key (LKW-Routing + Live-Verkehr: Stau, Unfälle, Baustellen)<input type="password" id="ttKey" placeholder="empfohlen – kostenlos auf developer.tomtom.com" autocomplete="off"></label>
+        <p class="hint">Mit TomTom-Key wird die Route als LKW (Maße, Gewicht, Gefahrgut) mit aktueller Verkehrslage berechnet, Staus und Sperren erscheinen im Fahrplan und auf der Karte. Key kostenlos unter <a href="https://developer.tomtom.com/user/register" target="_blank" rel="noopener">developer.tomtom.com</a> (2.500 Routen pro Tag gratis).</p>
+        <label>OpenRouteService API-Key (alternatives LKW-Routing ohne Verkehr)<input type="password" id="orsKey" placeholder="optional – kostenlos auf openrouteservice.org" autocomplete="off"></label>
+        <p class="hint">Ohne Key: OSRM-Straßenrouting mit LKW-Tempolimits, aber ohne Höhen-, Gewichts- und Durchfahrtsbeschränkungen. Mit Key: Profil „driving-hgv“, das Gewicht, Achslast, Höhe, Breite, Länge und Gefahrgut berücksichtigt. Key kostenlos unter <a href="https://openrouteservice.org/dev/#/signup" target="_blank" rel="noopener">openrouteservice.org</a>; Keys werden nur in diesem Browser gespeichert.</p>
+        <button type="button" id="phoneLink">📱 Auf dem iPhone öffnen (QR-Code mit deinen Keys)</button>
+      </div>
+    </details>
+
+    <section class="blk" id="planBlk">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2>Fahrplan</h2>
+        <div class="row">
+          <button type="button" id="autoPause" class="icon">Pausen automatisch planen</button>
+          <button type="button" id="clearPause" class="icon ghost">Pausen löschen</button>
+        </div>
+      </div>
+      <div class="summary" id="summary"></div>
+      <div class="tacho">
+        <div class="tacho-bar" id="tachoBar"></div>
+        <div class="legend"><span><i class="k-drive"></i>Lenkzeit</span><span><i class="k-over"></i>über 4,5 h</span><span><i class="k-pause"></i>Pause</span><span><i class="k-stop"></i>Stopp</span></div>
+      </div>
+      <div class="row">
+        <label style="flex:1">Pause bei km<input type="number" id="addKm" min="0" step="1" placeholder="z. B. 320"></label>
+        <label>Dauer<select id="addDur"><option>15</option><option>30</option><option selected>45</option></select></label>
+        <button type="button" id="addPauseBtn">+ Pause</button>
+      </div>
+      <ul class="tl" id="timeline"><li class="empty">Route berechnen, um den Fahrplan zu sehen.</li></ul>
+      <div class="row">
+        <button type="button" id="liveBtn2" class="primary" style="font-size:15px;padding:7px 12px">▶ Live-Navigation</button>
+        <button type="button" id="gmaps">In Google Maps öffnen</button>
+        <button type="button" id="printBtn" class="ghost">Fahrplan drucken</button>
+      </div>
+    </section>
+
+    <div class="footer">
+      Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+    </div>
+  </aside>
+  <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
+    <button type="button" class="fab" id="liveBtn">▶ Live</button>
+    <div class="live" id="livePanel" hidden>
+      <button type="button" class="grip" id="lvGrip" aria-label="Panel ein- oder ausklappen"></button>
+      <div class="live-top">
+        <div class="vzwrap" title="LKW-Tempolimit an deiner Position"><div class="vz none" id="lvVz">–</div><small id="lvVzSub">Limit</small></div>
+        <div id="lvSpeedBox"><b id="lvSpeed">–</b><span>km/h</span></div>
+        <div id="lvDriveBox"><b id="lvDrive">0:00</b><span>Lenkzeit seit Pause</span></div>
+        <div id="lvRestBox"><b id="lvRest">4:30</b><span>Rest bis Pause</span></div>
+      </div>
+      <div class="camwarn" id="lvCam" hidden></div>
+      <div class="live-road" id="lvRoad"></div>
+      <div class="lbar" id="lvBar"><i style="width:0%"></i></div>
+      <div class="live-state" id="lvState">GPS wird gesucht …</div>
+      <div class="tachoform" id="lvTachoForm" hidden>
+        <label>Lenkzeit seit letzter Pause laut Tacho <input type="number" id="lvTachoMin" min="0" max="600"> min</label>
+        <label><input type="checkbox" id="lvTachoSplit"> 1. Teil (15 min) der geteilten Pause schon genommen</label>
+        <div class="live-btns"><button type="button" id="lvTachoSave">Übernehmen</button><button type="button" id="lvTachoCancel" class="ghost">Abbrechen</button></div>
+      </div>
+      <div id="lvPark" hidden></div>
+      <div class="live-next" id="lvNext"></div>
+      <div class="live-next" id="lvDest"></div>
+      <div class="live-btns main">
+        <button type="button" id="lvPause">⏸ Pause starten</button>
+        <button type="button" id="lvParkBtn">🅿 Parken</button>
+        <button type="button" id="lvFollow" aria-label="Karte mitführen">⌖</button>
+        <button type="button" id="lvPlan">☰ Plan</button>
+        <button type="button" id="lvTacho">⏱ Tacho</button>
+        <button type="button" id="lvReroute" aria-label="Route neu berechnen">↻</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="qrModal" hidden><div>
+    <h2>Auf dem iPhone öffnen</h2>
+    <div id="qrBox"></div>
+    <p class="hint" id="qrText"></p>
+    <button type="button" id="qrCopy">Link kopieren</button>
+    <button type="button" id="qrClose" class="ghost">Schließen</button>
+  </div></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const LIM=270*60; // 4,5 h in s
+const uid=()=>Math.random().toString(36).slice(2,9);
+const STORE="lkw-routenplaner-v1";
+
+function defaultState(){
+  const d=new Date(); d.setDate(d.getDate()+((8-d.getDay())%7||7)); d.setHours(6,0,0,0);
+  return {
+    stops:[
+      {id:uid(),name:"Wien (Beispiel)",lat:48.2082,lng:16.3738,dwell:0,pause:0},
+      {id:uid(),name:"Linz – Laden (Beispiel)",lat:48.3069,lng:14.2858,dwell:30,pause:15},
+      {id:uid(),name:"Salzburg (Beispiel)",lat:47.8095,lng:13.0550,dwell:0,pause:0},
+      {id:uid(),name:"München (Beispiel)",lat:48.1351,lng:11.5820,dwell:0,pause:0}
+    ],
+    pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on",
+    v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false},
+    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, orsKey:"", ttKey:""
+  };
+}
+function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
+let S=load()||defaultState();
+// Keys per Link übernehmen (?tt=…&ors=…), danach aus der Adresszeile entfernen
+try{const q=new URLSearchParams(location.search);let ch=false;
+  if(q.get("tt")){S.ttKey=q.get("tt");ch=true}if(q.get("ors")){S.orsKey=q.get("ors");ch=true}
+  if(ch){save();history.replaceState(null,"",location.pathname)}}catch(e){}
+let R=null; // route
+let SIM=null;
+
+/* ---------- Karte ---------- */
+const map=L.map("map",{zoomControl:true}).setView([48.5,12],6);
+const OSM_ATTR='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+const ESRI="https://server.arcgisonline.com/ArcGIS/rest/services/";
+const baseLayers={
+  "Straßenkarte":L.tileLayer(ESRI+"World_Street_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Karte © Esri, HERE, Garmin, OpenStreetMap-Mitwirkende"}),
+  "Topografisch":L.tileLayer(ESRI+"World_Topo_Map/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Karte © Esri, HERE, Garmin, OpenStreetMap-Mitwirkende"}),
+  "Satellit":L.tileLayer(ESRI+"World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Bilder © Esri, Maxar, Earthstar Geographics"}),
+  "Satellit + Straßen":L.layerGroup([L.tileLayer(ESRI+"World_Imagery/MapServer/tile/{z}/{y}/{x}",{maxZoom:19,attribution:"Bilder © Esri, Maxar"}),L.tileLayer(ESRI+"Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",{maxZoom:19}),L.tileLayer(ESRI+"Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",{maxZoom:19})])
+};
+let baseName="Straßenkarte";try{const b=localStorage.getItem(STORE+"-map");if(baseLayers[b])baseName=b}catch(e){}
+baseLayers[baseName].addTo(map);
+let layerCtl=null,overlays={};
+function setupOverlays(){
+  if(layerCtl)layerCtl.remove();Object.values(overlays).forEach(l=>map.removeLayer(l));overlays={};
+  if(S.ttKey){const k=encodeURIComponent(S.ttKey);
+    overlays["Verkehrsfluss (TomTom)"]=L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/flow/relative0/{z}/{x}/{y}.png?key=${k}`,{maxZoom:22,opacity:.85,attribution:"Verkehr © TomTom"});
+    overlays["Verkehrsmeldungen (TomTom)"]=L.tileLayer(`https://api.tomtom.com/traffic/map/4/tile/incidents/s3/{z}/{x}/{y}.png?key=${k}`,{maxZoom:22});
+    overlays["Verkehrsfluss (TomTom)"].addTo(map);
+  }
+  layerCtl=L.control.layers(baseLayers,overlays,{position:"topright"}).addTo(map);
+}
+setupOverlays();
+map.on("baselayerchange",e=>{try{localStorage.setItem(STORE+"-map",e.name)}catch(x){}});
+const layers={traffic:L.layerGroup(),route:L.layerGroup().addTo(map),over:L.layerGroup().addTo(map),stops:L.layerGroup().addTo(map),events:L.layerGroup().addTo(map)};
+layers.traffic.addTo(map);
+let routeLine=null;
+
+function mkIcon(cls,txt,w,h){return L.divIcon({className:"",html:`<div class="mk ${cls}">${txt}</div>`,iconSize:w?[w,h]:null,iconAnchor:w?[w/2,h/2]:[12,11]})}
+function letter(i){return String.fromCharCode(65+i)}
+
+map.on("click",e=>{
+  const ll=e.latlng;
+  const div=document.createElement("div");div.className="pop";
+  div.innerHTML=`<h4>Punkt setzen</h4><div class="coords">${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}</div><div class="btns"><button data-a="start">Als Start</button><button data-a="via">Als Zwischenstopp</button><button data-a="end">Als Ziel</button></div>`;
+  const pop=L.popup().setLatLng(ll).setContent(div).openOn(map);
+  div.addEventListener("click",async ev=>{
+    const a=ev.target.dataset.a;if(!a)return;map.closePopup(pop);
+    const st={id:uid(),name:`${ll.lat.toFixed(4)}, ${ll.lng.toFixed(4)}`,lat:ll.lat,lng:ll.lng,dwell:0,pause:0};
+    if(a==="start")S.stops[0]=Object.assign(S.stops[0],{name:st.name,lat:st.lat,lng:st.lng});
+    else if(a==="end")S.stops[S.stops.length-1]=Object.assign(S.stops[S.stops.length-1],{name:st.name,lat:st.lat,lng:st.lng});
+    else S.stops.splice(S.stops.length-1,0,st);
+    renderStops();drawStops();
+    const target=a==="start"?S.stops[0]:a==="end"?S.stops[S.stops.length-1]:st;
+    const nm=await reverseGeocode(ll.lat,ll.lng);if(nm){target.name=nm;renderStops();}
+    calcRoute();
+  });
+});
+
+/* ---------- Geocoding (Nominatim) ---------- */
+async function geocode(q){
+  const base=`https://nominatim.openstreetmap.org/search?format=json&limit=6&accept-language=de&q=${encodeURIComponent(q)}`;
+  try{
+    const r=await fetch(base);if(!r.ok)throw 0;
+    return (await r.json()).map(x=>({name:x.display_name,lat:+x.lat,lng:+x.lon}));
+  }catch(e){
+    const r=await fetch(`https://photon.komoot.io/api/?limit=6&lang=de&q=${encodeURIComponent(q)}`);
+    if(!r.ok)throw new Error("Ortssuche nicht erreichbar");
+    return (await r.json()).features.map(f=>{const p=f.properties;return{name:[p.name,p.street&&(p.street+(p.housenumber?" "+p.housenumber:"")),[p.postcode,p.city].filter(Boolean).join(" "),p.country].filter(Boolean).join(", "),lat:f.geometry.coordinates[1],lng:f.geometry.coordinates[0]}});
+  }
+}
+async function reverseGeocode(lat,lng){
+  try{return await reverseNominatim(lat,lng)}catch(e){
+    try{const r=await fetch(`https://photon.komoot.io/reverse?lang=de&lat=${lat}&lon=${lng}`);const p=(await r.json()).features[0].properties;
+      return [p.street?(p.street+(p.housenumber?" "+p.housenumber:"")):p.name,[p.postcode,p.city].filter(Boolean).join(" ")].filter(Boolean).join(", ")||null}catch(x){return null}}
+}
+async function reverseNominatim(lat,lng){
+  {const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&zoom=16&accept-language=de&lat=${lat}&lon=${lng}`);
+    const j=await r.json();if(!j.address)return j.display_name||null;
+    const a=j.address;const town=a.city||a.town||a.village||a.municipality||"";const road=a.road?(a.road+(a.house_number?" "+a.house_number:"")):"";
+    return [road,[a.postcode,town].filter(Boolean).join(" ")].filter(Boolean).join(", ")||j.display_name;
+  }
+}
+function shortName(n){const p=n.split(",");return p.slice(0,3).join(",").trim()}
+
+/* ---------- Stopps UI ---------- */
+function renderStops(){
+  const box=$("#stops");box.innerHTML="";
+  S.stops.forEach((s,i)=>{
+    const first=i===0,last=i===S.stops.length-1;
+    const el=document.createElement("div");el.className="stop";
+    el.innerHTML=`<div class="badge ${first?"start":last?"end":""}">${letter(i)}</div>
+      <div class="stop-main">
+        <div class="stop-line">
+          <input type="text" id="q_${s.id}" value="${esc(s.name||"")}" placeholder="${first?"Start":last?"Ziel":"Zwischenstopp"} – Ort oder Adresse">
+          <button class="icon" data-a="search" title="Suchen" type="button">🔍</button>
+          ${!first?`<button class="icon ghost" data-a="up" title="Nach oben" type="button">↑</button>`:""}
+          ${S.stops.length>2?`<button class="icon ghost" data-a="del" title="Entfernen" type="button">✕</button>`:""}
+        </div>
+        ${!first&&!last?`<div class="stop-extra"><label>Aufenthalt <input type="number" id="dw_${s.id}" min="0" step="5" value="${s.dwell||0}"> min</label>
+          <span>Pause</span><span class="chips" role="group" aria-label="Pause an diesem Stopp">${[0,15,30,45].map(v=>`<button type="button" data-p="${v}" aria-pressed="${(s.pause||0)===v}">${v?v+" min":"keine"}</button>`).join("")}</span></div>`:""}
+        ${s.lat!=null?`<div class="coords">${s.lat.toFixed(4)}, ${s.lng.toFixed(4)}</div>`:`<div class="coords">noch nicht gefunden</div>`}
+      </div>`;
+    const inp=el.querySelector("input[type=text]");
+    const doSearch=async()=>{
+      const q=inp.value.trim();if(!q)return;
+      closeResults();
+      try{
+        const res=await geocode(q);
+        if(!res.length){status("Kein Ort gefunden für „"+q+"“.","err");return}
+        const list=document.createElement("div");list.className="results";
+        res.forEach(r=>{const b=document.createElement("button");b.type="button";b.textContent=r.name;
+          b.onclick=()=>{Object.assign(s,{name:shortName(r.name),lat:r.lat,lng:r.lng});closeResults();renderStops();drawStops();map.setView([r.lat,r.lng],11);if(S.stops.every(x=>x.lat!=null))calcRoute();};
+          list.appendChild(b)});
+        el.appendChild(list);
+      }catch(e){status(e.message,"err")}
+    };
+    inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();doSearch()}});
+    inp.addEventListener("change",()=>{s.name=inp.value;save()});
+    el.addEventListener("click",e=>{
+      const a=e.target.dataset&&e.target.dataset.a;
+      if(a==="search")doSearch();
+      if(a==="up"){[S.stops[i-1],S.stops[i]]=[S.stops[i],S.stops[i-1]];renderStops();drawStops();calcRoute();}
+      if(a==="del"){S.stops.splice(i,1);renderStops();drawStops();calcRoute();}
+    });
+    const dw=el.querySelector(`#dw_${s.id}`);if(dw)dw.addEventListener("change",()=>{s.dwell=Math.max(0,+dw.value||0);save();resim()});
+    el.querySelectorAll(".chips button").forEach(b=>b.addEventListener("click",()=>{s.pause=+b.dataset.p;el.querySelectorAll(".chips button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));save();resim()}));
+    box.appendChild(el);
+  });
+  save();
+}
+function closeResults(){document.querySelectorAll(".results").forEach(x=>x.remove())}
+document.addEventListener("click",e=>{if(!e.target.closest(".stop"))closeResults()});
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function drawStops(){
+  layers.stops.clearLayers();
+  S.stops.forEach((s,i)=>{if(s.lat==null)return;
+    const first=i===0,last=i===S.stops.length-1;
+    L.marker([s.lat,s.lng],{icon:mkIcon(`mk-stop ${first?"mk-start":last?"mk-end":""}`,letter(i),26,26),draggable:true,zIndexOffset:1000})
+      .bindTooltip(esc(s.name||letter(i)))
+      .on("dragend",async ev=>{const p=ev.target.getLatLng();s.lat=p.lat;s.lng=p.lng;s.name=(await reverseGeocode(p.lat,p.lng))||s.name;renderStops();calcRoute();})
+      .addTo(layers.stops);
+  });
+}
+
+$("#addStop").onclick=()=>{S.stops.splice(S.stops.length-1,0,{id:uid(),name:"",lat:null,lng:null,dwell:0,pause:0});renderStops();const ins=document.querySelectorAll("#stops input[type=text]");ins[ins.length-2].focus();};
+$("#reverse").onclick=()=>{S.stops.reverse();S.pauses=[];renderStops();drawStops();calcRoute();};
+
+/* ---------- Einstellungen ---------- */
+const bind=[["#depart","depart"],["#banMode","banMode"],["#camMode","camMode"],["#driveStart","driveStart",1],["#dayStart","dayStart",1],["#dayMax","dayMax",1],["#shiftMax","shiftMax",1],["#shiftStart","shiftStart"],["#buffer","buffer",1],["#parkLead","parkLead",1],["#orsKey","orsKey"],["#ttKey","ttKey"]];
+const vbind=[["#v_weight","weight"],["#v_axle","axle"],["#v_height","height"],["#v_width","width"],["#v_length","length"],["#v_hazmat","hazmat"]];
+function fillForm(){
+  bind.forEach(([sel,k])=>$(sel).value=S[k]);
+  vbind.forEach(([sel,k])=>$(sel).value=S.v[k]);
+  $("#v_quiet").checked=!!S.v.quiet;
+}
+bind.forEach(([sel,k,num])=>$(sel).addEventListener("change",()=>{S[k]=num?(+$(sel).value||0):$(sel).value;save();if(k==="camMode"){if(R){R.cams=[];if(S.camMode!=="off"){const rr=R;loadCams(rr).then(()=>{if(R===rr){drawCams();resim()}})}else{drawCams();resim()}}return}
+  if(k==="orsKey"||k==="ttKey"){if(k==="ttKey")setupOverlays();calcRoute();}else resim();}));
+vbind.forEach(([sel,k])=>$(sel).addEventListener("change",()=>{S.v[k]=+$(sel).value;save();if(S.orsKey||S.ttKey)calcRoute();}));
+$("#v_quiet").addEventListener("change",()=>{S.v.quiet=$("#v_quiet").checked;save();resim();});
+
+function status(msg,kind){const el=$("#status");el.textContent=msg||"";el.className="status"+(msg?" show "+(kind||"info"):"");}
+
+/* ---------- Routing ---------- */
+function hav(a,b){const R=6371000,t=Math.PI/180;const dLa=(b[0]-a[0])*t,dLo=(b[1]-a[1])*t;const x=Math.sin(dLa/2)**2+Math.cos(a[0]*t)*Math.cos(b[0]*t)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(x))}
+let reqId=0;
+async function calcRoute(opts){
+  opts=opts||{};
+  const list=opts.list||S.stops;
+  if(!opts.list){
+    const pts=S.stops.filter(s=>s.lat!=null);
+    if(pts.length<S.stops.length){status("Bitte für alle Punkte einen Ort suchen oder auf der Karte setzen.","info");return}
+    if(pts.length<2)return;
+  }
+  const my=++reqId;
+  if(!opts.silent)status("Route wird berechnet …","info");
+  try{
+    const prov=S.ttKey?"tomtom":S.orsKey?"ors":"osrm";
+    const r=prov==="tomtom"?await routeTomTom(list,opts.live):prov==="ors"?await routeORS(list):await routeOSRM(list);
+    if(my!==reqId)return;
+    try{await detectCountries(r)}catch(e){r.cc=new Array(r.dist.length).fill("??");r.geoErr=true}
+    if(my!==reqId)return;
+    r.stops=list;r.lbl=list.map(x=>x.virtual?"◉":letter(S.stops.indexOf(x)));
+    if(opts.kmShift){S.pauses=S.pauses.filter(p=>p.km>opts.kmShift+0.05).map(p=>Object.assign({},p,{km:p.km-opts.kmShift}));save();}
+    R=r;applySpeeds(R);
+    const delay=R.trafficDelay?` · Verkehrsverzögerung aktuell +${Math.round(R.trafficDelay/60)} min`:"";
+    status(prov==="tomtom"?"LKW-Routing mit Live-Verkehr (TomTom)"+delay+".":prov==="ors"?"LKW-Routing (OpenRouteService) mit Fahrzeugmaßen, ohne Verkehr.":"Straßenrouting (OSRM) mit LKW-Tempolimits. Für LKW-Beschränkungen und Live-Verkehr einen TomTom-Key eintragen.","info");
+    if(R.geoErr)status("Ländergrenzen konnten nicht geladen werden – es gelten Standard-Tempolimits, keine Fahrverbots-Hinweise.","err");
+    if(LIVE.active){LIVE.idx=0;LIVE.lastReroute=Date.now();}
+    drawRoute();resim();
+    if(R.src==="tomtom"){const rr=R;enrichTraffic(rr).then(()=>{if(R===rr)resim()})}
+    if(S.camMode!=="off"){const rc=R;loadCams(rc).then(()=>{if(R===rc){drawCams();resim()}})}else drawCams();
+    if(!opts.live)map.fitBounds(routeLine.getBounds(),{padding:[30,30]});
+  }catch(e){if(my===reqId)status("Route konnte nicht berechnet werden: "+e.message,"err")}
+}
+async function routeTomTom(pts,live){
+  const v=S.v;const loc=pts.map(p=>`${p.lat.toFixed(6)},${p.lng.toFixed(6)}`).join(":");
+  const q=new URLSearchParams({key:S.ttKey,travelMode:"truck",traffic:"true",routeType:"fastest",computeTravelTimeFor:"all",
+    sectionType:"traffic",instructionsType:"coded",routeRepresentation:"polyline",vehicleCommercial:"true",vehicleMaxSpeed:"80",
+    vehicleWeight:String(Math.round(v.weight*1000)),vehicleAxleWeight:String(Math.round(v.axle*1000)),
+    vehicleLength:String(v.length),vehicleWidth:String(v.width),vehicleHeight:String(v.height)});
+  if(+v.hazmat)q.set("vehicleLoadType","otherHazmatGeneral");
+  const dep=new Date(S.depart);if(!live&&!isNaN(dep)&&dep.getTime()>Date.now()+60000)q.set("departAt",dep.toISOString().replace(/\.\d+Z$/,"Z"));
+  const r=await fetch(`https://api.tomtom.com/routing/1/calculateRoute/${loc}/json?${q}`);
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error((j.error&&j.error.description)||(j.detailedError&&j.detailedError.message)||("HTTP "+r.status)+(r.status===403?" – TomTom-Key prüfen":""));
+  const rt=j.routes[0];
+  const coords=[],legEnd=[0];
+  rt.legs.forEach(l=>{l.points.forEach(p=>coords.push([p.latitude,p.longitude]));legEnd.push(coords.length-1)});
+  const n=coords.length;const dist=new Array(n-1),dur=new Array(n-1).fill(0);
+  for(let i=0;i<n-1;i++)dist[i]=hav(coords[i],coords[i+1]);
+  // Fahrzeit über die Abbiegehinweise (kumulierte Zeit je Punkt) verteilen
+  const ins=(rt.guidance&&rt.guidance.instructions)||[];
+  const marks=[[0,0]];ins.forEach(x=>{if(x.pointIndex>marks[marks.length-1][0])marks.push([x.pointIndex,x.travelTimeInSeconds])});
+  if(marks[marks.length-1][0]<n-1)marks.push([n-1,rt.summary.travelTimeInSeconds]);
+  for(let m=1;m<marks.length;m++){const[a,ta]=marks[m-1],[b,tb]=marks[m];let tot=0;for(let i=a;i<b;i++)tot+=dist[i];
+    for(let i=a;i<b;i++)dur[i]=tot>0?(tb-ta)*dist[i]/tot:(tb-ta)/(b-a);}
+  const res=finishRoute(coords,dist,dur,legEnd,"tomtom");
+  res.trafficDelay=rt.summary.trafficDelayInSeconds||0;
+  res.traffic=(rt.sections||[]).filter(x=>x.sectionType==="TRAFFIC").map(x=>({a:x.startPointIndex,b:x.endPointIndex,cat:x.simpleCategory,mag:x.magnitudeOfDelay,delay:x.delayInSeconds||0,speed:x.effectiveSpeedInKmh,cause:x.tec&&x.tec.causes&&x.tec.causes[0]&&x.tec.causes[0].mainCauseCode}));
+  return res;
+}
+const TEC={1:"Stau",2:"Unfall",3:"Baustelle",4:"Fahrbahnverengung",5:"Straße unpassierbar",6:"Glätte",7:"Aquaplaning",8:"Brand",9:"Gefährliche Fahrbedingungen",10:"Gegenstände auf der Fahrbahn",11:"Tiere auf der Fahrbahn",12:"Personen auf der Fahrbahn",13:"Pannenfahrzeug",14:"Falschfahrer",15:"Bergungsarbeiten",16:"Behördliche Maßnahme",17:"Extremwetter",18:"Sichtbehinderung",19:"Niederschlag",23:"Großveranstaltung",26:"Langsames Fahrzeug",27:"Gefährliches Stauende",30:"Polizeikontrolle"};
+const TCAT={JAM:"Stau",ROAD_WORK:"Baustelle",ROAD_CLOSURE:"Sperre",OTHER:"Verkehrsbehinderung"};
+function trafficLabel(x){return TEC[x.cause]||TCAT[x.cat]||"Verkehrsbehinderung"}
+function trafficWhere(x){if(!x||!x.inc)return"";const i=x.inc;const r=(i.roads||[]).join("/");
+  return [r,i.from&&i.to?`zwischen ${i.from} und ${i.to}`:i.from?`bei ${i.from}`:""].filter(Boolean).join(" ")}
+function trafficDesc(x){return x&&x.inc&&x.inc.desc?x.inc.desc:""}
+/* Klartext-Meldungen (TomTom Traffic Incident Details) zu den Verkehrsabschnitten der Route */
+async function enrichTraffic(r){
+  if(!S.ttKey||!r.traffic||!r.traffic.length)return;
+  const fields="{incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,events{description,code},startTime,endTime,from,to,length,delay,roadNumbers}}}";
+  await Promise.all(r.traffic.slice(0,25).map(async x=>{
+    const seg=r.coords.slice(x.a,x.b+1);if(!seg.length)return;
+    let la1=90,la2=-90,lo1=180,lo2=-180;seg.forEach(([la,lo])=>{la1=Math.min(la1,la);la2=Math.max(la2,la);lo1=Math.min(lo1,lo);lo2=Math.max(lo2,lo)});
+    const pad=0.01;const bbox=[lo1-pad,la1-pad,lo2+pad,la2+pad].map(v=>v.toFixed(5)).join(",");
+    try{
+      const q=new URLSearchParams({key:S.ttKey,bbox,fields,language:"de-DE",timeValidityFilter:"present"});
+      const res=await fetch(`https://api.tomtom.com/traffic/services/5/incidentDetails?${q}`);if(!res.ok)return;
+      const j=await res.json();let best=null,bd=Infinity;
+      const samp=seg.filter((_,k)=>k%Math.max(1,Math.floor(seg.length/40))===0);
+      (j.incidents||[]).forEach(inc=>{const g=inc.geometry;if(!g)return;const pts=g.type==="Point"?[g.coordinates]:g.coordinates;
+        let md=Infinity;pts.forEach(([lo,la],k)=>{if(k%3&&k!==pts.length-1)return;samp.forEach(sp=>{const d=hav(sp,[la,lo]);if(d<md)md=d})});
+        const score=md-(inc.properties&&inc.properties.delay?Math.min(inc.properties.delay,600):0)/10;
+        if(md<250&&score<bd){bd=score;best=inc}});
+      if(best){const pr=best.properties||{};
+        x.inc={desc:(pr.events||[]).map(e=>e.description).filter(Boolean).join(", "),from:pr.from,to:pr.to,roads:pr.roadNumbers||[],end:pr.endTime,delay:pr.delay};}
+    }catch(e){}
+  }));
+}
+async function routeOSRM(pts){
+  const c=pts.map(p=>`${p.lng},${p.lat}`).join(";");
+  const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${c}?overview=full&geometries=geojson&annotations=distance,duration&steps=false`);
+  const j=await r.json();
+  if(j.code!=="Ok")throw new Error(j.message||j.code||"Routingdienst-Fehler");
+  const rt=j.routes[0];
+  const coords=rt.geometry.coordinates.map(p=>[p[1],p[0]]);
+  const dist=[],dur=[],legEnd=[0];
+  rt.legs.forEach(l=>{dist.push(...l.annotation.distance);dur.push(...l.annotation.duration);legEnd.push(dist.length)});
+  return finishRoute(coords,dist,dur,legEnd,"osrm");
+}
+async function routeORS(pts){
+  const body={coordinates:pts.map(p=>[p.lng,p.lat]),instructions:true,radiuses:pts.map(()=>1000),
+    options:{vehicle_type:"hgv",profile_params:{restrictions:{weight:S.v.weight,axleload:S.v.axle,height:S.v.height,width:S.v.width,length:S.v.length,hazmat:!!+S.v.hazmat}}}};
+  const r=await fetch("https://api.openrouteservice.org/v2/directions/driving-hgv/geojson",{method:"POST",headers:{"Authorization":S.orsKey,"Content-Type":"application/json","Accept":"application/geo+json"},body:JSON.stringify(body)});
+  const j=await r.json();
+  if(!r.ok)throw new Error((j.error&&(j.error.message||j.error))||("HTTP "+r.status)+(r.status===403||r.status===401?" – API-Key prüfen":""));
+  const f=j.features[0];
+  const coords=f.geometry.coordinates.map(p=>[p[1],p[0]]);
+  const n=coords.length;const dist=new Array(n-1).fill(0),dur=new Array(n-1).fill(0);
+  for(let i=0;i<n-1;i++)dist[i]=hav(coords[i],coords[i+1]);
+  const legEnd=[0];
+  f.properties.segments.forEach(seg=>{
+    let end=0;
+    seg.steps.forEach(st=>{const[a,b]=st.way_points;end=Math.max(end,b);if(b<=a)return;
+      let tot=0;for(let i=a;i<b;i++)tot+=dist[i];
+      for(let i=a;i<b;i++)dur[i]=tot>0?st.duration*dist[i]/tot:st.duration/(b-a);});
+    legEnd.push(end);
+  });
+  return finishRoute(coords,dist,dur,legEnd,"ors");
+}
+function finishRoute(coords,dist,dur,legEnd,src){
+  const cumKm=[0];for(let i=0;i<dist.length;i++)cumKm.push(cumKm[i]+dist[i]/1000);
+  return {coords,dist,baseDur:dur,dur:dur.slice(),legEnd,cumKm,src};
+}
+function spFor(cc){const base=(C[cc]&&C[cc].sp)||DEF_SP;return Object.assign({},base,S.spOv[cc]||{})}
+function applySpeeds(r){
+  // Geschwindigkeit pro Abschnitt auf das LKW-Limit des jeweiligen Landes begrenzen; Straßentyp aus der Routing-Geschwindigkeit abgeleitet
+  if(r.src==="tomtom"){r.dur=r.baseDur.slice();r.durN=r.baseDur.slice();return}
+  r.durN=[];const cache={};
+  for(let i=0;i<r.dist.length;i++){
+    const d=r.dist[i],t=r.baseDur[i];
+    if(!(t>0)||!(d>0)){r.dur[i]=r.durN[i]=t||0;continue}
+    const cc=r.cc[i];const sp=cache[cc]||(cache[cc]=spFor(cc));
+    const v=d/t*3.6;
+    const cls=v>=88?"ab":v>=55?"land":"ort";
+    r.dur[i]=d/(Math.min(v,sp[cls])/3.6);
+    r.durN[i]=cls==="land"&&sp.landN?d/(Math.min(v,sp.landN)/3.6):r.dur[i];
+  }
+}
+function drawRoute(){
+  layers.route.clearLayers();
+  L.polyline(R.coords,{color:"#ffffff",weight:9,opacity:.9,interactive:false}).addTo(layers.route);
+  routeLine=L.polyline(R.coords,{color:getComputedStyle(document.documentElement).getPropertyValue("--route").trim()||"#1f5fbf",weight:6,opacity:.95}).addTo(layers.route);
+  routeLine.on("click",e=>{L.DomEvent.stopPropagation(e);routePopup(e.latlng)});
+  routeLine.bindTooltip("Klicken, um hier eine Pause einzufügen",{sticky:true});
+  layers.traffic.clearLayers();
+  (R.traffic||[]).forEach(x=>{const col=x.cat==="ROAD_WORK"?"#5b6570":x.cat==="ROAD_CLOSURE"||x.mag>=3?"#c8322b":"#e8710a";
+    L.polyline(R.coords.slice(x.a,x.b+1),{color:col,weight:7,opacity:.95,dashArray:x.cat==="ROAD_WORK"?"6 6":null,interactive:false}).addTo(layers.traffic)});
+}
+function nearestVertex(ll){let best=0,bd=Infinity;const p=[ll.lat,ll.lng];for(let i=0;i<R.coords.length;i++){const c=R.coords[i];const d=(c[0]-p[0])**2+((c[1]-p[1])*Math.cos(p[0]*Math.PI/180))**2;if(d<bd){bd=d;best=i}}return best}
+function vertexAtKm(km){const a=R.cumKm;let lo=0,hi=a.length-1;while(lo<hi){const m=(lo+hi)>>1;if(a[m]<km)lo=m+1;else hi=m}if(lo>0&&km-a[lo-1]<a[lo]-km)lo--;return lo}
+function routePopup(ll){
+  const vi=nearestVertex(ll);const km=R.cumKm[vi];
+  const t=SIM?SIM.timeAt[vi]:null;const ld=SIM?SIM.driveAt[vi]:null;
+  const div=document.createElement("div");div.className="pop";
+  div.innerHTML=`<h4>km ${km.toFixed(0)}</h4>${t?`<div>Ankunft ca. ${fmtT(t)}</div><div>Lenkzeit seit Pause: ${fmtDur(ld)}</div>`:""}
+    <div style="margin-top:6px">Pause hier einfügen:</div><div class="btns"><button data-d="15">15 min</button><button data-d="30">30 min</button><button data-d="45">45 min</button></div>`;
+  const pop=L.popup().setLatLng(R.coords[vi]).setContent(div).openOn(map);
+  div.addEventListener("click",e=>{const d=+e.target.dataset.d;if(!d)return;S.pauses.push({id:uid(),km,dur:d});map.closePopup(pop);save();resim();});
+}
+
+/* ---------- Simulation: Lenkzeit, Pausen, Fahrverbote ---------- */
+const DEF_SP={ab:80,land:70,ort:50};
+const C={
+  AT:{n:"Österreich",num:"040",sp:{ab:80,land:70,landN:60,ort:50},info:"Nacht 22–5 (lärmarm ausgenommen) · Sa 15 – So 22 · Feiertage 0–22",
+      hf:{"1-1":"Neujahr","1-6":"Heilige Drei Könige","5-1":"Staatsfeiertag","8-15":"Mariä Himmelfahrt","10-26":"Nationalfeiertag","11-1":"Allerheiligen","12-8":"Mariä Empfängnis","12-25":"Christtag","12-26":"Stefanitag"},he:{1:"Ostermontag",39:"Christi Himmelfahrt",50:"Pfingstmontag",60:"Fronleichnam"}},
+  DE:{n:"Deutschland",num:"276",sp:{ab:80,land:60,ort:50},info:"So + Feiertage 0–22 · Jul/Aug Sa 7–20 (Ferienreise-VO, bestimmte Autobahnen)",
+      hf:{"1-1":"Neujahr","5-1":"Tag der Arbeit","10-3":"Tag der Deutschen Einheit","12-25":"1. Weihnachtstag","12-26":"2. Weihnachtstag"},he:{"-2":"Karfreitag",1:"Ostermontag",39:"Christi Himmelfahrt",50:"Pfingstmontag"}},
+  CH:{n:"Schweiz",num:"756",sp:{ab:80,land:80,ort:50},info:"Nacht 22–5 · So + Feiertage ganztägig (über 3,5 t)",
+      hf:{"1-1":"Neujahr","8-1":"Bundesfeiertag","12-25":"Weihnachten","12-26":"Stephanstag"},he:{"-2":"Karfreitag",1:"Ostermontag",39:"Auffahrt",50:"Pfingstmontag"}},
+  LI:{n:"Liechtenstein",num:"438",sp:{ab:80,land:80,ort:50},info:"wie Schweiz",
+      hf:{"1-1":"Neujahr","8-15":"Staatsfeiertag","12-25":"Weihnachten","12-26":"Stephanstag"},he:{"-2":"Karfreitag",1:"Ostermontag",39:"Auffahrt",50:"Pfingstmontag"}},
+  IT:{n:"Italien",num:"380",sp:{ab:80,land:70,ort:50},info:"So + Feiertage 9–22 (Jun–Sep 7–22) · zusätzliche Kalendertage",
+      hf:{"1-1":"Capodanno","1-6":"Epifania","4-25":"Festa della Liberazione","5-1":"Festa del Lavoro","6-2":"Festa della Repubblica","8-15":"Ferragosto","11-1":"Ognissanti","12-8":"Immacolata","12-25":"Natale","12-26":"Santo Stefano"},he:{1:"Ostermontag"}},
+  FR:{n:"Frankreich",num:"250",sp:{ab:90,land:80,ort:50},info:"Sa 22 – So 22 · Vortag 22 – Feiertag 22",
+      hf:{"1-1":"Jour de l'An","5-1":"Fête du Travail","5-8":"Victoire 1945","7-14":"Fête nationale","8-15":"Assomption","11-1":"Toussaint","11-11":"Armistice","12-25":"Noël"},he:{1:"Ostermontag",39:"Ascension",50:"Pfingstmontag"}},
+  HU:{n:"Ungarn",num:"348",sp:{ab:80,land:70,ort:50},info:"Sa 22 – So 22 · Vortag 22 – Feiertag 22",
+      hf:{"1-1":"Neujahr","3-15":"Nationalfeiertag","5-1":"Tag der Arbeit","8-20":"Staatsgründung","10-23":"Nationalfeiertag","11-1":"Allerheiligen","12-25":"Weihnachten","12-26":"Weihnachten"},he:{"-2":"Karfreitag",1:"Ostermontag",50:"Pfingstmontag"}},
+  SI:{n:"Slowenien",num:"705",sp:{ab:80,land:70,ort:50},info:"So + Feiertage 8–21",
+      hf:{"1-1":"Neujahr","1-2":"Neujahr","2-8":"Prešeren-Tag","4-27":"Widerstandstag","5-1":"Tag der Arbeit","5-2":"Tag der Arbeit","6-25":"Staatsfeiertag","8-15":"Mariä Himmelfahrt","10-31":"Reformationstag","11-1":"Allerheiligen","12-25":"Weihnachten","12-26":"Unabhängigkeitstag"},he:{1:"Ostermontag"}},
+  SK:{n:"Slowakei",num:"703",sp:{ab:90,land:80,ort:50},info:"So + Feiertage 0–22",
+      hf:{"1-1":"Staatsfeiertag","1-6":"Heilige Drei Könige","5-1":"Tag der Arbeit","5-8":"Tag des Sieges","7-5":"Kyrill und Method","8-29":"Nationalaufstand","9-1":"Verfassungstag","9-15":"Maria der Sieben Schmerzen","11-1":"Allerheiligen","11-17":"Tag der Freiheit","12-24":"Heiliger Abend","12-25":"Weihnachten","12-26":"Weihnachten"},he:{"-2":"Karfreitag",1:"Ostermontag"}},
+  CZ:{n:"Tschechien",num:"203",sp:{ab:80,land:80,ort:50},info:"So + Feiertage 13–22",
+      hf:{"1-1":"Neujahr","5-1":"Tag der Arbeit","5-8":"Tag der Befreiung","7-5":"Kyrill und Method","7-6":"Jan Hus","9-28":"Wenzelstag","10-28":"Staatsgründung","11-17":"Tag der Freiheit","12-24":"Heiliger Abend","12-25":"Weihnachten","12-26":"Weihnachten"},he:{"-2":"Karfreitag",1:"Ostermontag"}},
+  PL:{n:"Polen",num:"616",sp:{ab:80,land:70,ort:50},info:"Feiertage 8–22 · Vortag 18–22 (über 12 t) · Sommerwochenenden",
+      hf:{"1-1":"Neujahr","1-6":"Heilige Drei Könige","5-1":"Tag der Arbeit","5-3":"Verfassungstag","8-15":"Mariä Himmelfahrt","11-1":"Allerheiligen","11-11":"Unabhängigkeitstag","12-24":"Heiliger Abend","12-25":"Weihnachten","12-26":"Weihnachten"},he:{0:"Ostersonntag",1:"Ostermontag",49:"Pfingstsonntag",60:"Fronleichnam"}},
+  HR:{n:"Kroatien",num:"191",sp:{ab:80,land:80,ort:50},info:"nur Sommer-Einschränkungen"},
+  NL:{n:"Niederlande",num:"528",sp:{ab:80,land:80,ort:50},info:"kein allgemeines Fahrverbot"},
+  BE:{n:"Belgien",num:"056",sp:{ab:90,land:60,ort:50},info:"kein allgemeines Fahrverbot"},
+  LU:{n:"Luxemburg",num:"442",sp:{ab:90,land:75,ort:50},info:"kein allgemeines Fahrverbot"},
+  DK:{n:"Dänemark",num:"208",sp:{ab:80,land:70,ort:50},info:"kein allgemeines Fahrverbot"},
+  SE:{n:"Schweden",num:"752",sp:{ab:80,land:70,ort:50},info:"kein allgemeines Fahrverbot"},
+  NO:{n:"Norwegen",num:"578",sp:{ab:80,land:80,ort:50},info:"kein allgemeines Fahrverbot"},
+  FI:{n:"Finnland",num:"246",sp:{ab:80,land:80,ort:50},info:"kein allgemeines Fahrverbot"},
+  ES:{n:"Spanien",num:"724",sp:{ab:90,land:80,ort:50},info:"Fahrverbote nur an bestimmten Tagen/Strecken"},
+  PT:{n:"Portugal",num:"620",sp:{ab:90,land:80,ort:50},info:"nur an bestimmten Tagen"},
+  RO:{n:"Rumänien",num:"642",sp:{ab:90,land:80,ort:50},info:"nur Sommer-Einschränkungen"},
+  BG:{n:"Bulgarien",num:"100",sp:{ab:90,land:80,ort:50},info:"nur Sommer-Einschränkungen"},
+  GB:{n:"Vereinigtes Königreich",num:"826",sp:{ab:90,land:80,ort:48},info:"kein allgemeines Fahrverbot · Linksverkehr"},
+  IE:{n:"Irland",num:"372",sp:{ab:80,land:80,ort:50},info:"kein allgemeines Fahrverbot"},
+  GR:{n:"Griechenland",num:"300",sp:{ab:85,land:80,ort:50},info:"nur an Feiertagen/Sommer"},
+  LT:{n:"Litauen",num:"440",sp:{ab:90,land:70,ort:50},info:"kein allgemeines Fahrverbot"},
+  LV:{n:"Lettland",num:"428",sp:{ab:90,land:80,ort:50},info:"kein allgemeines Fahrverbot"},
+  EE:{n:"Estland",num:"233",sp:{ab:90,land:80,ort:50},info:"kein allgemeines Fahrverbot"},
+  RS:{n:"Serbien",num:"688",sp:{ab:80,land:70,ort:50},info:"kein allgemeines Fahrverbot"},
+  BA:{n:"Bosnien-Herzegowina",num:"070",sp:{ab:80,land:70,ort:50},info:"kein allgemeines Fahrverbot"},
+  ME:{n:"Montenegro",num:"499",sp:{ab:80,land:70,ort:50},info:""},
+  MK:{n:"Nordmazedonien",num:"807",sp:{ab:80,land:70,ort:50},info:""},
+  AL:{n:"Albanien",num:"008",sp:{ab:80,land:70,ort:50},info:""},
+  MD:{n:"Moldau",num:"498",sp:{ab:80,land:70,ort:50},info:""},
+  UA:{n:"Ukraine",num:"804",sp:{ab:80,land:70,ort:50},info:""},
+  BY:{n:"Belarus",num:"112",sp:{ab:80,land:70,ort:50},info:""},
+  TR:{n:"Türkei",num:"792",sp:{ab:85,land:80,ort:50},info:""}
+};
+const NUM2CC={};Object.keys(C).forEach(k=>NUM2CC[C[k].num]=k);
+function cname(cc){return (C[cc]&&C[cc].n)||(GEO_NAMES[cc])||"Unbekannt"}
+
+/* Feiertage */
+const HOL={};
+function easter(y){const a=y%19,b=Math.floor(y/100),c=y%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451);return new Date(y,Math.floor((h+l-7*m+114)/31)-1,((h+l-7*m+114)%31)+1)}
+function holiday(cc,d){
+  const c=C[cc];if(!c||!c.hf)return null;
+  const y=d.getFullYear(),key=cc+y;
+  if(!HOL[key]){const L=Object.assign({},c.hf),E=easter(y);
+    Object.keys(c.he||{}).forEach(o=>{const x=new Date(E);x.setDate(x.getDate()+(+o));L[(x.getMonth()+1)+"-"+x.getDate()]=c.he[o]});HOL[key]=L}
+  return HOL[key][(d.getMonth()+1)+"-"+d.getDate()]||null;
+}
+
+/* Fahrverbote je Land (Richtwerte, LKW über 7,5 t sofern nicht anders angegeben) */
+function banRule(cc,d){
+  const wd=d.getDay(),h=d.getHours()+d.getMinutes()/60,m=d.getMonth()+1;
+  const hol=holiday(cc,d);const tom=new Date(d);tom.setDate(tom.getDate()+1);const holT=holiday(cc,tom);
+  const sunHol=wd===0||!!hol, sh=hol?`Feiertag (${hol})`:"Sonntag";
+  switch(cc){
+    case"AT":
+      if(hol&&h<22)return{id:"F",label:`Feiertagsfahrverbot – ${hol}`,sub:"LKW über 7,5 t, 00:00–22:00 Uhr"};
+      if(!S.v.quiet&&(h>=22||h<5))return{id:"N",label:"Nachtfahrverbot",sub:"LKW über 7,5 t, 22:00–05:00 Uhr (lärmarme Fahrzeuge ausgenommen)"};
+      if((wd===6&&h>=15)||(wd===0&&h<22))return{id:"W",label:"Wochenendfahrverbot",sub:"LKW über 7,5 t (bzw. Anhänger über 3,5 t), Sa 15:00 – So 22:00 Uhr"};
+      return null;
+    case"DE":
+      if(sunHol&&h<22)return{id:"S",label:`Sonn-/Feiertagsfahrverbot – ${sh}`,sub:"LKW über 7,5 t, 00:00–22:00 Uhr (regionale Feiertage zusätzlich)"};
+      if(wd===6&&(m===7||m===8)&&h>=7&&h<20)return{id:"FR",label:"Ferienreiseverordnung",sub:"Sa 07:00–20:00 Uhr, nur auf bestimmten Autobahnabschnitten"};
+      return null;
+    case"CH":case"LI":
+      if(sunHol)return{id:"S",label:`Sonn-/Feiertagsfahrverbot – ${sh}`,sub:"Fahrzeuge über 3,5 t, ganztägig"};
+      if(h>=22||h<5)return{id:"N",label:"Nachtfahrverbot",sub:"Fahrzeuge über 3,5 t, 22:00–05:00 Uhr"};
+      return null;
+    case"IT":{const from=(m>=6&&m<=9)?7:9;
+      if(sunHol&&h>=from&&h<22)return{id:"S",label:`Fahrverbot – ${sh}`,sub:`LKW über 7,5 t, ${from}:00–22:00 Uhr (zusätzliche Tage laut Jahreskalender)`};return null}
+    case"FR":case"HU":
+      if((wd===6&&h>=22)||(wd===0&&h<22))return{id:"W",label:"Wochenendfahrverbot",sub:"LKW über 7,5 t, Sa 22:00 – So 22:00 Uhr"};
+      if((hol&&h<22)||(holT&&h>=22))return{id:"F",label:`Feiertagsfahrverbot – ${hol||holT}`,sub:"LKW über 7,5 t, Vortag 22:00 – Feiertag 22:00 Uhr"};
+      return null;
+    case"SI":if(sunHol&&h>=8&&h<21)return{id:"S",label:`Fahrverbot – ${sh}`,sub:"LKW über 7,5 t, 08:00–21:00 Uhr"};return null;
+    case"SK":if(sunHol&&h<22)return{id:"S",label:`Fahrverbot – ${sh}`,sub:"LKW über 7,5 t, 00:00–22:00 Uhr"};return null;
+    case"CZ":if(sunHol&&h>=13&&h<22)return{id:"S",label:`Fahrverbot – ${sh}`,sub:"LKW über 7,5 t, 13:00–22:00 Uhr (Autobahnen und Straßen 1. Klasse)"};return null;
+    case"PL":
+      if(hol&&h>=8&&h<22)return{id:"F",label:`Feiertagsfahrverbot – ${hol}`,sub:"LKW über 12 t, 08:00–22:00 Uhr"};
+      if(holT&&h>=18&&h<22)return{id:"V",label:`Fahrverbot vor Feiertag – ${holT}`,sub:"LKW über 12 t, 18:00–22:00 Uhr"};
+      return null;
+  }
+  return null;
+}
+function banCheck(ms,cc,st){
+  if(S.banMode==="off")return null;
+  const r=banRule(cc,new Date(ms));if(!r)return null;
+  const k=cc+r.id,last=st[k];st[k]=ms;
+  if(last!=null&&ms-last<3*3600e3)return null;
+  return{k,label:`${cname(cc)}: ${r.label}`,sub:r.sub};
+}
+
+/* Ländererkennung über Natural-Earth-Grenzen (world-atlas 50m) */
+let GEO=null;const GEO_NAMES={};
+async function loadGeo(){
+  if(GEO)return GEO;
+  if(typeof topojson==="undefined")throw new Error("topojson fehlt");
+  const r=await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json");
+  if(!r.ok)throw new Error("Grenzen nicht ladbar");
+  const topo=await r.json();
+  const fc=topojson.feature(topo,topo.objects.countries);
+  const list=[];
+  fc.features.forEach(f=>{
+    if(!f.geometry)return;
+    const cb=f.geometry.coordinates;const polys=f.geometry.type==="Polygon"?[cb]:cb;
+    let bb=[180,90,-180,-90];
+    polys.forEach(p=>p[0].forEach(([x,y])=>{if(x<bb[0])bb[0]=x;if(y<bb[1])bb[1]=y;if(x>bb[2])bb[2]=x;if(y>bb[3])bb[3]=y}));
+    if(bb[2]<-30||bb[0]>60||bb[3]<30||bb[1]>75)return; // nur Europa und Umgebung
+    const cc=NUM2CC[f.id]||("N"+f.id);GEO_NAMES[cc]=f.properties&&f.properties.name;
+    list.push({cc,polys,bb});
+  });
+  GEO=list;return GEO;
+}
+function inRing(x,y,ring){let c=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+function inFeat(f,x,y){if(x<f.bb[0]||x>f.bb[2]||y<f.bb[1]||y>f.bb[3])return false;for(const p of f.polys){if(inRing(x,y,p[0])){let hole=false;for(let k=1;k<p.length;k++)if(inRing(x,y,p[k])){hole=true;break}if(!hole)return true}}return false}
+function ccAt(lat,lng,hint){
+  if(hint){const f=GEO.find(g=>g.cc===hint);if(f&&inFeat(f,lng,lat))return hint}
+  for(const f of GEO)if(inFeat(f,lng,lat))return f.cc;
+  return null;
+}
+async function detectCountries(r){
+  await loadGeo();
+  const n=r.coords.length,cc=new Array(n).fill(null);
+  const look=(i,h)=>ccAt(r.coords[i][0],r.coords[i][1],h);
+  const samples=[0];let lk=0;
+  for(let i=1;i<n-1;i++)if(r.cumKm[i]-lk>=2){samples.push(i);lk=r.cumKm[i]}
+  if(n>1)samples.push(n-1);
+  let pI=0,pC=look(0,null);cc[0]=pC;
+  for(let s=1;s<samples.length;s++){
+    const i=samples[s];const c=look(i,pC)||pC;
+    if(c===pC||!pC||!c){for(let k=pI;k<=i;k++)cc[k]=c||pC}
+    else{ // Grenze zwischen pI und i genau suchen
+      let lo=pI,hi=i;
+      while(hi-lo>1){const mid=(lo+hi)>>1;const cm=look(mid,pC)||pC;if(cm===pC)lo=mid;else hi=mid}
+      for(let k=pI;k<hi;k++)cc[k]=pC;for(let k=hi;k<=i;k++)cc[k]=c;
+    }
+    pI=i;pC=c||pC;
+  }
+  const first=cc.find(x=>x)||"??";let cur=first;
+  for(let k=0;k<n;k++){if(cc[k])cur=cc[k];else cc[k]=cur}
+  r.cc=cc.slice(0,n-1);
+}
+function renderCountries(){
+  const box=$("#ctyTable");if(!R)return;
+  const seen=[];R.cc.forEach(c=>{if(!seen.includes(c))seen.push(c)});
+  box.innerHTML=`<div class="ctywrap"><table class="cty"><thead><tr><th>Land</th><th>AB</th><th>Freiland</th><th>Ort</th></tr></thead><tbody>${seen.map(cc=>{const sp=spFor(cc);
+    return `<tr><td><span class="cc">${esc(cc.length===2?cc:"–")}</span>${esc(cname(cc))}${C[cc]&&C[cc].info?`<div class="ban">${esc(C[cc].info)}</div>`:""}</td>
+      <td><input type="number" id="sp_${cc}_ab" data-cc="${cc}" data-k="ab" value="${sp.ab}"></td>
+      <td><input type="number" id="sp_${cc}_land" data-cc="${cc}" data-k="land" value="${sp.land}">${sp.landN?`<div class="ban">nachts ${sp.landN}</div>`:""}</td>
+      <td><input type="number" id="sp_${cc}_ort" data-cc="${cc}" data-k="ort" value="${sp.ort}"></td></tr>`}).join("")}</tbody></table></div>`;
+}
+$("#ctyTable").addEventListener("change",e=>{const cc=e.target.dataset.cc,k=e.target.dataset.k;if(!cc)return;const v=+e.target.value;if(!(v>0))return;(S.spOv[cc]=S.spOv[cc]||{})[k]=v;save();if(R){applySpeeds(R);resim();}});
+function resim(){if(!R)return;SIM=simulate(LIVE.active&&LIVE.fix?liveOpts():{});renderAll();if(LIVE.active)renderLive();}
+function simulate(o){
+  o=o||{};
+  const n=R.coords.length,i0=o.startIdx||0,km0=R.cumKm[i0];
+  const dep=new Date(S.depart);let t=o.t!=null?o.t:(isNaN(dep)?Date.now():dep.getTime());
+  let drive=o.drive!=null?o.drive:(S.driveStart||0)*60,day=o.day!=null?o.day:(S.dayStart||0)*60,split=!!o.split,overActive=drive>=LIM;
+  const dayMax=(+S.dayMax||540)*60;
+  const t0=t;let shiftStart=o.shiftStart||(S.shiftStart?new Date(S.shiftStart).getTime():t);if(isNaN(shiftStart)||shiftStart>t)shiftStart=t;
+  const shiftMaxMs=(+S.shiftMax||900)*60000,shiftEnd=shiftStart+shiftMaxMs,warnAt=shiftEnd-3600e3;
+  let shiftFlag=false,warnFlag=warnAt<=t;
+  const shiftCheck=(tA,tB,km,ll,kmB,llB)=>{ // Zeit läuft von tA bis tB
+    if(!warnFlag&&tB>=warnAt){warnFlag=true;const f=tB>tA?(warnAt-tA)/(tB-tA):0;items.push({type:"shiftWarn",t:warnAt,km:kmB!=null?km+(kmB-km)*f:km});}
+    if(!shiftFlag&&tB>=shiftEnd){shiftFlag=true;const f=tB>tA?(shiftEnd-tA)/(tB-tA):0;
+      const kk=kmB!=null?km+(kmB-km)*f:km;const L2=llB?[ll[0]+(llB[0]-ll[0])*f,ll[1]+(llB[1]-ll[1])*f]:ll;
+      items.push({type:"limit",shift:true,t:shiftEnd,km:kk});events.push({type:"shift",ll:L2,t:shiftEnd,km:kk});}
+  };
+  const items=[],bars=[],events=[],overRuns=[];
+  const timeAt=new Array(n),driveAt=new Array(n);
+  const pausesAt={};S.pauses.forEach(p=>{if(p.km<km0-0.01)return;const vi=Math.min(n-1,vertexAtKm(p.km));(pausesAt[vi]=pausesAt[vi]||[]).push(p)});
+  const stopAt={};R.legEnd.forEach((vi,k)=>{if(k>0&&vi>=i0)stopAt[vi]=k});
+  const camsAt={};(S.camMode!=="off"?R.cams||[]:[]).forEach(c=>{if(c.i>=i0)(camsAt[c.i]=camsAt[c.i]||[]).push(c)});
+  const trafficAt={};(R.traffic||[]).forEach(x=>{if(x.b>=i0)(trafficAt[Math.max(x.a,i0)]=trafficAt[Math.max(x.a,i0)]||[]).push(x)});
+  const bans={};
+  let segStartT=t,segStartKm=km0,segDrive=0,segOver=false;
+  let barDrive=0,barOver=0,dayFlag=day>=dayMax,limitCount=0,preKm=null;const overSeg=new Uint8Array(n);
+  let totalPause=0,totalStop=0,totalDrive=0;
+  const flushDrive=()=>{
+    if(barDrive>0)bars.push({k:"drive",d:barDrive});if(barOver>0)bars.push({k:"over",d:barOver});barDrive=barOver=0;
+  };
+  const pushDriveItem=(km)=>{if(segDrive>30)items.push({type:"drive",dur:segDrive,km:km-segStartKm,over:segOver});segDrive=0;segOver=false;segStartKm=km;};
+  const doBreak=min=>{let note,cls="";
+    if(min>=45){note="45 min erfüllt – 4,5 h Lenkzeit beginnt neu";cls="reset"}
+    else if(split&&min>=30){note="15 + 30 min erfüllt – 4,5 h Lenkzeit beginnt neu";cls="reset"}
+    else if(split&&min>=15){note="Zählt nicht als 2. Teil – dafür sind mind. 30 min nötig";cls="bad"}
+    else if(min>=15){note=`1. Teil der geteilten Pause – noch mind. 30 min als 2. Teil nötig`}
+    else{note="Unter 15 min – zählt nicht als Pause";cls="bad"}
+    if(cls==="reset"){drive=0;split=false;preKm=null}else if(min>=15&&!split)split=true;
+    if(drive<LIM)overActive=false;return{note,cls};};
+  items.push({type:"start",t,name:o.label||R.stops[0].name,km:km0,cc:R.cc[Math.min(i0,n-2)],live:!!o.label});
+  let prevCc=R.cc[Math.min(i0,n-2)];
+  shiftCheck(t,t,km0,R.coords[i0]);
+  for(let i=i0;i<n;i++){
+    const km=R.cumKm[i];
+    if(stopAt[i]!=null){
+      const k=stopAt[i],s=R.stops[k],last=k===R.stops.length-1;
+      pushDriveItem(km);flushDrive();
+      if(last){items.push({type:"end",t,name:s.name,km});}
+      else{
+        items.push({type:"stop",t,name:s.name,km,dwell:s.dwell||0,letter:R.lbl[k]});
+        if(s.dwell>0){shiftCheck(t,t+s.dwell*60000,km,R.coords[i]);t+=s.dwell*60000;totalStop+=s.dwell;bars.push({k:"stop",d:s.dwell*60})}
+        if(s.pause>0){const r=doBreak(s.pause);
+          items.push({type:"pause",t,km,dur:s.pause,atStop:R.lbl[k],note:r.note,ncls:r.cls});
+          events.push({type:"pause",ll:R.coords[i],t,dur:s.pause,km});
+          shiftCheck(t,t+s.pause*60000,km,R.coords[i]);t+=s.pause*60000;totalPause+=s.pause;bars.push({k:"pause",d:s.pause*60});}
+      }
+    }
+    if(pausesAt[i])pausesAt[i].forEach(p=>{
+      pushDriveItem(km);flushDrive();
+      const r=doBreak(p.dur);
+      items.push({type:"pause",t,km,dur:p.dur,id:p.id,auto:p.auto,place:p.place,note:r.note,ncls:r.cls});
+      events.push({type:"pause",ll:R.coords[i],t,dur:p.dur,id:p.id,km});
+      shiftCheck(t,t+p.dur*60000,km,R.coords[i]);t+=p.dur*60000;totalPause+=p.dur;bars.push({k:"pause",d:p.dur*60});
+    });
+    if(camsAt[i])camsAt[i].forEach(c=>{pushDriveItem(km);items.push({type:"cam",t,km:c.km,c});events.push({type:"cam",ll:c.ll||R.coords[i],t,c})});
+    if(trafficAt[i])trafficAt[i].forEach(x=>{pushDriveItem(km);const lenKm=R.cumKm[x.b]-R.cumKm[x.a];
+      items.push({type:"traffic",t,km,label:trafficLabel(x),cat:x.cat,delay:x.delay,len:lenKm,speed:x.speed,x});
+      events.push({type:"traffic",ll:R.coords[i],t,label:trafficLabel(x),delay:x.delay,cat:x.cat,mag:x.mag,km,len:lenKm,x});});
+    timeAt[i]=t;driveAt[i]=drive;
+    if(i===n-1)break;
+    const cc=R.cc[i];
+    if(cc!==prevCc){pushDriveItem(km);items.push({type:"border",t,km,cc,from:prevCc});events.push({type:"border",ll:R.coords[i],cc});prevCc=cc;}
+    const hh=new Date(t).getHours();
+    const dt=((hh>=22||hh<5)?R.durN[i]:R.dur[i])||0;
+    const ban=banCheck(t,cc,bans);
+    if(ban){pushDriveItem(km);items.push(Object.assign({type:"ban",t,km},ban));events.push({type:"ban",ll:R.coords[i],t,label:ban.label,km});}
+    if(preKm==null&&drive<LIM-(S.buffer||0)*60&&drive+dt>=LIM-(S.buffer||0)*60)preKm=km;
+    if(drive<LIM&&drive+dt>=LIM){
+      const f=dt>0?(LIM-drive)/dt:0;const a=R.coords[i],b=R.coords[i+1];
+      const ll=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];const tt=t+f*dt*1000;const kk=km+(R.cumKm[i+1]-km)*f;
+      barDrive+=LIM-drive;barOver+=drive+dt-LIM;
+      pushDriveItem(kk);
+      limitCount++;
+      items.push({type:"limit",t:tt,km:kk,preKm:preKm!=null?preKm:kk,split});
+      events.push({type:"limit",ll,t:tt,km:kk,preKm:preKm!=null?preKm:kk});
+      overActive=true;segOver=true;overSeg[i]=1;
+    }else if(overActive){barOver+=dt;segOver=true;overSeg[i]=1}
+    else barDrive+=dt;
+    if(!dayFlag&&day<dayMax&&day+dt>=dayMax){dayFlag=true;items.push({type:"limit",day:true,t:t+(dayMax-day)*1000,km});events.push({type:"dayLimit",ll:R.coords[i],t,km});}
+    if(!shiftFlag&&t+dt*1000>=warnAt){if(t+dt*1000>=shiftEnd||!warnFlag)pushDriveItem(km);shiftCheck(t,t+dt*1000,km,R.coords[i],R.cumKm[i+1],R.coords[i+1]);}
+    drive+=dt;day+=dt;totalDrive+=dt;segDrive+=dt;t+=dt*1000;
+    if(drive>=LIM&&!overActive)overActive=true;
+  }
+  for(let i=0,a=-1;i<=n-1;i++){if(overSeg[i]&&a<0)a=i;if(!overSeg[i]&&a>=0){overRuns.push([a,i]);a=-1}}
+  flushDrive();
+  return {items,bars,events,overRuns,timeAt,driveAt,arrival:t,shiftStart,splitEnd:split,dayDrive:day,shiftUsed:t-shiftStart,shiftMaxMs,shiftFlag,driveEnd:drive,totalDrive,totalPause,totalStop,km:R.cumKm[n-1],limitCount,dayEnd:day};
+}
+
+/* ---------- Ausgabe ---------- */
+const DF=new Intl.DateTimeFormat("de-AT",{weekday:"short",day:"2-digit",month:"2-digit"});
+const TF=new Intl.DateTimeFormat("de-AT",{hour:"2-digit",minute:"2-digit"});
+function fmtT(ms){return TF.format(new Date(ms))}
+function fmtD(ms){return DF.format(new Date(ms))}
+function fmtDur(s){s=Math.round(s/60);const h=Math.floor(s/60),m=s%60;return h?`${h}:${String(m).padStart(2,"0")} h`:`${m} min`}
+
+function renderAll(){
+  const sim=SIM;renderCountries();
+  // Zusammenfassung
+  $("#summary").innerHTML=`
+    <div><b>${sim.km.toFixed(0)} km</b><span>Strecke</span></div>
+    <div><b>${fmtDur(sim.totalDrive)}</b><span>Lenkzeit</span></div>
+    <div><b>${sim.totalPause} min</b><span>Pausen</span></div>
+    <div class="${sim.shiftFlag?"alert":""}"><b>${fmtDur(sim.shiftUsed/1000)}</b><span>Einsatzzeit / ${S.shiftMax/60} h</span></div>
+    <div class="${sim.driveEnd>=LIM?"alert":""}"><b>${fmtDur(Math.max(0,LIM-sim.driveEnd))}</b><span>Rest bis Pause</span></div>
+    <div><b>${fmtT(sim.arrival)}</b><span>Ankunft ${fmtD(sim.arrival)}</span></div>`;
+  const tot=sim.bars.reduce((a,b)=>a+b.d,0)||1;
+  $("#tachoBar").innerHTML=sim.bars.map(b=>`<i class="k-${b.k}" style="width:${(b.d/tot*100).toFixed(3)}%" title="${({drive:"Lenkzeit",over:"Über 4,5 h",pause:"Pause",stop:"Stopp"})[b.k]} ${fmtDur(b.d)}"></i>`).join("");
+  // Zeitleiste
+  const tl=$("#timeline");tl.innerHTML="";
+  let lastDay=null;
+  sim.items.forEach(it=>{
+    const li=document.createElement("li");li.className=it.type+(it.over?" over":"");
+    const showDay=it.t&&fmtD(it.t)!==lastDay;if(it.t)lastDay=fmtD(it.t);
+    const time=it.t?`${fmtT(it.t)}${showDay?`<small>${fmtD(it.t)}</small>`:""}`:"";
+    let body="";
+    switch(it.type){
+      case"start":body=it.live?`<b>Jetzt</b> · aktuelle Position<small>km ${it.km.toFixed(0)} der Route</small>`:`<b>Abfahrt</b> · ${esc(shortName(it.name))}${S.driveStart?`<small>bereits ${S.driveStart} min Lenkzeit seit letzter Pause</small>`:""}`;break;
+      case"end":body=`<b>Ankunft</b> · ${esc(shortName(it.name))}<small>km ${it.km.toFixed(0)}</small>`;break;
+      case"stop":body=`<b>${it.letter}: ${esc(shortName(it.name))}</b><small>km ${it.km.toFixed(0)}${it.dwell?` · ${it.dwell} min Aufenthalt`:""}</small>`;break;
+      case"drive":body=`Fahrt ${fmtDur(it.dur)} · ${it.km.toFixed(0)} km${it.over?" · Lenkzeit überschritten":""}`;break;
+      case"pause":body=`<b>Pause ${it.dur} min</b>${it.place?` · ${esc(it.place)}`:it.auto?" (automatisch)":""}${it.atStop?` an Stopp ${it.atStop}`:""}<small>km ${it.km.toFixed(0)} · weiter um ${fmtT(it.t+it.dur*60000)}</small><span class="note ${it.ncls||""}">${esc(it.note||"")}</span>
+        ${it.atStop?"":`<div class="pctl"><select data-id="${it.id}" aria-label="Pausendauer">${[15,30,45,60].map(v=>`<option value="${v}" ${v===it.dur?"selected":""}>${v} min</option>`).join("")}</select><button type="button" data-del="${it.id}">Entfernen</button><button type="button" data-pk="pause" data-id="${it.id}" data-km="${it.km}" data-t="${it.t}" data-dur="${it.dur}">🅿 Parkplatz</button></div><div class="plist"></div>`}`;break;
+      case"shiftWarn":body=`<b>Noch 1 h Einsatzzeit</b><small>km ${it.km.toFixed(0)} – jetzt Parkplatz für die Tagesruhe suchen (Ende ${fmtT(it.t+3600e3)})</small>`;break;
+      case"limit":body=it.shift?`Max. Einsatzzeit ${S.shiftMax/60} h erreicht<small>km ${it.km.toFixed(0)} – spätestens hier tägliche Ruhezeit (11 h, reduziert 9 h) beginnen</small>`:it.day?`Tageslenkzeit ${S.dayMax/60} h erreicht<small>km ${it.km.toFixed(0)} – tägliche Ruhezeit einplanen</small>`:`4,5 h Lenkzeit erreicht<small>km ${it.km.toFixed(0)} – spätestens hier ${it.split?"30 min (2. Teil)":"45 min Pause (oder 15 + 30)"}</small><button type="button" class="pk-btn" data-pk="limit" data-km="${it.km}" data-t="${it.t}" data-dur="${it.split?30:45}">🅿 Parkplätze davor suchen</button><div class="plist"></div>`;break;
+      case"border":{const sp=spFor(it.cc);body=`Grenze → <b>${esc(cname(it.cc))}</b><small>LKW ${sp.ab} / ${sp.land} / ${sp.ort} km/h${C[it.cc]&&C[it.cc].info?" · "+esc(C[it.cc].info):""}</small>`;break}
+      case"cam":{const c=it.c,tm=camTruckMax(c);body=c.kind==="section"?`<b>📷 Section Control</b> · ${(c.kmEnd-c.km).toFixed(1)} km${c.name&&c.name!=="Section Control"?`<span class="tdesc">${esc(c.name)}</span>`:""}<small>km ${c.km.toFixed(0)}–${c.kmEnd.toFixed(0)}${c.max?` · Limit ${c.max}${tm&&tm<c.max?`, LKW ${tm}`:""} km/h`:""}</small>`:`<b>📷 ${esc(c.name)}</b><small>km ${c.km.toFixed(1)}${c.max?` · Limit ${c.max}${tm&&tm<c.max?`, LKW ${tm}`:""} km/h`:""}</small>`;break}
+      case"traffic":{const w=trafficWhere(it.x),d=trafficDesc(it.x),end=it.x&&it.x.inc&&it.x.inc.end?new Date(it.x.inc.end):null;
+        body=`<b>${esc(it.label)}</b>${it.delay?` · +${Math.max(1,Math.round(it.delay/60))} min`:""}${w?`<span class="tdesc">${esc(w)}</span>`:""}${d?`<span class="tdesc">${esc(d)}</span>`:""}<small>km ${it.km.toFixed(0)} · ${it.len.toFixed(1)} km lang${it.speed?` · ca. ${it.speed} km/h`:""}${end&&!isNaN(end)?` · voraussichtlich bis ${fmtD(+end)} ${fmtT(+end)}`:""}</small>`;break}
+      case"ban":body=`<b>${it.label}</b><small>${it.sub} · km ${it.km.toFixed(0)} – Gültigkeit für deine Route prüfen</small>`;break;
+    }
+    li.innerHTML=`<div class="time">${it.type==="drive"?"":time}</div><div class="dot"></div><div class="body">${body}</div>`;
+    tl.appendChild(li);
+  });
+  // Karte: Ereignisse
+  layers.events.clearLayers();layers.over.clearLayers();
+  sim.overRuns.forEach(([a,b])=>{if(b>a)L.polyline(R.coords.slice(a,b+1),{color:"#c8322b",weight:6,opacity:.95,interactive:false}).addTo(layers.over)});
+  sim.events.forEach(ev=>{
+    if(ev.type==="pause")L.marker(ev.ll,{icon:mkIcon("mk-pause","P",24,24),zIndexOffset:800}).bindPopup(`<b>Pause ${ev.dur} min</b><br>${fmtD(ev.t)} ${fmtT(ev.t)} · km ${ev.km.toFixed(0)}`).addTo(layers.events);
+    if(ev.type==="limit")L.marker(ev.ll,{icon:mkIcon("mk-limit","4,5 h · "+fmtT(ev.t)),zIndexOffset:900}).bindPopup(`<b>4,5 h Lenkzeit erreicht</b><br>${fmtD(ev.t)} ${fmtT(ev.t)} · km ${ev.km.toFixed(0)}`).addTo(layers.events);
+    if(ev.type==="shift")L.marker(ev.ll,{icon:mkIcon("mk-limit",`${S.shiftMax/60} h Einsatz · `+fmtT(ev.t)),zIndexOffset:950}).bindPopup(`<b>Max. Einsatzzeit erreicht</b><br>${fmtD(ev.t)} ${fmtT(ev.t)} · km ${ev.km.toFixed(0)}<br>Tägliche Ruhezeit einplanen`).addTo(layers.events);
+    if(ev.type==="dayLimit")L.marker(ev.ll,{icon:mkIcon("mk-limit",`${S.dayMax/60} h Tag`),zIndexOffset:900}).bindPopup("<b>Tageslenkzeit erreicht</b>").addTo(layers.events);
+    if(ev.type==="cam"){const c=ev.c;L.marker(c.kind==="section"?R.coords[c.i]:ev.ll,{icon:mkIcon("mk-cam",c.kind==="section"?"📷 Section Control":"📷"+(c.max?" "+c.max:"")),zIndexOffset:700}).bindPopup(`<b>${c.kind==="section"?"Section Control":esc(c.name)}</b><br>km ${c.km.toFixed(1)}${c.kind==="section"?` – ${c.kmEnd.toFixed(1)} (${(c.kmEnd-c.km).toFixed(1)} km)`:""}${c.max?`<br>Limit ${c.max} km/h`:""}`).addTo(layers.events);if(c.kind==="section")L.marker(R.coords[c.iEnd+1]||R.coords[c.iEnd],{icon:mkIcon("mk-cam","Ende SC"),zIndexOffset:690}).addTo(layers.events)}
+    if(ev.type==="traffic")L.marker(ev.ll,{icon:mkIcon(`traffic-mk ${ev.cat==="ROAD_WORK"?"work":(ev.cat==="ROAD_CLOSURE"||ev.mag>=3)?"major":""}`,`⚠ ${esc(ev.label)}${ev.delay?" +"+Math.max(1,Math.round(ev.delay/60))+"′":""}`),zIndexOffset:750}).bindPopup(`<b>${esc(ev.label)}</b>${trafficWhere(ev.x)?`<br>${esc(trafficWhere(ev.x))}`:""}${trafficDesc(ev.x)?`<br>${esc(trafficDesc(ev.x))}`:""}<br>km ${ev.km.toFixed(0)} · ${ev.len.toFixed(1)} km${ev.delay?`<br>Verzögerung ca. ${Math.round(ev.delay/60)} min`:""}`).addTo(layers.events);
+    if(ev.type==="ban")L.marker(ev.ll,{icon:mkIcon("mk-ban","⚠ "+fmtT(ev.t)),zIndexOffset:700}).bindPopup(`<b>${ev.label}</b><br>${fmtD(ev.t)} ${fmtT(ev.t)} · km ${ev.km.toFixed(0)}`).addTo(layers.events);
+  });
+  const note=$("#mapnote");
+  const msgs=[];if(sim.limitCount)msgs.push(`${sim.limitCount}× Lenkzeit 4,5 h überschritten`);if(sim.shiftFlag)msgs.push(`Einsatzzeit ${S.shiftMax/60} h überschritten`);
+  if(msgs.length){note.hidden=false;note.textContent=msgs.join(" · ")+" – rot markiert";}else{note.hidden=true}
+}
+
+$("#timeline").addEventListener("change",e=>{const id=e.target.dataset.id;if(!id)return;const p=S.pauses.find(x=>x.id===id);if(p){p.dur=+e.target.value;save();resim()}});
+$("#timeline").addEventListener("click",e=>{
+  const pk=e.target.closest("[data-pk]");
+  if(pk){planParkSearch(pk);return}
+  const id=e.target.dataset.del;if(!id)return;S.pauses=S.pauses.filter(x=>x.id!==id);save();resim()});
+$("#addPauseBtn").onclick=()=>{if(!R){status("Zuerst die Route berechnen.","info");return}const km=+$("#addKm").value;if(!(km>=0)||km>R.cumKm[R.cumKm.length-1]){status(`Bitte einen km-Wert zwischen 0 und ${R.cumKm[R.cumKm.length-1].toFixed(0)} eingeben.`,"err");return}S.pauses.push({id:uid(),km,dur:+$("#addDur").value});$("#addKm").value="";save();resim();};
+$("#clearPause").onclick=()=>{S.pauses=[];save();resim()};
+$("#autoPause").onclick=()=>{
+  if(!R){status("Zuerst die Route berechnen.","info");return}
+  S.pauses=S.pauses.filter(p=>!p.auto);
+  for(let g=0;g<30;g++){
+    const sim=simulate();const lim=sim.items.find(x=>x.type==="limit"&&!x.day);
+    if(!lim)break;
+    const km=Math.max(0,lim.preKm);
+    if(S.pauses.some(p=>Math.abs(p.km-km)<0.5)){S.pauses.push({id:uid(),km:lim.km,dur:45,auto:true})}
+    else S.pauses.push({id:uid(),km,dur:45,auto:true});
+  }
+  save();resim();status("45-min-Pausen vor jeder 4,5-h-Grenze eingeplant. Auf der Karte oder in der Liste anpassbar, z. B. in 15 + 30 min aufteilen.","info");
+};
+$("#gmaps").onclick=()=>{
+  const p=S.stops.filter(s=>s.lat!=null);if(p.length<2)return;
+  const f=s=>`${s.lat.toFixed(6)},${s.lng.toFixed(6)}`;
+  let u=`https://www.google.com/maps/dir/?api=1&travelmode=driving&origin=${f(p[0])}&destination=${f(p[p.length-1])}`;
+  if(p.length>2)u+="&waypoints="+encodeURIComponent(p.slice(1,-1).map(f).join("|"));
+  window.open(u,"_blank","noopener");
+};
+$("#printBtn").onclick=()=>window.print();
+
+/* ---------- Blitzer & Section Control (nur Österreich, OpenStreetMap) ---------- */
+const camLayer=L.layerGroup().addTo(map);
+async function loadCams(r){
+  r.cams=[];
+  const at=[];r.cc.forEach((c,i)=>{if(c==="AT")at.push(i)});if(!at.length)return;
+  let s1=90,w1=180,n1=-90,e1=-180;at.forEach(i=>{[r.coords[i],r.coords[i+1]].forEach(([la,lo])=>{s1=Math.min(s1,la);n1=Math.max(n1,la);w1=Math.min(w1,lo);e1=Math.max(e1,lo)})});
+  const bb=[s1-0.02,w1-0.02,n1+0.02,e1+0.02].map(v=>v.toFixed(4)).join(",");
+  const q=`[out:json][timeout:60];node[highway=speed_camera](${bb});out body;rel[type=enforcement][enforcement~"^(average_speed|maxspeed)$"](${bb});out body;>;out skel qt;`;
+  let j=null;
+  for(const ep of OVERPASS){try{const res=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});if(res.ok){j=await res.json();break}}catch(e){}}
+  if(!j)return;
+  // Raster der österreichischen Routenabschnitte für schnelle Abstandssuche
+  const G=0.01,grid={},key=(a,b)=>a+"|"+b;
+  at.forEach(i=>{const a=r.coords[i],b=r.coords[i+1];
+    for(let y=Math.floor(Math.min(a[0],b[0])/G);y<=Math.floor(Math.max(a[0],b[0])/G);y++)for(let x=Math.floor(Math.min(a[1],b[1])/G);x<=Math.floor(Math.max(a[1],b[1])/G);x++)(grid[key(y,x)]=grid[key(y,x)]||[]).push(i)});
+  const near=(la,lo)=>{let best=null;const cy=Math.floor(la/G),cx=Math.floor(lo/G);
+    for(let y=cy-1;y<=cy+1;y++)for(let x=cx-1;x<=cx+1;x++)(grid[key(y,x)]||[]).forEach(i=>{const a=r.coords[i],b=r.coords[i+1],k=Math.cos(a[0]*Math.PI/180)*111320;
+      const bx=(b[1]-a[1])*k,by=(b[0]-a[0])*110540,px=(lo-a[1])*k,py=(la-a[0])*110540;const L2=bx*bx+by*by;let f=L2?Math.max(0,Math.min(1,(px*bx+py*by)/L2)):0;
+      const d=Math.hypot(px-f*bx,py-f*by);if(!best||d<best.d)best={i,f,d,brg:(Math.atan2(bx,by)*180/Math.PI+360)%360}});return best};
+  const kmOf=m=>r.cumKm[m.i]+m.f*(r.dist[m.i]||0)/1000;
+  const nodes={};j.elements.forEach(e=>{if(e.type==="node")nodes[e.id]=Object.assign(nodes[e.id]||{},e)});
+  const out=[];
+  // Abschnittskontrollen
+  j.elements.filter(e=>e.type==="relation"&&e.tags&&e.tags.enforcement==="average_speed").forEach(rel=>{
+    const fr=rel.members.find(m=>m.role==="from"&&m.type==="node"),to=rel.members.find(m=>m.role==="to"&&m.type==="node");
+    if(!fr||!to||!nodes[fr.ref]||!nodes[to.ref])return;
+    const a=near(nodes[fr.ref].lat,nodes[fr.ref].lon),b=near(nodes[to.ref].lat,nodes[to.ref].lon);
+    if(!a||!b||a.d>60||b.d>60)return;const ka=kmOf(a),kb=kmOf(b);if(kb-ka<0.3)return; // Gegenrichtung oder zu kurz
+    out.push({kind:"section",i:a.i,iEnd:b.i,km:ka,kmEnd:kb,name:rel.tags.name||rel.tags.description||"Section Control",max:parseInt(rel.tags.maxspeed)||null});
+  });
+  // Fixe Radargeräte
+  Object.values(nodes).forEach(n=>{const t=n.tags;if(!t||t.highway!=="speed_camera")return;
+    const m=near(n.lat,n.lon);if(!m||m.d>45)return;
+    const dir=parseFloat(t.direction);if(!isNaN(dir)){const df=Math.abs(((dir-m.brg)+540)%360-180);if(df>70)return}
+    const km=kmOf(m);if(out.some(o=>o.kind==="section"&&km>=o.km-0.2&&km<=o.kmEnd+0.2))return;
+    if(out.some(o=>o.kind==="cam"&&Math.abs(o.km-km)<0.15))return;
+    out.push({kind:"cam",i:m.i,km,name:t.name||"Radar (fix)",max:parseInt(t.maxspeed)||null,ll:[n.lat,n.lon]});
+  });
+  out.sort((a,b)=>a.km-b.km);r.cams=out;
+}
+function camTruckMax(c){const ab=spFor("AT").ab;return c.max?Math.min(c.max,ab):null}
+function drawCams(){
+  camLayer.clearLayers();if(!R||!R.cams)return;
+  R.cams.forEach(c=>{if(c.kind==="section")L.polyline(R.coords.slice(c.i,c.iEnd+2),{color:"#6b3fa0",weight:8,opacity:.55,interactive:false}).addTo(camLayer)});
+}
+
+/* ---------- Parkplatzsuche (OpenStreetMap / Overpass) ---------- */
+const parkLayer=L.layerGroup().addTo(map);
+const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
+async function findParking(vA,vB){
+  vA=Math.max(0,vA);vB=Math.min(R.coords.length-1,vB);if(vB<=vA)return[];
+  const span=R.cumKm[vB]-R.cumKm[vA];const step=Math.max(1.5,span/120);
+  const pts=[];let last=-1e9;for(let i=vA;i<=vB;i++){if(R.cumKm[i]-last>=step||i===vB){pts.push(R.coords[i]);last=R.cumKm[i]}}
+  const poly=pts.map(p=>p[0].toFixed(5)+","+p[1].toFixed(5)).join(",");
+  const A=`(around:400,${poly})`;
+  const q=`[out:json][timeout:25];(nwr${A}[highway~"^(rest_area|services)$"];nwr${A}[amenity=parking][hgv~"^(yes|designated)$"];nwr${A}[amenity=parking]["capacity:hgv"];);out center tags;`;
+  let j=null,err;
+  for(const ep of OVERPASS){try{const r=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});if(r.ok){j=await r.json();break}err="HTTP "+r.status}catch(e){err=e.message}}
+  if(!j)throw new Error("Parkplatzsuche nicht erreichbar ("+err+")");
+  const out=[];
+  j.elements.forEach(el=>{
+    const t=el.tags||{};if(t.hgv==="no"||t.access==="private"||t.access==="no")return;
+    const lat=el.lat!=null?el.lat:el.center&&el.center.lat,lng=el.lon!=null?el.lon:el.center&&el.center.lon;if(lat==null)return;
+    let bi=vA,bd=Infinity;for(let i=Math.max(0,vA-5);i<=Math.min(R.coords.length-1,vB+5);i++){const d=hav(R.coords[i],[lat,lng]);if(d<bd){bd=d;bi=i}}
+    const kind=t.highway==="services"?"Raststätte":t.highway==="rest_area"?"Rastplatz":"LKW-Parkplatz";
+    // Fahrbahnseite (rechts = in Fahrtrichtung erreichbar, Linksverkehr in GB/IE umgekehrt)
+    let side=null;if(bd>35&&bi<R.coords.length-1){const a=R.coords[bi],b=R.coords[bi+1],k=Math.cos(a[0]*Math.PI/180);
+      const cr=(b[1]-a[1])*k*(lat-a[0])-(b[0]-a[0])*(lng-a[1])*k;const lht=["GB","IE"].includes(R.cc[Math.min(bi,R.cc.length-1)]);side=(cr<0)!==lht?"r":"l";}
+    const info=[];if(t["capacity:hgv"])info.push(t["capacity:hgv"]+" LKW-Plätze");else if(t.hgv==="designated")info.push("LKW-Stellplätze");
+    if(t.highway==="services")info.push("Tankstelle/Restaurant");if(t.toilets==="yes"||t.amenity==="toilets")info.push("WC");if(t.fee==="yes")info.push("gebührenpflichtig");if(t.fee==="no")info.push("kostenlos");if(t.supervised==="yes")info.push("bewacht");
+    out.push({name:t.name||t.operator||kind,kind,lat,lng,km:R.cumKm[bi],vi:bi,side,info:info.join(" · "),score:(t.name?2:0)+(t.highway?2:0)+(t["capacity:hgv"]?1:0)});
+  });
+  out.sort((a,b)=>b.score-a.score);
+  const res=[];out.forEach(o=>{if(!res.some(r=>hav([r.lat,r.lng],[o.lat,o.lng])<300))res.push(o)});
+  res.sort((a,b)=>a.km-b.km);
+  return res;
+}
+function parkHtml(list,dur,limitT,ctx){
+  if(!list.length)return`<small class="hint">Keine LKW-Parkplätze in OpenStreetMap entlang dieses Abschnitts gefunden.</small>`;
+  return list.map((p,ix)=>{const t=SIM&&SIM.timeAt[p.vi];const buf=t&&limitT?Math.round((limitT-t)/60000):null;
+    return`<div class="pitem"><b>🅿 ${esc(p.name)}</b><small>${esc(p.kind)} · km ${p.km.toFixed(0)}${t?` · an ca. ${fmtT(t)}`:""}${buf!=null?` · ${buf} min vor Lenkzeitende`:""}</small>
+    ${p.info?`<small>${esc(p.info)}</small>`:""}${p.side?`<small class="${p.side==="l"?"side-l":""}">${p.side==="r"?"In Fahrtrichtung":"Andere Straßenseite – evtl. Gegenrichtung, bitte prüfen"}</small>`:""}
+    <div class="pbtns"><button type="button" class="go" data-park="${ix}" data-ctx="${ctx}" data-dur="${dur}">${dur} min Pause hier</button><a href="https://maps.apple.com/?daddr=${p.lat},${p.lng}&dirflg=d" target="_blank" rel="noopener">Apple Karten</a><button type="button" data-show="${ix}" data-ctx="${ctx}">Karte</button></div></div>`}).join("");
+}
+const PARK={};
+function showParkMarkers(list,ctx,dur){
+  parkLayer.clearLayers();
+  list.forEach((p,ix)=>{const m=L.marker([p.lat,p.lng],{icon:mkIcon("mk-park","P",24,24),zIndexOffset:850});
+    const div=document.createElement("div");div.className="pop";div.innerHTML=`<h4>${esc(p.name)}</h4><div>${esc(p.kind)} · km ${p.km.toFixed(0)}</div>${p.info?`<div>${esc(p.info)}</div>`:""}<div class="btns"><button type="button">${dur} min Pause hier</button></div>`;
+    div.querySelector("button").onclick=()=>{applyPark(ctx,ix,dur);map.closePopup()};
+    m.bindPopup(div).addTo(parkLayer)});
+}
+function applyPark(ctx,ix,dur){
+  const c=PARK[ctx];if(!c)return;const p=c.list[ix];
+  if(c.pauseId){const ps=S.pauses.find(x=>x.id===c.pauseId);if(ps){ps.km=p.km;ps.place=p.name;ps.auto=false}}
+  else S.pauses.push({id:uid(),km:p.km,dur:+dur,place:p.name});
+  save();parkLayer.clearLayers();resim();
+  if(LIVE.active){$("#lvPark").hidden=true;LIVE.parkShown=false}
+  status(`Pause bei „${p.name}“ eingeplant.`,"info");
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-park],[data-show]");if(!b)return;
+  const c=PARK[b.dataset.ctx];if(!c)return;
+  if(b.dataset.park!=null)applyPark(b.dataset.ctx,+b.dataset.park,+b.dataset.dur);
+  else{const p=c.list[+b.dataset.show];map.setView([p.lat,p.lng],15);LIVE.follow=false}
+});
+function vertexAtTime(tt,from){if(!SIM)return from;for(let i=from;i<R.coords.length;i++){if(SIM.timeAt[i]!=null&&SIM.timeAt[i]>=tt)return i}return R.coords.length-1}
+async function planParkSearch(btn){
+  const li=btn.closest("li");const box=li.querySelector(".plist");
+  const km=+btn.dataset.km,t=+btn.dataset.t,dur=+btn.dataset.dur;
+  const vB=vertexAtKm(km);const i0=SIM&&SIM.items[0]?vertexAtKm(SIM.items[0].km):0;
+  const vA=Math.max(i0,vertexAtTime(t-(btn.dataset.pk==="pause"?75:90)*60000,i0));
+  const vB2=btn.dataset.pk==="pause"?Math.min(R.coords.length-1,vertexAtTime(t+10*60000,vB)):vB;
+  box.innerHTML=`<small class="hint">Suche LKW-Parkplätze …</small>`;btn.disabled=true;
+  try{const list=await findParking(vA,vB2);const ctx="c"+uid();PARK[ctx]={list,pauseId:btn.dataset.id||null};
+    const limitT=btn.dataset.pk==="limit"?t:null;box.innerHTML=parkHtml(list,dur,limitT,ctx);showParkMarkers(list,ctx,dur);
+    if(list.length)map.fitBounds(L.latLngBounds(list.map(p=>[p.lat,p.lng])).pad(0.3));}
+  catch(e){box.innerHTML=`<small class="hint">${esc(e.message)}</small>`}
+  btn.disabled=false;
+}
+
+/* ---------- Live-Navigation (GPS) ---------- */
+const LIVE={active:false,watch:null,fix:null,idx:0,off:0,lastT:null,driveSec:0,daySec:0,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:0,lastSim:0,wake:null,shiftStart:null,marker:null,acc:null,speed:0,breakNote:""};
+function liveOpts(){
+  const o={startIdx:LIVE.idx,t:Date.now(),drive:LIVE.driveSec,day:LIVE.daySec,split:LIVE.split,label:"Aktuelle Position",shiftStart:LIVE.shiftStart};
+  if(LIVE.pauseSince){const el=(Date.now()-LIVE.pauseSince)/60000,need=LIVE.split?30:45;if(el<need)o.t=Date.now()+(need-el)*60000;o.drive=0;o.split=false;}
+  return o;
+}
+function liveBreak(min){
+  if(min>=45||(LIVE.split&&min>=30)){LIVE.driveSec=0;LIVE.split=false;LIVE.block++;return(min>=45?`${Math.round(min)} min Pause`:"15 + 30 min Pause")+" erfüllt – 4,5 h beginnen neu"}
+  if(min>=15&&!LIVE.split){LIVE.split=true;return`${Math.round(min)} min Pause = 1. Teil – noch 30 min als 2. Teil nötig`}
+  return LIVE.split?`${Math.round(min)} min Pause – zu kurz für den 2. Teil (mind. 30 min)`:`${Math.round(min)} min Pause – zu kurz (mind. 15 min)`;
+}
+function startPause(){
+  const now=Date.now();
+  LIVE.pauseSince=LIVE.stillSince&&now-LIVE.stillSince<60*60000?LIVE.stillSince:now;
+  $("#lvPause").textContent="▶ Pause beenden";$("#lvPause").classList.add("on");LIVE.breakNote="";
+  $("#lvPark").hidden=true;parkLayer.clearLayers();resim();
+}
+function endPause(auto){
+  if(!LIVE.pauseSince)return;
+  LIVE.breakNote=liveBreak((Date.now()-LIVE.pauseSince)/60000)+(auto?" (Pause automatisch beendet, weil du losgefahren bist)":"");
+  LIVE.pauseSince=null;$("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");resim();
+}
+$("#lvGrip").onclick=()=>{$("#livePanel").classList.toggle("mini")};
+$("#lvPause").onclick=()=>LIVE.pauseSince?endPause(false):startPause();
+$("#lvTacho").onclick=()=>{const f=$("#lvTachoForm");f.hidden=!f.hidden;$("#lvTachoMin").value=Math.round(LIVE.driveSec/60);$("#lvTachoSplit").checked=LIVE.split};
+$("#lvTachoCancel").onclick=()=>{$("#lvTachoForm").hidden=true};
+$("#lvTachoSave").onclick=()=>{const m=+$("#lvTachoMin").value;if(m>=0){LIVE.driveSec=m*60;LIVE.split=$("#lvTachoSplit").checked;LIVE.block++;LIVE.breakNote="Mit Tacho abgeglichen";}$("#lvTachoForm").hidden=true;resim()};
+$("#lvParkBtn").onclick=()=>liveParkSearch(true);
+async function liveParkSearch(manual){
+  if(!R||!SIM||!LIVE.fix)return;
+  LIVE.parkBlock=LIVE.block;
+  const nowKm=R.cumKm[LIVE.idx];
+  const lim=SIM.items.find(x=>x.type==="limit"&&!x.day&&!x.shift&&x.km>=nowKm);
+  const pz=SIM.items.find(x=>x.type==="pause"&&x.km>=nowKm);
+  const target=lim||pz;
+  const box=$("#lvPark");box.hidden=false;LIVE.parkShown=true;
+  const tKm=target?target.km:Math.min(R.cumKm[R.cumKm.length-1],nowKm+60);
+  const dur=LIVE.split?30:45;
+  box.innerHTML=`<b>🅿 Parkplätze bis ${lim?"zur 4,5-h-Grenze":"zur geplanten Pause"} (km ${tKm.toFixed(0)})</b><div class="plist"><small class="hint">Suche …</small></div><div class="live-btns" style="margin-top:6px"><button type="button" id="lvParkClose" class="ghost">Schließen</button></div>`;
+  $("#lvParkClose").onclick=()=>{box.hidden=true;LIVE.parkShown=false;parkLayer.clearLayers()};
+  try{const list=await findParking(LIVE.idx,vertexAtKm(tKm));
+    const ctx="live";PARK[ctx]={list:list.slice(-6),pauseId:null};
+    box.querySelector(".plist").innerHTML=parkHtml(PARK[ctx].list,dur,lim?lim.t:null,ctx);showParkMarkers(PARK[ctx].list,ctx,dur);
+  }catch(e){box.querySelector(".plist").innerHTML=`<small class="hint">${esc(e.message)}</small>`}
+}
+async function wakeOn(){try{if(navigator.wakeLock)LIVE.wake=await navigator.wakeLock.request("screen")}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(LIVE.active&&document.visibilityState==="visible")wakeOn()});
+function startLive(){
+  if(!("geolocation" in navigator)){status("Dieses Gerät bietet keine Ortung an.","err");return}
+  if(!window.isSecureContext){status("Live-Ortung funktioniert nur, wenn das Tool über einen https-Link geöffnet wird (nicht als Datei). Anleitung siehe Chat.","err");return}
+  if(!R){status("Zuerst die Route berechnen.","info");return}
+  Object.assign(LIVE,{active:true,fix:null,idx:0,off:0,lastT:null,driveSec:(S.driveStart||0)*60,daySec:(S.dayStart||0)*60,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:Date.now(),breakNote:""});
+  $("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");$("#lvPark").hidden=true;$("#lvTachoForm").hidden=true;
+  const ss=S.shiftStart?new Date(S.shiftStart).getTime():NaN;LIVE.shiftStart=isNaN(ss)?Date.now():ss;
+  document.body.classList.add("livemode");$("#livePanel").hidden=false;
+  ["#liveBtn","#liveBtn2"].forEach(x=>{$(x).textContent="■ Live beenden";$(x).classList.add("on")});
+  setTimeout(()=>map.invalidateSize(),50);
+  wakeOn();
+  LIVE.watch=navigator.geolocation.watchPosition(onFix,err=>{$("#lvState").textContent=err.code===1?"Ortung nicht erlaubt – in den iPhone-Einstellungen unter Datenschutz › Ortungsdienste › Safari erlauben.":"GPS-Signal fehlt ("+err.message+")";},{enableHighAccuracy:true,maximumAge:2000,timeout:30000});
+}
+function stopLive(){
+  LIVE.active=false;if(LIVE.watch!=null)navigator.geolocation.clearWatch(LIVE.watch);LIVE.watch=null;
+  try{LIVE.wake&&LIVE.wake.release()}catch(e){}
+  if(LIVE.marker){map.removeLayer(LIVE.marker);map.removeLayer(LIVE.acc);LIVE.marker=LIVE.acc=null}
+  document.body.classList.remove("livemode","showplan");$("#livePanel").hidden=true;
+  ["#liveBtn","#liveBtn2"].forEach(x=>{$(x).textContent=x==="#liveBtn"?"▶ Live":"▶ Live-Navigation";$(x).classList.remove("on")});
+  setTimeout(()=>map.invalidateSize(),50);resim();
+}
+["#liveBtn","#liveBtn2"].forEach(x=>$(x).onclick=()=>LIVE.active?stopLive():startLive());
+$("#lvFollow").onclick=()=>{LIVE.follow=true;if(LIVE.fix)map.setView([LIVE.fix.lat,LIVE.fix.lng],Math.max(map.getZoom(),15))};
+$("#lvPlan").onclick=()=>{document.body.classList.toggle("showplan");setTimeout(()=>map.invalidateSize(),50)};
+$("#lvReroute").onclick=()=>liveReroute(true);
+map.on("dragstart",()=>{if(LIVE.active)LIVE.follow=false});
+function liveReroute(manual){
+  if(!LIVE.fix||!R)return;
+  const rest=[];R.legEnd.forEach((vi,k)=>{if(k>0&&vi>LIVE.idx&&!R.stops[k].virtual)rest.push(R.stops[k])});
+  if(!rest.length)return;
+  LIVE.lastReroute=Date.now();LIVE.off=0;
+  calcRoute({list:[{name:"Aktuelle Position",lat:LIVE.fix.lat,lng:LIVE.fix.lng,virtual:true},...rest],live:true,silent:!manual,kmShift:R.cumKm[LIVE.idx]});
+}
+function onFix(p){
+  const now=Date.now(),c=p.coords,pos={lat:c.latitude,lng:c.longitude};
+  const prev=LIVE.fix;const dtS=LIVE.lastT?Math.min(120,(now-LIVE.lastT)/1000):0;
+  let kmh=c.speed!=null&&c.speed>=0?c.speed*3.6:(prev&&dtS>0?hav([prev.lat,prev.lng],[pos.lat,pos.lng])/dtS*3.6:0);
+  LIVE.speed=kmh;const moving=kmh>4&&(c.accuracy||0)<80;
+  // Stillstand (z. B. Stau) zählt NICHT als Pause – Pausen nur über „Pause starten“ wie am Tacho
+  if(LIVE.pauseSince&&kmh>15&&now-LIVE.pauseSince>2*60000)endPause(true);
+  if(moving){LIVE.stillSince=null;if(!LIVE.pauseSince){LIVE.driveSec+=dtS;LIVE.daySec+=dtS;}}
+  else if(!LIVE.stillSince)LIVE.stillSince=LIVE.lastT||now;
+  LIVE.lastT=now;LIVE.fix=pos;
+  // Marker
+  const hd=c.heading!=null&&!isNaN(c.heading)&&moving?c.heading:null;
+  const html=`<div class="me ${hd==null?"noheading":""}"><i style="transform:rotate(${hd||0}deg)"></i></div>`;
+  if(!LIVE.marker){LIVE.acc=L.circle([pos.lat,pos.lng],{radius:c.accuracy||30,color:"#1a73e8",weight:1,fillOpacity:.1,interactive:false}).addTo(map);
+    LIVE.marker=L.marker([pos.lat,pos.lng],{icon:L.divIcon({className:"",html,iconSize:[22,22],iconAnchor:[11,11]}),zIndexOffset:2000,interactive:false}).addTo(map);}
+  else{LIVE.marker.setLatLng([pos.lat,pos.lng]);LIVE.marker.setIcon(L.divIcon({className:"",html,iconSize:[22,22],iconAnchor:[11,11]}));LIVE.acc.setLatLng([pos.lat,pos.lng]).setRadius(c.accuracy||30)}
+  if(LIVE.follow)map.setView([pos.lat,pos.lng],Math.max(map.getZoom(),15),{animate:true});
+  // Position auf der Route
+  if(R){
+    const lo=Math.max(0,LIVE.idx-30),hi=Math.min(R.coords.length-1,LIVE.idx+3000);let best=LIVE.idx,bd=Infinity;
+    for(let i=lo;i<=hi;i++){const d=hav(R.coords[i],[pos.lat,pos.lng]);if(d<bd){bd=d;best=i}}
+    const tol=Math.max(250,(c.accuracy||0)*2);
+    if(bd<=tol){LIVE.idx=best;LIVE.off=0}else LIVE.off++;
+    if(LIVE.off>=3&&now-LIVE.lastReroute>30000){$("#lvState").textContent="Abweichung von der Route – wird neu berechnet …";liveReroute(false);}
+    else if(S.ttKey&&now-LIVE.lastReroute>5*60000&&moving)liveReroute(false); // Verkehr alle 5 min aktualisieren
+  }
+  updateSpeedLimit(pos,moving);
+  if(now-LIVE.lastSim>3000||!SIM){LIVE.lastSim=now;resim()}else renderLive();
+}
+/* Tempolimit an der Position (TomTom Reverse Geocoding mit returnSpeedLimit) */
+LIVE.sl={t:0,pos:null,car:null,truck:null,road:"",busy:false};
+async function updateSpeedLimit(pos,moving){
+  if(!S.ttKey||LIVE.sl.busy)return;
+  const now=Date.now(),sl=LIVE.sl;
+  if(sl.pos&&(!moving||(now-sl.t<45000&&hav(sl.pos,[pos.lat,pos.lng])<1000)))return;
+  sl.busy=true;
+  try{
+    const q=new URLSearchParams({key:S.ttKey,returnSpeedLimit:"true",returnRoadUse:"true",language:"de-DE"});
+    const r=await fetch(`https://api.tomtom.com/search/2/reverseGeocode/${pos.lat.toFixed(6)},${pos.lng.toFixed(6)}.json?${q}`);
+    const j=await r.json();const a=j.addresses&&j.addresses[0]&&j.addresses[0].address||{};
+    let car=null;if(a.speedLimit){car=parseFloat(a.speedLimit);if(/MPH/i.test(a.speedLimit))car=Math.round(car*1.609);}
+    const use=(j.addresses&&j.addresses[0]&&j.addresses[0].roadUse)||[];
+    const cc=R&&R.cc?R.cc[Math.min(LIVE.idx,R.cc.length-1)]:"AT";const sp=spFor(cc);
+    const h=new Date().getHours(),night=h>=22||h<5;
+    const cls=use.includes("LimitedAccess")?"ab":(car!=null&&car<=50)?"ort":"land";
+    const cap=cls==="land"&&night&&sp.landN?sp.landN:sp[cls];
+    Object.assign(sl,{t:now,pos:[pos.lat,pos.lng],car,truck:car!=null?Math.min(car,cap):cap,guess:car==null,
+      road:[(a.routeNumbers||[]).join("/"),a.streetName,a.municipality].filter(Boolean).filter((v,i,arr)=>arr.indexOf(v)===i).join(" · ")});
+  }catch(e){}
+  sl.busy=false;renderLive();
+}
+function renderLive(){
+  if(!LIVE.active)return;
+  $("#lvSpeed").textContent=LIVE.fix?Math.round(LIVE.speed):"–";
+  const sl=LIVE.sl,vz=$("#lvVz");
+  if(sl&&sl.truck){vz.textContent=sl.truck;vz.className="vz";$("#lvVzSub").textContent=sl.guess?"LKW (geschätzt)":sl.car>sl.truck?`LKW · Pkw ${sl.car}`:"LKW";
+    $("#lvSpeedBox").className=LIVE.fix&&LIVE.speed>sl.truck+3?"speeding":"";}
+  else{vz.textContent="–";vz.className="vz none";$("#lvVzSub").textContent=S.ttKey?"Limit":"Limit (TomTom-Key)";$("#lvSpeedBox").className=""}
+  $("#lvRoad").textContent=sl&&sl.road?sl.road:"";
+  const d=LIVE.driveSec,rest=LIM-d;
+  const hm=x=>{x=Math.max(0,Math.round(x/60));return Math.floor(x/60)+":"+String(x%60).padStart(2,"0")};
+  $("#lvDrive").textContent=hm(d);
+  $("#lvRest").textContent=hm(rest);
+  $("#lvRestBox").className=rest<=15*60?"alert":"";
+  const bar=$("#lvBar");bar.className="lbar"+(rest<=0?" over":rest<=30*60?" warn":"");bar.firstElementChild.style.width=Math.min(100,d/LIM*100)+"%";
+  const st=$("#lvState");
+  if(!LIVE.fix){st.textContent="GPS wird gesucht …";st.className="live-state";}
+  else if(LIVE.pauseSince){const m=Math.floor((Date.now()-LIVE.pauseSince)/60000);
+    st.className="live-state pause";st.textContent=`Pause läuft: ${m} min (seit ${fmtT(LIVE.pauseSince)}) – `+(LIVE.split?(m>=30?"2. Teil erfüllt ✓ – Lenkzeit beginnt beim Beenden neu":`2. Teil: noch ${30-m} min`):(m>=45?"45 min erfüllt ✓ – Lenkzeit beginnt beim Beenden neu":m>=15?`15 min erfüllt (1. Teil) – bis 45 min noch ${45-m} min`:`noch ${15-m} min bis zum 1. Teil (15 min)`));}
+  else if(LIVE.stillSince&&Date.now()-LIVE.stillSince>90000){const m=Math.floor((Date.now()-LIVE.stillSince)/60000);
+    st.className="live-state";st.textContent=`Stillstand ${m} min (z. B. Stau) – zählt nicht als Pause. Wenn du am Tacho Pause gesetzt hast: „Pause starten“ tippen.`;}
+  else{st.className="live-state";st.textContent=(LIVE.breakNote||(LIVE.split?"Geteilte Pause: 1. Teil genommen, noch 30 min offen":"Fahrt läuft"))+(LIVE.off?" · abseits der Route":"");}
+  if(!SIM)return;
+  const nowKm=R.cumKm[LIVE.idx];
+  // Blitzer-Hinweis (nur Österreich)
+  const cw=$("#lvCam");cw.hidden=true;
+  if(S.camMode!=="off"&&R.cams&&R.cams.length){
+    const sec=R.cams.find(c=>c.kind==="section"&&nowKm>=c.km-0.05&&nowKm<=c.kmEnd);
+    if(sec){if(!LIVE.sec||LIVE.sec.c!==sec)LIVE.sec={c:sec,t0:Date.now(),km0:nowKm};
+      const el=(Date.now()-LIVE.sec.t0)/3600e3,avg=el>0.003?(nowKm-LIVE.sec.km0)/el:null,tm=camTruckMax(sec)||spFor("AT").ab;
+      cw.hidden=false;cw.innerHTML=`📷 Section Control aktiv – noch ${(sec.kmEnd-nowKm).toFixed(1)} km<small>${avg?`Dein Schnitt: ${Math.round(avg)} km/h · `:""}LKW max. ${tm} km/h</small>`;}
+    else{LIVE.sec=null;const nc=R.cams.find(c=>c.km>=nowKm-0.05&&c.km-nowKm<=2);
+      if(nc){cw.hidden=false;const tm=camTruckMax(nc);cw.innerHTML=`📷 ${nc.kind==="section"?"Section Control":"Radar"} in ${Math.max(0,Math.round((nc.km-nowKm)*1000/50)*50)} m<small>${nc.max?`Limit ${nc.max}${tm&&tm<nc.max?` · LKW ${tm}`:""} km/h`:"Tempolimit beachten"}${nc.kind==="section"?` · Länge ${(nc.kmEnd-nc.km).toFixed(1)} km`:""}</small>`;}}
+  }
+  // Parkplatz-Vorschläge automatisch, wenn die Pause näher rückt
+  if(!LIVE.pauseSince&&LIVE.fix&&rest<=(+S.parkLead||30)*60&&LIVE.parkBlock!==LIVE.block)liveParkSearch(false);
+  const nx=SIM.items.find(x=>["stop","pause","limit","traffic","cam","ban","shiftWarn","border"].includes(x.type)&&x.km>=nowKm-0.05);
+  const lab=x=>x.type==="stop"?`Stopp ${x.letter}: ${shortName(x.name)}`:x.type==="pause"?`Pause ${x.dur} min${x.atStop?" an Stopp "+x.atStop:""}`:x.type==="limit"?(x.shift?"Ende Einsatzzeit":x.day?"Tageslenkzeit erreicht":"4,5 h Lenkzeit erreicht"):x.type==="cam"?(x.c.kind==="section"?"📷 Section Control":"📷 "+x.c.name):x.type==="traffic"?`${x.label}${x.delay?" +"+Math.round(x.delay/60)+" min":""}`:x.type==="ban"?x.label:x.type==="border"?`Grenze ${cname(x.cc)}`:x.type==="shiftWarn"?"Noch 1 h Einsatzzeit":"";
+  const extra=nx&&nx.type==="traffic"?[trafficWhere(nx.x),trafficDesc(nx.x)].filter(Boolean).join(" – "):"";
+  $("#lvNext").innerHTML=nx?`<b>${esc(lab(nx))}</b>${extra?`<small>${esc(extra)}</small>`:""}<small>in ${(nx.km-nowKm).toFixed(0)} km · ca. ${fmtT(nx.t)}</small>`:"";
+  const last=R.stops[R.stops.length-1];
+  $("#lvDest").innerHTML=`<b>Ziel: ${esc(shortName(last.name||""))}</b><small>${(R.cumKm[R.cumKm.length-1]-nowKm).toFixed(0)} km · an ${fmtT(SIM.arrival)}${fmtD(SIM.arrival)!==fmtD(Date.now())?" "+fmtD(SIM.arrival):""} · Einsatz ${fmtDur(SIM.shiftUsed/1000)}${SIM.shiftFlag?" ⚠":""}</small>`;
+}
+setInterval(()=>{if(LIVE.active)renderLive()},15000);
+
+/* ---------- iPhone-Link / QR ---------- */
+$("#phoneLink").onclick=()=>{
+  const m=$("#qrModal");m.hidden=false;const box=$("#qrBox");box.innerHTML="";
+  if(location.protocol!=="https:"){box.hidden=true;$("#qrCopy").hidden=true;
+    $("#qrText").textContent="Das Tool ist gerade als Datei geöffnet. Lade es zuerst auf einen Webspace hoch (z. B. Netlify Drop, siehe Anleitung im Chat) und öffne es über den https-Link – dann erscheint hier ein QR-Code für dein iPhone.";return}
+  box.hidden=false;$("#qrCopy").hidden=false;
+  const q=new URLSearchParams();if(S.ttKey)q.set("tt",S.ttKey);if(S.orsKey)q.set("ors",S.orsKey);
+  const url=location.origin+location.pathname+(q.toString()?"?"+q:"");
+  if(window.QRCode)new QRCode(box,{text:url,width:220,height:220});
+  $("#qrText").textContent="Mit der iPhone-Kamera scannen. Der Link enthält deine API-Keys – nur für dich verwenden, nicht weitergeben. Danach in Safari: Teilen › „Zum Home-Bildschirm“.";
+  $("#qrCopy").onclick=async()=>{try{await navigator.clipboard.writeText(url);$("#qrCopy").textContent="Kopiert"}catch(e){prompt("Link:",url)}};
+};
+$("#qrClose").onclick=()=>{$("#qrModal").hidden=true};
+$("#calc").onclick=calcRoute;
+
+fillForm();renderStops();drawStops();calcRoute();
+})();
+</script>
+</body>
+</html>

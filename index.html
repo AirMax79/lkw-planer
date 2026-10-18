@@ -263,12 +263,16 @@ details .inner{padding:0 18px 14px;display:flex;flex-direction:column;gap:10px}
 #qrBox{background:#fff;padding:10px;border-radius:8px}
 body.livemode .app{grid-template-columns:1fr}
 body.livemode aside{display:none}
-body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:min(420px,100%);z-index:1500;box-shadow:0 0 30px rgba(0,0,0,.4)}
+body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:min(420px,100%);z-index:640;box-shadow:0 0 30px rgba(0,0,0,.4)}
+body.livemode.showplan .live{z-index:660}
+.planclose{display:none;position:sticky;top:0;z-index:6;margin:0;padding:10px 16px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:0;font:700 15px var(--f-display);letter-spacing:.03em;width:100%;text-align:left}
+body.livemode.showplan .planclose{display:block}
 @media (max-width:860px){
   body.livemode .app{display:block;height:100%}
   body.livemode .mapwrap{height:100%}
   .live{left:0;right:0;bottom:0;width:100%;border-radius:14px 14px 0 0;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
   body.livemode .fab{bottom:auto;top:calc(70px + env(safe-area-inset-top,0px))}
+  body.livemode.showplan aside{width:100%;padding-bottom:45vh}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{.mapwrap{display:none}.app{display:block}aside{border:0}button,details{display:none}}
@@ -277,6 +281,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
 <body>
 <div class="app">
   <aside>
+    <button type="button" class="planclose" id="planClose">✕ Fahrplan schließen – zurück zur Navigation</button>
     <header class="brand">
       <div class="sign">LKW</div>
       <div><h1>TruckHub</h1><p>LKW-Route, Lenkzeit 4,5 h und Pausen auf einen Blick</p></div>
@@ -378,7 +383,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>TruckHub · Version 27 · 18.10.2026</b> – Ortungslücken werden erkannt, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 28 · 18.10.2026</b> – Fehlerbereinigung nach Komplettprüfung, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -659,6 +664,7 @@ function hav(a,b){const R=6371000,t=Math.PI/180;const dLa=(b[0]-a[0])*t,dLo=(b[1
 let reqId=0;
 async function calcRoute(opts){
   opts=opts||{};
+  if(!opts.list&&LIVE.active&&LIVE.fix&&R){liveReroute(true);return}
   const list=opts.list||S.stops;
   if(!opts.list){
     const pts=S.stops.filter(s=>s.lat!=null);
@@ -682,7 +688,8 @@ async function calcRoute(opts){
     if(LIVE.active){LIVE.idx=0;LIVE.lastReroute=Date.now();}
     drawRoute();resim();
     if(R.src==="tomtom"){const rr=R;enrichTraffic(rr).then(()=>{if(R===rr){resim();if(!LIVE.active)planDetours()}})}
-    if(!LIVE.active||!opts.live){ALTS=[];showAlts()}
+    ALTS=[];showAlts();
+    if(PARK.live){delete PARK.live;$("#lvPark").hidden=true;LIVE.parkShown=false;parkLayer.clearLayers()}
     if(S.camMode!=="off"){const rc=R;loadCams(rc).then(()=>{if(R===rc){drawCams();resim()}})}else drawCams();
     if(!opts.live&&!opts.keepView)map.fitBounds(routeLine.getBounds(),{padding:[30,30]});
     closeRouteAlts();
@@ -746,22 +753,24 @@ async function checkDetour(a,b,o){
   let refreshed=null;
   if(o.refresh){ // bisherige Strecke mit aktuellem Verkehr neu bewerten
     const sp=samplePath(refPts,180).map(([la,lo])=>({latitude:la,longitude:lo}));sp[0]={latitude:origin.lat,longitude:origin.lng};
-    const q=ttParams(true);q.delete("instructionsType");
+    const q=ttParams(true);
     try{const j=await ttFetch([origin,dest],q,{supportingPoints:sp});refreshed=parseTT(j.routes[0]);refTime=refreshed.time}catch(e){}
     if(refreshed&&refreshed.trafficDelay<180&&!o.force)return{refreshed};
   }
-  const q=ttParams(!!o.origin);q.set("maxAlternatives","2");q.set("minDeviationTime","120");
-  const j=await ttFetch([origin,dest],q);
+  // Alternativen als Rekonstruktion der bisherigen Strecke anfordern – nur so sind minDeviationTime/alternativeType erlaubt
+  const q=ttParams(!!o.origin);q.set("maxAlternatives","2");q.set("alternativeType","betterRoute");q.set("minDeviationDistance","1000");q.set("minDeviationTime","120");
+  const sp2=samplePath(refPts,180).map(([la,lo])=>({latitude:la,longitude:lo}));sp2[0]={latitude:origin.lat,longitude:origin.lng};
+  const j=await ttFetch([origin,dest],q,{supportingPoints:sp2});
   let best=null;
   j.routes.forEach(rt=>{const p=parseTT(rt);const save=refTime-p.time;
     if(save>=300&&pathDiffers(p.coords,refPts)&&(!best||p.time<best.time))best=p});
   if(!best)return{refreshed};
   let refLen=0;for(let i=a;i<b;i++)refLen+=R.dist[i]||0;
-  return{refreshed,alt:{p:best,a,b,save:refTime-best.time,dKm:(best.len-refLen)/1000,origin}};
+  return{refreshed,alt:{p:best,a,b,save:refTime-best.time,dKm:(best.len-refLen)/1000,origin,route:R}};
 }
 // Ersetzt den Routenabschnitt a..b durch einen neuen Abschnitt (Umfahrung oder aktualisierte Verkehrsdaten)
-async function replaceRange(a,b,p){
-  const old=R;const d=p.coords.length-(b-a+1);
+async function replaceRange(a,b,p,ro){
+  ro=ro||{};const old=R;const d=p.coords.length-(b-a+1);
   const coords=old.coords.slice(0,a).concat(p.coords,old.coords.slice(b+1));
   const dist=[],dur=[];
   for(let i=0;i<a-1;i++){dist.push(old.dist[i]);dur.push(old.baseDur[i])}
@@ -774,13 +783,16 @@ async function replaceRange(a,b,p){
   nr.stops=old.stops;nr.lbl=old.lbl;
   nr.traffic=(old.traffic||[]).filter(x=>x.b<a||x.a>b).map(x=>x.a>b?Object.assign({},x,{a:x.a+d,b:x.b+d}):x).concat(p.traffic.map(x=>Object.assign({},x,{a:x.a+a,b:x.b+a})));
   nr.trafficDelay=nr.traffic.reduce((s,x)=>s+(x.delay||0),0);
-  const kA=old.cumKm[a],kB=old.cumKm[b],nkB=nr.cumKm[b+d],nkA=nr.cumKm[a];
-  S.pauses.forEach(ps=>{if(ps.km>kB)ps.km+=nkB-kB;else if(ps.km>kA)ps.km=nkA+(ps.km-kA)*(nkB-nkA)/Math.max(0.001,kB-kA)});save();
   try{await detectCountries(nr)}catch(e){nr.cc=new Array(nr.dist.length).fill(old.cc[0]||"??")}
   if(R!==old)return false;
+  const kA=old.cumKm[a],kB=old.cumKm[b],nkB=nr.cumKm[b+d],nkA=nr.cumKm[a];
+  S.pauses.forEach(ps=>{if(ps.km>kB)ps.km+=nkB-kB;else if(ps.km>kA)ps.km=nkA+(ps.km-kA)*(nkB-nkA)/Math.max(0.001,kB-kA)});save();
+  ALTS=[];showAlts();
   R=nr;applySpeeds(R);drawRoute();resim();
   const rr=R;enrichTraffic(rr).then(()=>{if(R===rr)resim()});
-  if(S.camMode!=="off")loadCams(rr).then(()=>{if(R===rr){drawCams();resim()}});
+  if(S.camMode!=="off"){if(ro.keepCams&&old.cams){rr.cams=old.cams.map(c=>{const sh=k=>k<=a?k:k>=b?k+d:k;const o=Object.assign({},c,{i:sh(c.i)});if(c.iEnd!=null)o.iEnd=sh(c.iEnd);
+      o.km=rr.cumKm[Math.min(o.i,rr.cumKm.length-1)];if(o.kmEnd!=null)o.kmEnd=rr.cumKm[Math.min(o.iEnd,rr.cumKm.length-1)];return o}).filter(c=>c.i<a||c.i>b);drawCams();resim()}
+    else loadCams(rr).then(()=>{if(R===rr){drawCams();resim()}})}
   return true;
 }
 function showAlts(){
@@ -798,6 +810,7 @@ function showAlts(){
 }
 async function acceptAlt(ix){
   const x=ALTS[ix];if(!x)return;ALTS=[];showAlts();
+  if(x.route!==R||x.b>=R.coords.length){status("Die Route hat sich inzwischen geändert – Umfahrung bitte erneut prüfen.","err");return}
   const ok=await replaceRange(x.a,x.b,x.p);
   status(ok?`Umfahrung übernommen – ca. ${Math.round(x.save/60)} min schneller.`:"Die Route hat sich inzwischen geändert – bitte erneut prüfen.",ok?"info":"err");
 }
@@ -842,7 +855,8 @@ async function liveTrafficCheck(){
   try{const res=await checkDetour(a,b,{origin:LIVE.fix,refresh:true});if(!res||R!==rr)return;
     if(res.alt&&!isIgnored(res.alt)){const secs=R.traffic.filter(x=>x.b>=a&&x.a<=b).sort((p,q)=>q.delay-p.delay);
       res.alt.why=secs[0]?[trafficLabel(secs[0]),trafficWhere(secs[0])].filter(Boolean).join(" "):"Verkehr auf deiner Route";ALTS=[res.alt];showAlts();}
-    else if(res.refreshed&&!ALTS.length)await replaceRange(a,b,res.refreshed);
+    else if(res.refreshed&&!ALTS.length){const oldDelay=(R.traffic||[]).filter(x=>x.b>=a&&x.a<=b).reduce((s,x)=>s+(x.delay||0),0);
+      if(Math.abs(res.refreshed.trafficDelay-oldDelay)>=120)await replaceRange(a,b,res.refreshed,{keepCams:true});}
   }catch(e){}
 }
 const TEC={1:"Stau",2:"Unfall",3:"Baustelle",4:"Fahrbahnverengung",5:"Straße unpassierbar",6:"Glätte",7:"Aquaplaning",8:"Brand",9:"Gefährliche Fahrbedingungen",10:"Gegenstände auf der Fahrbahn",11:"Tiere auf der Fahrbahn",12:"Personen auf der Fahrbahn",13:"Pannenfahrzeug",14:"Falschfahrer",15:"Bergungsarbeiten",16:"Behördliche Maßnahme",17:"Extremwetter",18:"Sichtbehinderung",19:"Niederschlag",23:"Großveranstaltung",26:"Langsames Fahrzeug",27:"Gefährliches Stauende",30:"Polizeikontrolle"};
@@ -855,7 +869,9 @@ function trafficDesc(x){return x&&x.inc&&x.inc.desc?x.inc.desc:""}
 async function enrichTraffic(r){
   if(!S.ttKey||!r.traffic||!r.traffic.length)return;
   const fields="{incidents{type,geometry{type,coordinates},properties{iconCategory,magnitudeOfDelay,events{description,code},startTime,endTime,from,to,length,delay,roadNumbers}}}";
-  await Promise.all(r.traffic.slice(0,25).map(async x=>{
+  const queue=r.traffic.slice(0,25);
+  const worker=async()=>{while(queue.length){const x=queue.shift();await enrichOne(x)}};
+  const enrichOne=async x=>{
     const seg=r.coords.slice(x.a,x.b+1);if(!seg.length)return;
     let la1=90,la2=-90,lo1=180,lo2=-180;seg.forEach(([la,lo])=>{la1=Math.min(la1,la);la2=Math.max(la2,la);lo1=Math.min(lo1,lo);lo2=Math.max(lo2,lo)});
     const pad=0.01;const bbox=[lo1-pad,la1-pad,lo2+pad,la2+pad].map(v=>v.toFixed(5)).join(",");
@@ -871,7 +887,8 @@ async function enrichTraffic(r){
       if(best){const pr=best.properties||{};
         x.inc={desc:(pr.events||[]).map(e=>e.description).filter(Boolean).join(", "),from:pr.from,to:pr.to,roads:pr.roadNumbers||[],end:pr.endTime,delay:pr.delay};}
     }catch(e){}
-  }));
+  };
+  await Promise.all([worker(),worker(),worker()]);
 }
 function osrmExclude(){const x=[];if(S.avoid.motorways)x.push("motorway");if(S.avoid.toll)x.push("toll");if(S.avoid.ferry)x.push("ferry");return x.join(",")}
 async function osrmFetch(pts,extra){
@@ -898,7 +915,7 @@ async function routeORS(pts){
   const af=[];if(S.avoid.motorways)af.push("highways");if(S.avoid.toll)af.push("tollways");if(S.avoid.ferry)af.push("ferries");if(af.length)body.options.avoid_features=af;
   const r=await fetch("https://api.openrouteservice.org/v2/directions/driving-hgv/geojson",{method:"POST",headers:{"Authorization":S.orsKey,"Content-Type":"application/json","Accept":"application/geo+json"},body:JSON.stringify(body)});
   const j=await r.json();
-  if(!r.ok)throw new Error((j.error&&(j.error.message||j.error))||("HTTP "+r.status)+(r.status===403||r.status===401?" – API-Key prüfen":""));
+  if(!r.ok)throw new Error((j.error&&(j.error.message||(typeof j.error==="string"?j.error:JSON.stringify(j.error))))||("HTTP "+r.status)+(r.status===403||r.status===401?" – API-Key prüfen":""));
   const f=j.features[0];
   const coords=f.geometry.coordinates.map(p=>[p[1],p[0]]);
   const n=coords.length;const dist=new Array(n-1).fill(0),dur=new Array(n-1).fill(0);
@@ -920,16 +937,18 @@ function finishRoute(coords,dist,dur,legEnd,src){
 function spFor(cc){const base=(C[cc]&&C[cc].sp)||DEF_SP;return Object.assign({},base,S.spOv[cc]||{})}
 function applySpeeds(r){
   // Geschwindigkeit pro Abschnitt auf das LKW-Limit des jeweiligen Landes begrenzen; Straßentyp aus der Routing-Geschwindigkeit abgeleitet
-  if(r.src==="tomtom"){r.dur=r.baseDur.slice();r.durN=r.baseDur.slice();return}
-  r.durN=[];const cache={};
+  // TomTom (truck) und ORS (driving-hgv) liefern bereits LKW-Fahrzeiten – nur das Nachttempo (AT Freiland 60) wird ergänzt
+  r.durN=[];const cache={};const hgv=r.src==="tomtom"||r.src==="ors";
   for(let i=0;i<r.dist.length;i++){
     const d=r.dist[i],t=r.baseDur[i];
     if(!(t>0)||!(d>0)){r.dur[i]=r.durN[i]=t||0;continue}
     const cc=r.cc[i];const sp=cache[cc]||(cache[cc]=spFor(cc));
     const v=d/t*3.6;
-    const cls=v>=88?"ab":v>=55?"land":"ort";
-    r.dur[i]=d/(Math.min(v,sp[cls])/3.6);
-    r.durN[i]=cls==="land"&&sp.landN?d/(Math.min(v,sp.landN)/3.6):r.dur[i];
+    // OSRM rechnet mit Pkw-Tempo (maxspeed×0,8): Autobahn ≥78, Freiland 45–78, Ort darunter
+    const cls=hgv?(v>=75?"ab":v>=45?"land":"ort"):(v>=78?"ab":v>=45?"land":"ort");
+    r.dur[i]=hgv?t:d/(Math.min(v,sp[cls])/3.6);
+    const vEff=d/r.dur[i]*3.6;
+    r.durN[i]=cls==="land"&&sp.landN&&vEff>sp.landN?d/(sp.landN/3.6):r.dur[i];
   }
 }
 function drawRoute(){
@@ -1230,13 +1249,13 @@ function simulate(o){
   };
   const items=[],bars=[],events=[],overRuns=[];
   const timeAt=new Array(n),driveAt=new Array(n);
-  const pausesAt={};S.pauses.forEach(p=>{if(!Number.isFinite(p.km)||p.km<km0-0.01)return;const vi=Math.min(n-1,vertexAtKm(p.km));(pausesAt[vi]=pausesAt[vi]||[]).push(p)});
+  const pausesAt={};S.pauses.forEach(p=>{if(!Number.isFinite(p.km)||p.km<km0-0.01||p.km>=R.cumKm[n-1]-0.01)return;const vi=Math.min(n-1,vertexAtKm(p.km));(pausesAt[vi]=pausesAt[vi]||[]).push(p)});
   const stopAt={};R.legEnd.forEach((vi,k)=>{if(k>0&&vi>=i0)stopAt[vi]=k});
   const camsAt={};(S.camMode!=="off"?R.cams||[]:[]).forEach(c=>{if(c.i>=i0)(camsAt[c.i]=camsAt[c.i]||[]).push(c)});
   const trafficAt={};(R.traffic||[]).forEach(x=>{if(x.b>=i0)(trafficAt[Math.max(x.a,i0)]=trafficAt[Math.max(x.a,i0)]||[]).push(x)});
   const bans={};
   let segStartT=t,segStartKm=km0,segDrive=0,segOver=false;
-  let barDrive=0,barOver=0,dayFlag=day>=dayMax,limitCount=0,preKm=null;const overSeg=new Uint8Array(n);
+  let barDrive=0,barOver=0,dayFlag=false,limitCount=0,preKm=null;const overSeg=new Uint8Array(n);
   let totalPause=0,totalStop=0,totalDrive=0;
   const flushDrive=()=>{
     if(barDrive>0)bars.push({k:"drive",d:barDrive});if(barOver>0)bars.push({k:"over",d:barOver});barDrive=barOver=0;
@@ -1251,13 +1270,14 @@ function simulate(o){
     if(cls==="reset"){drive=0;split=false;preKm=null}else if(min>=15&&!split)split=true;
     if(drive<LIM)overActive=false;return{note,cls};};
   items.push({type:"start",t,name:o.label||R.stops[0].name,km:km0,cc:R.cc[Math.min(i0,n-2)],live:!!o.label});
+
   let prevCc=R.cc[Math.min(i0,n-2)];
   shiftCheck(t,t,km0,R.coords[i0]);
   for(let i=i0;i<n;i++){
     const km=R.cumKm[i];
     if(stopAt[i]!=null){
       const k=stopAt[i],s=R.stops[k],last=k===R.stops.length-1;
-      pushDriveItem(km);flushDrive();
+      if(!s.via||last){pushDriveItem(km);flushDrive();}
       if(last){items.push({type:"end",t,name:s.name,km});}
       else if(!s.via){
         items.push({type:"stop",t,name:s.name,km,dwell:s.dwell||0,letter:R.lbl[k]});
@@ -1279,6 +1299,11 @@ function simulate(o){
     if(trafficAt[i])trafficAt[i].forEach(x=>{pushDriveItem(km);const lenKm=R.cumKm[x.b]-R.cumKm[x.a];
       items.push({type:"traffic",t,km,label:trafficLabel(x),cat:x.cat,delay:x.delay,len:lenKm,speed:x.speed,x});
       events.push({type:"traffic",ll:R.coords[i],t,label:trafficLabel(x),delay:x.delay,cat:x.cat,mag:x.mag,km,len:lenKm,x});});
+    if(i===i0){ // Startzustand prüfen – nach Stopp/Pausen am Startpunkt
+      if(drive>=LIM){limitCount++;items.push({type:"limit",t,km:km0,preKm:km0,split});events.push({type:"limit",ll:R.coords[i0],t,km:km0,preKm:km0});overActive=true}
+      else if(drive>=LIM-(S.buffer||0)*60)preKm=km0;
+      if(!dayFlag&&day>=dayMax){dayFlag=true;items.push({type:"limit",day:true,t,km:km0});events.push({type:"dayLimit",ll:R.coords[i0],t,km:km0})}
+    }
     timeAt[i]=t;driveAt[i]=drive;
     if(i===n-1)break;
     const cc=R.cc[i];
@@ -1294,12 +1319,14 @@ function simulate(o){
       barDrive+=LIM-drive;barOver+=drive+dt-LIM;
       pushDriveItem(kk);
       limitCount++;
-      items.push({type:"limit",t:tt,km:kk,preKm:preKm!=null?preKm:kk,split});
-      events.push({type:"limit",ll,t:tt,km:kk,preKm:preKm!=null?preKm:kk});
+      items.push({type:"limit",t:tt,km:kk,preKm:preKm!=null?preKm:km,split});
+      events.push({type:"limit",ll,t:tt,km:kk,preKm:preKm!=null?preKm:km});
       overActive=true;segOver=true;overSeg[i]=1;
     }else if(overActive){barOver+=dt;segOver=true;overSeg[i]=1}
     else barDrive+=dt;
-    if(!dayFlag&&day<dayMax&&day+dt>=dayMax){dayFlag=true;items.push({type:"limit",day:true,t:t+(dayMax-day)*1000,km});events.push({type:"dayLimit",ll:R.coords[i],t,km});}
+    if(!dayFlag&&day<dayMax&&day+dt>=dayMax){dayFlag=true;const f=dt>0?(dayMax-day)/dt:0;const a2=R.coords[i],b2=R.coords[i+1];
+      const kk2=km+(R.cumKm[i+1]-km)*f,tt2=t+f*dt*1000;pushDriveItem(kk2);
+      items.push({type:"limit",day:true,t:tt2,km:kk2});events.push({type:"dayLimit",ll:[a2[0]+(b2[0]-a2[0])*f,a2[1]+(b2[1]-a2[1])*f],t:tt2,km:kk2});}
     if(!shiftFlag&&t+dt*1000>=warnAt){if(t+dt*1000>=shiftEnd||!warnFlag)pushDriveItem(km);shiftCheck(t,t+dt*1000,km,R.coords[i],R.cumKm[i+1],R.coords[i+1]);}
     drive+=dt;day+=dt;totalDrive+=dt;segDrive+=dt;t+=dt*1000;
     if(drive>=LIM&&!overActive)overActive=true;
@@ -1377,7 +1404,7 @@ $("#timeline").addEventListener("click",e=>{
   const pk=e.target.closest("[data-pk]");
   if(pk){planParkSearch(pk);return}
   const id=e.target.dataset.del;if(!id)return;S.pauses=S.pauses.filter(x=>x.id!==id);save();resim()});
-$("#addPauseBtn").onclick=()=>{if(!R){status("Zuerst die Route berechnen.","info");return}const km=+$("#addKm").value;if(!(km>=0)||km>R.cumKm[R.cumKm.length-1]){status(`Bitte einen km-Wert zwischen 0 und ${R.cumKm[R.cumKm.length-1].toFixed(0)} eingeben.`,"err");return}S.pauses.push({id:uid(),km,dur:+$("#addDur").value});$("#addKm").value="";save();resim();};
+$("#addPauseBtn").onclick=()=>{if(!R){status("Zuerst die Route berechnen.","info");return}const km=+$("#addKm").value;if(!(km>=0)||km>=R.cumKm[R.cumKm.length-1]){status(`Bitte einen km-Wert zwischen 0 und ${R.cumKm[R.cumKm.length-1].toFixed(0)} eingeben.`,"err");return}S.pauses.push({id:uid(),km,dur:+$("#addDur").value});$("#addKm").value="";save();resim();};
 $("#clearPause").onclick=()=>{S.pauses=[];save();resim()};
 $("#autoPause").onclick=()=>{
   if(!R){status("Zuerst die Route berechnen.","info");return}
@@ -1459,12 +1486,12 @@ const parkLayer=L.layerGroup().addTo(map);
 const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"];
 async function findParking(vA,vB){
   vA=Math.max(0,vA);vB=Math.min(R.coords.length-1,vB);if(vB<=vA)return[];
-  const span=R.cumKm[vB]-R.cumKm[vA];const step=Math.max(1.5,span/120);
+  const span=R.cumKm[vB]-R.cumKm[vA];const step=Math.max(0.7,span/250);
   const pts=[];let last=-1e9;for(let i=vA;i<=vB;i++){if(R.cumKm[i]-last>=step||i===vB){pts.push(R.coords[i]);last=R.cumKm[i]}}
   const poly=pts.map(p=>p[0].toFixed(5)+","+p[1].toFixed(5)).join(",");
   const A=`(around:400,${poly})`;
   // Parkplätze, dazu Restaurants, Imbisse, WCs, Duschen und Tankstellen auf dem Gelände (in OSM meist eigene Punkte)
-  const q=`[out:json][timeout:40];(nwr${A}[highway~"^(rest_area|services)$"];nwr${A}[amenity=parking][hgv~"^(yes|designated)$"];nwr${A}[amenity=parking]["capacity:hgv"];)->.p;.p out center tags;(nwr(around.p:400)[amenity~"^(restaurant|fast_food|cafe|food_court|toilets|shower|fuel)$"];nwr(around.p:400)[shower~"^(yes|hot)$"];);out center tags;`;
+  const q=`[out:json][timeout:40];(nwr${A}[highway~"^(rest_area|services)$"];nwr${A}[amenity=parking][hgv~"^(yes|designated)$"];nwr${A}[amenity=parking]["capacity:hgv"];)->.p;.p out body center;(nwr(around.p:400)[amenity~"^(restaurant|fast_food|cafe|food_court|toilets|shower|fuel)$"];nwr(around.p:400)[shower~"^(yes|hot)$"];);out body center;`;
   let j=null,err;
   for(const ep of OVERPASS){try{const r=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});if(r.ok){j=await r.json();break}err="HTTP "+r.status}catch(e){err=e.message}}
   if(!j)throw new Error("Parkplatzsuche nicht erreichbar ("+err+")");
@@ -1499,7 +1526,7 @@ async function findParking(vA,vB){
     out.push(p);
   });
   out.sort((a,b)=>b.score-a.score);
-  const res=[];out.forEach(o=>{const d=res.find(r=>hav([r.lat,r.lng],[o.lat,o.lng])<300);
+  const res=[];out.forEach(o=>{const d=res.find(r=>r.side===o.side&&hav([r.lat,r.lng],[o.lat,o.lng])<300);
     if(!d)res.push(o);else["rest","shower","wc","fuel","guard"].forEach(k=>{if(o[k])d[k]=true})});
   res.sort((a,b)=>a.km-b.km);
   return res;
@@ -1630,7 +1657,7 @@ function liveBreak(min){
   return LIVE.split?`${Math.round(min)} min Pause – zu kurz für den 2. Teil (mind. 30 min)`:`${Math.round(min)} min Pause – zu kurz (mind. 15 min)`;
 }
 function startPause(){
-  const now=Date.now();
+  const now=Date.now();LIVE.pausePos=LIVE.fix?{lat:LIVE.fix.lat,lng:LIVE.fix.lng}:null;
   LIVE.pauseSince=LIVE.stillSince&&now-LIVE.stillSince<60*60000?LIVE.stillSince:now;
   $("#lvPause").textContent="▶ Pause beenden";$("#lvPause").classList.add("on");LIVE.breakNote="";
   $("#lvPark").hidden=true;parkLayer.clearLayers();resim();
@@ -1652,7 +1679,9 @@ $("#lvPause").onclick=()=>LIVE.pauseSince?endPause(false):startPause();
 // Zeitangaben wie am Tacho: „2:15“, „2.15“, „2,15“, „2h15“ oder Minuten („135“)
 function parseHM(v){
   v=String(v||"").trim().toLowerCase().replace(/\s+/g,"").replace(/min$/,"");if(!v)return null;
-  let m=v.match(/^(\d{1,2})[:.,h](\d{1,2})$/);if(m){const mm=+m[2];if(mm>59)return NaN;return +m[1]*60+mm}
+  let m=v.match(/^(\d{1,2})[.,](\d)$/);if(m)return +m[1]*60+(+m[2])*6;        // „2,5“ = 2,5 Stunden
+  m=v.match(/^(\d{1,2})[:.,h](\d{2})$/);if(m){const mm=+m[2];if(mm>59)return NaN;return +m[1]*60+mm}
+  m=v.match(/^(\d{1,2})h(\d{1,2})$/);if(m){const mm=+m[2];if(mm>59)return NaN;return +m[1]*60+mm}
   m=v.match(/^(\d{1,3})$/);if(m)return +m[1];
   return NaN;
 }
@@ -1670,6 +1699,7 @@ $("#lvTachoSave").onclick=()=>{
   const rest=parseHM($("#lvTachoRest").value),day=parseHM($("#lvTachoDay").value),err=$("#lvTachoErr");
   if(rest==null||isNaN(rest)||rest>270){err.textContent="Restlenkzeit bitte als Stunden:Minuten eingeben, z. B. 2:15 (höchstens 4:30).";return}
   if(day!=null&&(isNaN(day)||day>600)){err.textContent="Tageslenkzeit bitte als Stunden:Minuten eingeben, z. B. 6:40 (höchstens 10:00).";return}
+  if(day!=null&&day>(+S.dayMax||540)){S.dayMax=600;$("#dayMax").value="600";save();}   // mehr Rest als 9 h → 10-h-Tag
   LIVE.driveSec=(270-rest)*60;
   if(day!=null)LIVE.daySec=Math.max(0,((+S.dayMax||540)-day)*60);
   LIVE.split=$("#lvTachoSplit").checked;LIVE.block++;
@@ -1694,14 +1724,15 @@ function showGap(kind,g){
 $("#lvGap").addEventListener("click",e=>{
   const b=e.target.closest("[data-gap]");if(!b)return;const g=LIVE.gap;const box=$("#lvGap");if(!g){box.hidden=true;return}
   const a=b.dataset.gap;
+  const since=Math.max(0,LIVE.driveSec-(g.before+(g.kind==="moved"?g.gap:0)));   // seit dem Dialog weitergefahren
   if(a==="pause"){
     const m=Math.max(1,Math.min(g.gap/60,+$("#lvGapMin").value||0));const drove=Math.max(0,g.gap-m*60);
     // Pause am Anfang der Lücke angenommen: Die Fahrt danach zählt voll – das ist die sichere Seite
-    LIVE.driveSec=g.before;LIVE.daySec=g.dayBefore+drove;LIVE.split=g.split;
-    const note=liveBreak(m);LIVE.driveSec+=drove;LIVE.breakNote=note+" (nachgetragen)";
+    LIVE.driveSec=g.before;LIVE.daySec=g.dayBefore+drove+since;LIVE.split=g.split;
+    const note=liveBreak(m);LIVE.driveSec+=drove+since;LIVE.breakNote=note+" (nachgetragen)";
   }else if(a==="still"){
-    LIVE.driveSec=g.before;LIVE.daySec=g.dayBefore;LIVE.split=g.split;
-    LIVE.breakNote=liveBreak(g.gap/60)+" (nachgetragen)";
+    LIVE.driveSec=g.before;LIVE.daySec=g.dayBefore+since;LIVE.split=g.split;
+    LIVE.breakNote=liveBreak(g.gap/60)+" (nachgetragen)";LIVE.driveSec+=since;
   }else if(a==="tacho"){openTacho()}
   if(a==="pause"||a==="still")LIVE.stillSince=null;
   box.hidden=true;LIVE.gap=null;resim();natState();
@@ -1736,6 +1767,7 @@ function startLive(){
   Object.assign(LIVE,{active:true,fix:null,idx:0,off:0,lastT:null,driveSec:(S.driveStart||0)*60,daySec:(S.dayStart||0)*60,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:Date.now(),breakNote:"",lastDrv:null});
   $("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");$("#lvPark").hidden=true;$("#lvTachoForm").hidden=true;$("#lvRemind").hidden=true;$("#lvGap").hidden=true;LIVE.gap=null;
   const ss=S.shiftStart?new Date(S.shiftStart).getTime():NaN;LIVE.shiftStart=isNaN(ss)?Date.now():ss;
+  LIVE.sl={t:0,pos:null,car:null,truck:null,road:"",busy:false};LIVE.sec=null;LIVE.speed=0;LIVE.lastSim=0;LIVE.gap=null;LIVE.pausePos=null;$("#lvRoad").textContent="";
   document.body.classList.add("livemode");$("#livePanel").hidden=false;
   ["#liveBtn","#liveBtn2"].forEach(x=>{$(x).textContent="■ Live beenden";$(x).classList.add("on")});
   setTimeout(()=>map.invalidateSize(),50);
@@ -1755,6 +1787,7 @@ function stopLive(){
 ["#liveBtn","#liveBtn2"].forEach(x=>$(x).onclick=()=>LIVE.active?stopLive():startLive());
 $("#lvFollow").onclick=()=>{LIVE.follow=true;if(LIVE.fix)map.setView([LIVE.fix.lat,LIVE.fix.lng],Math.max(map.getZoom(),15))};
 $("#lvPlan").onclick=()=>{document.body.classList.toggle("showplan");setTimeout(()=>map.invalidateSize(),50)};
+$("#planClose").onclick=()=>{document.body.classList.remove("showplan");setTimeout(()=>map.invalidateSize(),50)};
 $("#lvReroute").onclick=()=>liveReroute(true);
 map.on("dragstart",()=>{if(LIVE.active)LIVE.follow=false});
 function liveReroute(manual){
@@ -1772,9 +1805,14 @@ function onFix(p){
   const now=Date.now(),c=p.coords,pos={lat:c.latitude,lng:c.longitude};
   const prev=LIVE.fix;const dtS=LIVE.lastT?Math.min(120,(now-LIVE.lastT)/1000):0;
   let kmh=c.speed!=null&&c.speed>=0?c.speed*3.6:(prev&&dtS>0?hav([prev.lat,prev.lng],[pos.lat,pos.lng])/dtS*3.6:0);
+  const age=p.timestamp?now-p.timestamp:0;if(age>60000&&age<3600000)kmh=0;   // veralteter Fix (z. B. nach dem Entsperren) → keine Bewegung; absurde Abweichungen (Uhr falsch) ignorieren
   LIVE.speed=kmh;const moving=kmh>4&&(c.accuracy||0)<80;
+  const wasPause=!!LIVE.pauseSince;
   // Stillstand (z. B. Stau) zählt NICHT als Pause – Pausen nur über „Pause starten“ wie am Tacho
-  if(LIVE.pauseSince&&kmh>15&&now-LIVE.pauseSince>2*60000)endPause(true);
+  if(LIVE.pauseSince&&moving&&kmh>15&&now-LIVE.pauseSince>2*60000){
+    if(!LIVE.pausePos)LIVE.pausePos=prev||pos;
+    if(hav([LIVE.pausePos.lat,LIVE.pausePos.lng],[pos.lat,pos.lng])>150)endPause(true);
+  }
   if(p._drv!=null){ // App: Fahrsekunden misst das iPhone selbst, auch im Hintergrund
     const add=LIVE.lastDrv!=null?Math.max(0,p._drv-LIVE.lastDrv):0;LIVE.lastDrv=p._drv;
     if(add>0||moving)LIVE.stillSince=null;else if(!LIVE.stillSince)LIVE.stillSince=LIVE.lastT||now;
@@ -1783,7 +1821,7 @@ function onFix(p){
     // Ortung war unterbrochen (Display gesperrt, Safari im Hintergrund, kein Signal)
     const gap=(now-LIVE.lastT)/1000,dist=hav([prev.lat,prev.lng],[pos.lat,pos.lng]),avg=dist/gap*3.6;
     const g={gap,dist,before:LIVE.driveSec,dayBefore:LIVE.daySec,split:LIVE.split,t:now};
-    if(LIVE.pauseSince){/* Pause läuft – Lücke gehört zur Pause */}
+    if(wasPause||LIVE.pauseSince||LIVE.gap){/* Pause läuft(e) – Lücke gehört zur Pause; offener Dialog wird nicht überschrieben */}
     else if(dist>1000){                      // deutlich bewegt → als Lenkzeit zählen (sichere Seite)
       LIVE.driveSec+=gap;LIVE.daySec+=gap;LIVE.stillSince=moving?null:now;
       if(avg<30&&gap>=15*60)showGap("moved",g);
@@ -1879,7 +1917,7 @@ function renderLive(){
   const last=R.stops[R.stops.length-1];
   $("#lvDest").innerHTML=`<b>Ziel: ${esc(shortName(last.name||""))}</b><small>${(R.cumKm[R.cumKm.length-1]-nowKm).toFixed(0)} km · an ${fmtT(SIM.arrival)}${fmtD(SIM.arrival)!==fmtD(Date.now())?" "+fmtD(SIM.arrival):""} · Einsatz ${fmtDur(SIM.shiftUsed/1000)}${SIM.shiftFlag?" ⚠":""}</small>`;
 }
-setInterval(()=>{if(LIVE.active)renderLive()},15000);
+setInterval(()=>{if(LIVE.active){if(LIVE.lastT&&Date.now()-LIVE.lastT>8000)LIVE.speed=0;renderLive()}},15000);
 setInterval(()=>{if(LIVE.active){natState();
   const end=LIVE.shiftStart+(+S.shiftMax||900)*60000;if(Date.now()>=end-3600e3)natNotify("shift"+LIVE.shiftStart,"⏰ Noch 1 h Einsatzzeit","Jetzt einen Platz für die Tagesruhe suchen – Einsatzzeit endet um "+fmtT(end)+".");}},60000);
 if(NAT){const pl=$("#phoneLink");if(pl)pl.hidden=true}

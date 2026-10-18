@@ -39,6 +39,7 @@ final class Bridge: NSObject, WKScriptMessageHandler, WKNavigationDelegate, WKUI
         location.distanceFilter = 5
         location.pausesLocationUpdatesAutomatically = false
         UNUserNotificationCenter.current().delegate = self
+        requestNotifications()
         NotificationCenter.default.addObserver(self, selector: #selector(appBecameActive),
                                                name: UIApplication.didBecomeActiveNotification, object: nil)
     }
@@ -65,14 +66,19 @@ final class Bridge: NSObject, WKScriptMessageHandler, WKNavigationDelegate, WKUI
         Object.keys(watchers).forEach(function (k) { try { watchers[k].s(pos); } catch (e) {} });
       };
       window.__lkwErr = function (code, msg) {
-        Object.keys(watchers).forEach(function (k) { var w = watchers[k]; if (w.e) { try { w.e({ code: code, message: msg }); } catch (e) {} } });
+        Object.keys(watchers).forEach(function (k) { var w = watchers[k]; if (w.e) { try { w.e({ code: code, message: msg }); } catch (e) {} }
+          if (w.once) geo.clearWatch(k); });
       };
       var geo = {
         watchPosition: function (s, e) { var id = nextId++; watchers[id] = { s: s, e: e }; H.postMessage({ type: "geo", on: true }); return id; },
         clearWatch: function (id) { delete watchers[id]; if (!Object.keys(watchers).length) H.postMessage({ type: "geo", on: false }); },
-        getCurrentPosition: function (s, e) {
-          if (last) { s(toPos(last)); return; }
-          var id = geo.watchPosition(function (p) { geo.clearWatch(id); s(p); }, e);
+        getCurrentPosition: function (s, e, o) {
+          if (last && Date.now() - last.ts < ((o && o.maximumAge) || 60000)) { s(toPos(last)); return; }
+          var id = nextId++, done = false;
+          var t = setTimeout(function () { if (done) return; done = true; geo.clearWatch(id); if (e) try { e({ code: 3, message: "Timeout" }); } catch (x) {} }, (o && o.timeout) || 20000);
+          watchers[id] = { once: true, s: function (p) { if (done) return; done = true; clearTimeout(t); geo.clearWatch(id); s(p); },
+                           e: function (err) { if (done) return; done = true; clearTimeout(t); if (e) e(err); } };
+          H.postMessage({ type: "geo", on: true });
         }
       };
       try { Object.defineProperty(navigator, "geolocation", { value: geo, configurable: true }); } catch (e) {}
@@ -204,13 +210,24 @@ final class Bridge: NSObject, WKScriptMessageHandler, WKNavigationDelegate, WKUI
 
     @objc private func appBecameActive() {
         if live { UIApplication.shared.isIdleTimerDisabled = true }
-        if geoActive, let loc = lastLocation { sendFix(loc) }
+        if geoActive, let loc = lastLocation, Date().timeIntervalSince(loc.timestamp) < 10 { sendFix(loc) }
     }
 
     // MARK: - Lenkzeit-Warnungen (funktionieren auch bei gesperrtem iPhone)
 
+    private var pauseDriveWarned = false
     private func checkDrivingTime() {
-        guard live, !statePause else { return }
+        guard live else { return }
+        let movedSincePause = drivenSeconds - stateAt
+        if statePause {
+            // „Pause“ läuft laut App, aber der LKW bewegt sich seit Minuten → Fahrer hat „Pause beenden“ vergessen
+            if movedSincePause > 180 && !pauseDriveWarned {
+                pauseDriveWarned = true
+                schedule(id: "pausedrive", title: "⏸ Pause läuft noch – aber du fährst",
+                         body: "Bitte in TruckHub „Pause beenden“ tippen, damit die Lenkzeit stimmt.", after: 0)
+            }
+            if movedSincePause <= 180 { return }
+        } else { pauseDriveWarned = false }
         let rest = 270 * 60 - (stateDrive + (drivenSeconds - stateAt))
         let steps: [(Int, String, String)] = [
             (0, "⏱ 4,5 h Lenkzeit erreicht",

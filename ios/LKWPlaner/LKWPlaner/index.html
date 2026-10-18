@@ -447,7 +447,7 @@ body.livemode.showplan .planclose{display:block}
     </section>
 
     <div class="footer" data-tab="veh">
-      <b>TruckHub · Version 37 · 18.10.2026</b> – Belegungs-Knopf (AT/DE), LKW-Stellplatzzahlen deutscher Rastanlagen (Autobahn GmbH), Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 38 · 18.10.2026</b> – Belegungs-Knopf (AT/DE), LKW-Stellplatzzahlen deutscher Rastanlagen (Autobahn GmbH), Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -1675,13 +1675,14 @@ async function findParking(vA,vB){
       abl.forEach(a=>{const{bi,bd}=nearestOn(a.lat,a.lng,vA,vB);if(bd>350||bi<vA||bi>vB)return;
         const d=res.find(r=>hav([r.lat,r.lng],[a.lat,a.lng])<400);
         if(d){if(a.k!=null&&!d.cap)d.cap=String(a.k);if(!d.name||/^(Rastplatz|Parkplatz|LKW-Parkplatz|Raststätte)$/.test(d.name))d.name=a.n;d.ab=a.r;hit++;return}
-        if(a.k===0||a.b)return;
+        if(a.k===0||a.b||/aufgelassen|gesperrt|geschlossen|außer betrieb/i.test(a.n))return;
         res.push({src:"abl",name:a.n,kind:/^RA |Raststätte|Rasthof/i.test(a.n)?"Raststätte":"Rastanlage",lat:a.lat,lng:a.lng,km:R.cumKm[bi],vi:bi,side:sideOf(a.lat,a.lng,bi,bd),
           cap:a.k!=null?String(a.k):null,rest:false,shower:false,wc:true,fuel:false,guard:false,fee:null,ab:a.r,score:1});add++});
+      for(let i=res.length-1;i>=0;i--)if(/aufgelassen|gesperrt|geschlossen|außer betrieb/i.test(res[i].name||""))res.splice(i,1);
       diag.push(`Autobahn GmbH: ${hit} Stellplatzzahlen${add?", "+add+" Rastanlagen ergänzt":""}`);
     }catch(e){diag.push("Autobahn GmbH: "+e.message)}
   }
-  res.forEach(p=>{const info=[];if(p.cap)info.push(p.cap+" LKW-Plätze");if(p.rest)info.push("🍽 Restaurant");if(p.shower)info.push("🚿 Dusche");if(p.wc)info.push("WC");if(p.fuel)info.push("⛽ Tankstelle");if(p.guard)info.push("bewacht");if(p.hours)info.push(p.hours);p.info=info.join(" · ")});
+  res.forEach(p=>{const info=[];if(p.cap)info.push(p.cap+" LKW-Stellplätze gesamt");if(p.rest)info.push("🍽 Restaurant");if(p.shower)info.push("🚿 Dusche");if(p.wc)info.push("WC");if(p.fuel)info.push("⛽ Tankstelle");if(p.guard)info.push("bewacht");if(p.hours)info.push(p.hours);p.info=info.join(" · ")});
   res.sort((a,b)=>a.km-b.km);res.diag=diag;
   return res;
 }

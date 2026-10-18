@@ -447,7 +447,7 @@ body.livemode.showplan .planclose{display:block}
     </section>
 
     <div class="footer" data-tab="veh">
-      <b>TruckHub · Version 34 · 18.10.2026</b> – TomTom-Parkplatzsuche per Umkreissuche, neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 35 · 18.10.2026</b> – TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -1569,18 +1569,22 @@ async function findParkingTomTom(vA,vB){
   // TomTom "Nearby Search" (reine Kategoriesuche ohne Suchbegriff) an Stützpunkten entlang des Abschnitts –
   // die Suche entlang der Route mit Suchbegriff liefert je nach Sprache/Region keine Treffer
   await ttCats();
-  const RAD=7000,STEP=9; // Suchkreis 7 km, Stützpunkte alle 9 km (Kreise überlappen)
+  const RAD=20000,STEP=28; // Suchkreis 20 km, Stützpunkte alle 28 km (Kreise überlappen)
   const centers=[];let last=-1e9;for(let i=vA;i<=vB;i++){if(R.cumKm[i]-last>=STEP||i===vB){centers.push(R.coords[i]);last=R.cumKm[i]}}
   const catSet=[catId("TRUCK_STOP"),catId("REST_AREA"),catId("OPEN_PARKING_AREA")].filter(Boolean).join(",");
   const got=[];got.diag=[];const seen=new Set();let okN=0,n=0;const errs={};
   const one=async c=>{
     const q=new URLSearchParams({key:S.ttKey,lat:c[0].toFixed(5),lon:c[1].toFixed(5),radius:String(RAD),categorySet:catSet,limit:"100",language:"de-DE",view:"Unified"});
-    try{const r=await fetch(`https://api.tomtom.com/search/2/nearbySearch/.json?${q}`);
-      if(!r.ok){errs[r.status]=(errs[r.status]||0)+1;return}
-      okN++;const j=await r.json();
-      (j.results||[]).forEach(x=>{
+    try{let all=[];
+      for(let ofs=0;ofs<300;ofs+=100){ // bis zu 3 Seiten je Suchkreis
+        const r=await fetch(`https://api.tomtom.com/search/2/nearbySearch/.json?${q}&ofs=${ofs}`);
+        if(!r.ok){errs[r.status]=(errs[r.status]||0)+1;return}
+        const j=await r.json();const rs=j.results||[];all=all.concat(rs);if(rs.length<100)break;}
+      okN++;
+      all.forEach(x=>{
         if(seen.has(x.id))return;seen.add(x.id);
-        const poi=x.poi||{},lat=x.position.lat,lng=x.position.lon;const{bi,bd}=nearestOn(lat,lng,vA,vB);if(bd>450)return;
+        const poi=x.poi||{},lat=x.position.lat,lng=x.position.lon;const{bi,bd}=nearestOn(lat,lng,vA,vB);
+        const nm=poi.name||"";if(bd>(/autohof|truck|lkw/i.test(nm)?2500:600))return; // Rastplätze direkt an der Strecke, Autohöfe bis 2,5 km neben der Abfahrt
         const cl=(poi.classifications||[]).flatMap(c=>(c.names||[]).map(n=>n.name||"")).filter(Boolean);
         const ids=(poi.categorySet||[]).map(c=>String(c.id));
         const cats2=(poi.categories||[]).map(c=>c.toLowerCase()).join(" ")+" "+cl.join(" ").toLowerCase()+" "+(poi.classifications||[]).map(c=>c.code||"").join(" ").toLowerCase();

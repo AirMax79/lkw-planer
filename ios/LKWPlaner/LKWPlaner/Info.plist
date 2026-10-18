@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Der LKW-Planer braucht deinen Standort für die Live-Navigation, die Lenkzeit-Messung und Hinweise auf Pausen, Parkplätze und Blitzer.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Damit die Lenkzeit auch bei gesperrtem Display weiterläuft, nutzt der LKW-Planer deinen Standort im Hintergrund, solange die Live-Navigation aktiv ist.</string>
+</dict>
+</plist>

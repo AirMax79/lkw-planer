@@ -361,7 +361,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>Version 12 · 18.10.2026</b> – Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>Version 13 · 18.10.2026</b> – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -745,6 +745,7 @@ function showAlts(){
     <div class="pbtns"><button type="button" class="go" data-alt="${ix}">Umfahrung übernehmen</button><button type="button" data-altshow="${ix}">Karte</button><button type="button" data-altno="${ix}">Nein danke</button></div></div>`).join("");}
   // Live-Banner
   const lb=$("#lvAlt");
+  if(LIVE.active&&ALTS.length){natNotify("alt"+Math.round(ALTS[0].save/60)+"_"+ALTS[0].p.coords.length,"🔀 Umfahrung spart "+Math.round(ALTS[0].save/60)+" min",(ALTS[0].why||"Verkehr auf deiner Route")+" – im LKW-Planer übernehmen oder ablehnen.");}
   if(LIVE.active&&ALTS.length){const x=ALTS[0];lb.hidden=false;lb.innerHTML=`<b>🔀 Umfahrung spart ${Math.round(x.save/60)} min</b><small>${x.why?esc(x.why)+" · ":""}${x.dKm>=0?"+":"−"}${Math.abs(x.dKm).toFixed(0)} km</small><div class="live-btns"><button type="button" class="go" data-alt="0">Übernehmen</button><button type="button" data-altno="0">Nein danke</button></div>`;}
   else{lb.hidden=true;lb.innerHTML=""}
 }
@@ -1474,6 +1475,12 @@ async function planParkSearch(btn){
 }
 
 /* ---------- Live-Navigation (GPS) ---------- */
+/* ---------- Brücke zur iPhone-App (nur aktiv, wenn der Planer in der App läuft) ---------- */
+const NAT=window.lkwNative||null;
+function natPost(m){try{if(NAT)NAT.post(m)}catch(e){}}
+function natState(){natPost({type:"state",driveSec:LIVE.driveSec,split:LIVE.split,pause:!!LIVE.pauseSince,block:LIVE.block,live:LIVE.active})}
+const NOTI={};
+function natNotify(key,title,body){if(!NAT||NOTI[key])return;NOTI[key]=1;natPost({type:"notify",id:key,title,body})}
 const LIVE={active:false,watch:null,fix:null,idx:0,off:0,lastT:null,driveSec:0,daySec:0,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:0,lastSim:0,wake:null,shiftStart:null,marker:null,acc:null,speed:0,breakNote:""};
 function liveOpts(){
   const o={startIdx:LIVE.idx,t:Date.now(),drive:LIVE.driveSec,day:LIVE.daySec,split:LIVE.split,label:"Aktuelle Position",shiftStart:LIVE.shiftStart};
@@ -1490,11 +1497,17 @@ function startPause(){
   LIVE.pauseSince=LIVE.stillSince&&now-LIVE.stillSince<60*60000?LIVE.stillSince:now;
   $("#lvPause").textContent="▶ Pause beenden";$("#lvPause").classList.add("on");LIVE.breakNote="";
   $("#lvPark").hidden=true;parkLayer.clearLayers();resim();
+  if(NAT){const el=(now-LIVE.pauseSince)/1000;const at=m=>Math.max(1,m*60-el);
+    if(LIVE.split)natPost({type:"notify",id:"p30",title:"✅ 30 min Pause erfüllt",body:"2. Teil der geteilten Pause erledigt – Lenkzeit beginnt beim Weiterfahren neu. „Pause beenden“ nicht vergessen.",after:at(30)});
+    else{natPost({type:"notify",id:"p15",title:"15 min Pause erreicht",body:"Zählt als 1. Teil einer geteilten Pause. Für die volle Pause noch 30 min.",after:at(15)});
+      natPost({type:"notify",id:"p45",title:"✅ 45 min Pause erfüllt",body:"Du kannst weiterfahren – 4,5 h Lenkzeit beginnen neu. „Pause beenden“ nicht vergessen.",after:at(45)});}
+    natState();}
 }
 function endPause(auto){
   if(!LIVE.pauseSince)return;
   LIVE.breakNote=liveBreak((Date.now()-LIVE.pauseSince)/60000)+(auto?" (Pause automatisch beendet, weil du losgefahren bist)":"");
   LIVE.pauseSince=null;$("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");resim();
+  natPost({type:"cancel",ids:["p15","p30","p45"]});natState();
   if(S.tachoRemind!==false&&$("#lvTachoForm").hidden){$("#lvRemind").hidden=false;clearTimeout(LIVE.remindT);LIVE.remindT=setTimeout(()=>{$("#lvRemind").hidden=true},10*60000)}
 }
 $("#lvGrip").onclick=()=>{$("#livePanel").classList.toggle("mini")};
@@ -1524,7 +1537,7 @@ $("#lvTachoSave").onclick=()=>{
   if(day!=null)LIVE.daySec=Math.max(0,((+S.dayMax||540)-day)*60);
   LIVE.split=$("#lvTachoSplit").checked;LIVE.block++;
   LIVE.breakNote=`Mit Tacho abgeglichen: noch ${hmStr(rest*60)} bis zur Pause`+(day!=null?`, ${hmStr(day*60)} Tageslenkzeit`:"");
-  $("#lvTachoForm").hidden=true;resim();
+  $("#lvTachoForm").hidden=true;resim();natState();
 };
 ["#lvTachoRest","#lvTachoDay"].forEach(x=>$(x).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#lvTachoSave").click()}}));
 $("#lvRemindYes").onclick=openTacho;
@@ -1544,6 +1557,7 @@ async function liveParkSearch(manual){
   $("#lvParkClose").onclick=()=>{box.hidden=true;LIVE.parkShown=false;parkLayer.clearLayers()};
   try{const list=await findParking(LIVE.idx,vertexAtKm(tKm));
     const ctx="live";PARK[ctx]={list:list.slice(-6),pauseId:null};
+    if(list.length){const nx=PARK[ctx].list[0];natNotify("park"+LIVE.block,"🅿 Parkplätze vor Lenkzeitende",`${PARK[ctx].list.length} Vorschläge – z. B. ${nx.name} in ${Math.max(0,nx.km-R.cumKm[LIVE.idx]).toFixed(0)} km`);}
     box.querySelector(".plist").innerHTML=parkHtml(PARK[ctx].list,dur,lim?lim.t:null,ctx);showParkMarkers(PARK[ctx].list,ctx,dur);
   }catch(e){box.querySelector(".plist").innerHTML=`<small class="hint">${esc(e.message)}</small>`}
 }
@@ -1551,19 +1565,21 @@ async function wakeOn(){try{if(navigator.wakeLock)LIVE.wake=await navigator.wake
 document.addEventListener("visibilitychange",()=>{if(LIVE.active&&document.visibilityState==="visible")wakeOn()});
 function startLive(){
   if(!("geolocation" in navigator)){status("Dieses Gerät bietet keine Ortung an.","err");return}
-  if(!window.isSecureContext){status("Live-Ortung funktioniert nur, wenn das Tool über einen https-Link geöffnet wird (nicht als Datei). Anleitung siehe Chat.","err");return}
+  if(!window.isSecureContext&&!NAT){status("Live-Ortung funktioniert nur, wenn das Tool über einen https-Link geöffnet wird (nicht als Datei). Anleitung siehe Chat.","err");return}
   if(!R){status("Zuerst die Route berechnen.","info");return}
-  Object.assign(LIVE,{active:true,fix:null,idx:0,off:0,lastT:null,driveSec:(S.driveStart||0)*60,daySec:(S.dayStart||0)*60,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:Date.now(),breakNote:""});
+  Object.assign(LIVE,{active:true,fix:null,idx:0,off:0,lastT:null,driveSec:(S.driveStart||0)*60,daySec:(S.dayStart||0)*60,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:Date.now(),breakNote:"",lastDrv:null});
   $("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");$("#lvPark").hidden=true;$("#lvTachoForm").hidden=true;$("#lvRemind").hidden=true;
   const ss=S.shiftStart?new Date(S.shiftStart).getTime():NaN;LIVE.shiftStart=isNaN(ss)?Date.now():ss;
   document.body.classList.add("livemode");$("#livePanel").hidden=false;
   ["#liveBtn","#liveBtn2"].forEach(x=>{$(x).textContent="■ Live beenden";$(x).classList.add("on")});
   setTimeout(()=>map.invalidateSize(),50);
   wakeOn();
-  LIVE.watch=navigator.geolocation.watchPosition(onFix,err=>{$("#lvState").textContent=err.code===1?"Ortung nicht erlaubt – in den iPhone-Einstellungen unter Datenschutz › Ortungsdienste › Safari erlauben.":"GPS-Signal fehlt ("+err.message+")";},{enableHighAccuracy:true,maximumAge:2000,timeout:30000});
+  natPost({type:"live",on:true});natState();
+  LIVE.watch=navigator.geolocation.watchPosition(onFix,err=>{$("#lvState").textContent=err.code===1?(NAT?"Ortung nicht erlaubt – in den iPhone-Einstellungen › LKW-Planer › Standort erlauben.":"Ortung nicht erlaubt – in den iPhone-Einstellungen unter Datenschutz › Ortungsdienste › Safari erlauben."):"GPS-Signal fehlt ("+err.message+")";},{enableHighAccuracy:true,maximumAge:2000,timeout:30000});
 }
 function stopLive(){
   LIVE.active=false;if(LIVE.watch!=null)navigator.geolocation.clearWatch(LIVE.watch);LIVE.watch=null;
+  natPost({type:"cancel",ids:["p15","p30","p45"]});natPost({type:"live",on:false});
   try{LIVE.wake&&LIVE.wake.release()}catch(e){}
   if(LIVE.marker){map.removeLayer(LIVE.marker);map.removeLayer(LIVE.acc);LIVE.marker=LIVE.acc=null}
   document.body.classList.remove("livemode","showplan");$("#livePanel").hidden=true;$("#lvAlt").hidden=true;
@@ -1593,7 +1609,11 @@ function onFix(p){
   LIVE.speed=kmh;const moving=kmh>4&&(c.accuracy||0)<80;
   // Stillstand (z. B. Stau) zählt NICHT als Pause – Pausen nur über „Pause starten“ wie am Tacho
   if(LIVE.pauseSince&&kmh>15&&now-LIVE.pauseSince>2*60000)endPause(true);
-  if(moving){LIVE.stillSince=null;if(!LIVE.pauseSince){LIVE.driveSec+=dtS;LIVE.daySec+=dtS;}}
+  if(p._drv!=null){ // App: Fahrsekunden misst das iPhone selbst, auch im Hintergrund
+    const add=LIVE.lastDrv!=null?Math.max(0,p._drv-LIVE.lastDrv):0;LIVE.lastDrv=p._drv;
+    if(add>0||moving)LIVE.stillSince=null;else if(!LIVE.stillSince)LIVE.stillSince=LIVE.lastT||now;
+    if(!LIVE.pauseSince){LIVE.driveSec+=add;LIVE.daySec+=add;}
+  }else if(moving){LIVE.stillSince=null;if(!LIVE.pauseSince){LIVE.driveSec+=dtS;LIVE.daySec+=dtS;}}
   else if(!LIVE.stillSince)LIVE.stillSince=LIVE.lastT||now;
   LIVE.lastT=now;LIVE.fix=pos;
   // Marker
@@ -1668,6 +1688,7 @@ function renderLive(){
       const el=(Date.now()-LIVE.sec.t0)/3600e3,avg=el>0.003?(nowKm-LIVE.sec.km0)/el:null,tm=camTruckMax(sec)||spFor("AT").ab;
       cw.hidden=false;cw.innerHTML=`📷 Section Control aktiv – noch ${(sec.kmEnd-nowKm).toFixed(1)} km<small>${avg?`Dein Schnitt: ${Math.round(avg)} km/h · `:""}LKW max. ${tm} km/h</small>`;}
     else{LIVE.sec=null;const nc=R.cams.find(c=>c.km>=nowKm-0.05&&c.km-nowKm<=2);
+      if(nc&&nc.km-nowKm<=1)natNotify("cam"+nc.km.toFixed(2),nc.kind==="section"?"📷 Section Control in 1 km":"📷 Radar in 1 km",nc.max?`Limit ${nc.max} km/h${camTruckMax(nc)&&camTruckMax(nc)<nc.max?` · LKW ${camTruckMax(nc)}`:""}`:"Tempolimit beachten");
       if(nc){cw.hidden=false;const tm=camTruckMax(nc);cw.innerHTML=`📷 ${nc.kind==="section"?"Section Control":"Radar"} in ${Math.max(0,Math.round((nc.km-nowKm)*1000/50)*50)} m<small>${nc.max?`Limit ${nc.max}${tm&&tm<nc.max?` · LKW ${tm}`:""} km/h`:"Tempolimit beachten"}${nc.kind==="section"?` · Länge ${(nc.kmEnd-nc.km).toFixed(1)} km`:""}</small>`;}}
   }
   // Parkplatz-Vorschläge automatisch, wenn die Pause näher rückt
@@ -1680,6 +1701,9 @@ function renderLive(){
   $("#lvDest").innerHTML=`<b>Ziel: ${esc(shortName(last.name||""))}</b><small>${(R.cumKm[R.cumKm.length-1]-nowKm).toFixed(0)} km · an ${fmtT(SIM.arrival)}${fmtD(SIM.arrival)!==fmtD(Date.now())?" "+fmtD(SIM.arrival):""} · Einsatz ${fmtDur(SIM.shiftUsed/1000)}${SIM.shiftFlag?" ⚠":""}</small>`;
 }
 setInterval(()=>{if(LIVE.active)renderLive()},15000);
+setInterval(()=>{if(LIVE.active){natState();
+  const end=LIVE.shiftStart+(+S.shiftMax||900)*60000;if(Date.now()>=end-3600e3)natNotify("shift"+LIVE.shiftStart,"⏰ Noch 1 h Einsatzzeit","Jetzt einen Platz für die Tagesruhe suchen – Einsatzzeit endet um "+fmtT(end)+".");}},60000);
+if(NAT){const pl=$("#phoneLink");if(pl)pl.hidden=true}
 
 /* ---------- iPhone-Link / QR ---------- */
 $("#phoneLink").onclick=()=>{

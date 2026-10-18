@@ -7,8 +7,8 @@
 		<string>location</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Der LKW-Planer braucht deinen Standort für die Live-Navigation, die Lenkzeit-Messung und Hinweise auf Pausen, Parkplätze und Blitzer.</string>
+	<string>TruckHub braucht deinen Standort für die Live-Navigation, die Lenkzeit-Messung und Hinweise auf Pausen, Parkplätze und Blitzer.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Damit die Lenkzeit auch bei gesperrtem Display weiterläuft, nutzt der LKW-Planer deinen Standort im Hintergrund, solange die Live-Navigation aktiv ist.</string>
+	<string>Damit die Lenkzeit auch bei gesperrtem Display weiterläuft, nutzt TruckHub deinen Standort im Hintergrund, solange die Live-Navigation aktiv ist.</string>
 </dict>
 </plist>

@@ -1,6 +1,6 @@
-# LKW-Planer – iPhone-App
+# TruckHub – iPhone-App
 
-Die App zeigt den LKW-Planer (https://airmax79.github.io/lkw-planer/) und ergänzt:
+Die App zeigt TruckHub (https://airmax79.github.io/lkw-planer/) und ergänzt:
 - GPS im Hintergrund – die Lenkzeit zählt auch bei gesperrtem Display weiter
 - Mitteilungen: noch 30 / 15 min Lenkzeit, 4,5 h erreicht, Pause 15 / 30 / 45 min erfüllt,
   Blitzer (AT), Umfahrung, Parkplätze, 1 h vor Ende der Einsatzzeit

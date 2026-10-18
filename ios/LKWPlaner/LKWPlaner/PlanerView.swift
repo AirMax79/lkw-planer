@@ -1,10 +1,10 @@
 import SwiftUI
 import WebKit
 
-/// Adresse des LKW-Planers. Updates auf GitHub landen automatisch in der App.
+/// Adresse von TruckHub. Updates auf GitHub landen automatisch in der App.
 let planerURL = URL(string: "https://airmax79.github.io/lkw-planer/")!
 
-/// Zeigt den LKW-Planer in einer WebView und verbindet ihn mit GPS und Mitteilungen des iPhones.
+/// Zeigt TruckHub in einer WebView und verbindet ihn mit GPS und Mitteilungen des iPhones.
 struct PlanerView: UIViewRepresentable {
     func makeCoordinator() -> Bridge { Bridge() }
 

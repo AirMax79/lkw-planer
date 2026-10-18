@@ -4,7 +4,7 @@ import WebKit
 import CoreLocation
 import UserNotifications
 
-/// Verbindet den LKW-Planer (Web) mit dem iPhone:
+/// Verbindet TruckHub (Web) mit dem iPhone:
 /// - GPS über CoreLocation, auch im Hintergrund (Lenkzeit zählt bei gesperrtem Display weiter)
 /// - Mitteilungen (Restlenkzeit, Pause erfüllt, Blitzer, Umfahrung, Parkplätze)
 /// - Display bleibt an, solange die Live-Navigation läuft
@@ -106,7 +106,7 @@ final class Bridge: NSObject, WKScriptMessageHandler, WKNavigationDelegate, WKUI
             UIApplication.shared.isIdleTimerDisabled = live
         case "notify":
             schedule(id: (m["id"] as? String) ?? UUID().uuidString,
-                     title: (m["title"] as? String) ?? "LKW-Planer",
+                     title: (m["title"] as? String) ?? "TruckHub",
                      body: (m["body"] as? String) ?? "",
                      after: num(m["after"]))
         case "cancel":

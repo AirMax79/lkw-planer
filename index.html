@@ -235,8 +235,12 @@ details .inner{padding:0 18px 14px;display:flex;flex-direction:column;gap:10px}
 .pk-btn{margin-top:4px;padding:3px 8px;font-size:12.5px}
 .mk-park{width:24px;height:24px;border-radius:5px;background:#1f5fbf;color:#fff}
 .live #lvPark{max-height:34vh;overflow:auto}
+.tachoremind{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:8px;background:var(--warn-bg);font-size:14px;font-weight:600}
+.tachoremind .go,.tachoform .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.tachoform input[type=text]{width:110px}
 .tachoform{display:flex;flex-direction:column;gap:6px;background:var(--panel-2);border-radius:8px;padding:8px}
-.tachoform label{flex-direction:row;align-items:center;gap:6px}
+.tachoform label{flex-direction:row;align-items:center;gap:6px;flex-wrap:wrap}
+.tachoform b{font-size:13.5px}
 .tachoform input[type=number]{width:80px}
 .modal{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:16px}
 .modal>div{background:var(--panel);color:var(--ink);border-radius:12px;padding:18px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
@@ -320,6 +324,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
           <label>Auto-Pause vor Grenze (min)<input type="number" id="buffer" min="0" max="60"></label>
           <label>Parkplatz-Vorschläge ab … min vor 4,5 h<input type="number" id="parkLead" min="10" max="120" step="5"></label>
         </div>
+        <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="tachoRemind"> Nach jeder Pause an den Tacho-Abgleich erinnern</label>
         <label>TomTom API-Key (LKW-Routing + Live-Verkehr: Stau, Unfälle, Baustellen)<input type="password" id="ttKey" placeholder="empfohlen – kostenlos auf developer.tomtom.com" autocomplete="off"></label>
         <p class="hint">Mit TomTom-Key wird die Route als LKW (Maße, Gewicht, Gefahrgut) mit aktueller Verkehrslage berechnet, Staus und Sperren erscheinen im Fahrplan und auf der Karte. Key kostenlos unter <a href="https://developer.tomtom.com/user/register" target="_blank" rel="noopener">developer.tomtom.com</a> (2.500 Routen pro Tag gratis).</p>
         <label>OpenRouteService API-Key (alternatives LKW-Routing ohne Verkehr)<input type="password" id="orsKey" placeholder="optional – kostenlos auf openrouteservice.org" autocomplete="off"></label>
@@ -356,7 +361,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>Version 11 · 18.10.2026</b> – Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>Version 12 · 18.10.2026</b> – Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -374,10 +379,17 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
       <div class="live-road" id="lvRoad"></div>
       <div class="lbar" id="lvBar"><i style="width:0%"></i></div>
       <div class="live-state" id="lvState">GPS wird gesucht …</div>
+      <div class="tachoremind" id="lvRemind" hidden>
+        <span>⏱ Pause beendet – mit Tacho bzw. VDO-App abgleichen?</span>
+        <div class="live-btns"><button type="button" id="lvRemindYes" class="go">Abgleichen</button><button type="button" id="lvRemindNo">Später</button></div>
+      </div>
       <div class="tachoform" id="lvTachoForm" hidden>
-        <label>Lenkzeit seit letzter Pause laut Tacho <input type="number" id="lvTachoMin" min="0" max="600"> min</label>
-        <label><input type="checkbox" id="lvTachoSplit"> 1. Teil (15 min) der geteilten Pause schon genommen</label>
-        <div class="live-btns"><button type="button" id="lvTachoSave">Übernehmen</button><button type="button" id="lvTachoCancel" class="ghost">Abbrechen</button></div>
+        <b>Werte vom Tacho / aus der VDO-App</b>
+        <label>Restlenkzeit bis zur nächsten Pause <input type="text" inputmode="decimal" id="lvTachoRest" placeholder="z. B. 2:15" autocomplete="off"></label>
+        <label>Tageslenkzeit noch übrig (optional) <input type="text" inputmode="decimal" id="lvTachoDay" placeholder="z. B. 6:40" autocomplete="off"></label>
+        <label class="chk"><input type="checkbox" id="lvTachoSplit"> 1. Teil (15 min) der geteilten Pause schon genommen</label>
+        <small class="hint" id="lvTachoErr"></small>
+        <div class="live-btns"><button type="button" id="lvTachoSave" class="go">Übernehmen</button><button type="button" id="lvTachoCancel" class="ghost">Abbrechen</button></div>
       </div>
       <div id="lvPark" hidden></div>
       <div class="live-next" id="lvNext"></div>
@@ -423,7 +435,7 @@ function defaultState(){
     ],
     pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on", avoid:{motorways:false,toll:false,ferry:false},
     v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false},
-    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, orsKey:"", ttKey:""
+    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, tachoRemind:true, orsKey:"", ttKey:""
   };
 }
 function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
@@ -1483,12 +1495,40 @@ function endPause(auto){
   if(!LIVE.pauseSince)return;
   LIVE.breakNote=liveBreak((Date.now()-LIVE.pauseSince)/60000)+(auto?" (Pause automatisch beendet, weil du losgefahren bist)":"");
   LIVE.pauseSince=null;$("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");resim();
+  if(S.tachoRemind!==false&&$("#lvTachoForm").hidden){$("#lvRemind").hidden=false;clearTimeout(LIVE.remindT);LIVE.remindT=setTimeout(()=>{$("#lvRemind").hidden=true},10*60000)}
 }
 $("#lvGrip").onclick=()=>{$("#livePanel").classList.toggle("mini")};
 $("#lvPause").onclick=()=>LIVE.pauseSince?endPause(false):startPause();
-$("#lvTacho").onclick=()=>{const f=$("#lvTachoForm");f.hidden=!f.hidden;$("#lvTachoMin").value=Math.round(LIVE.driveSec/60);$("#lvTachoSplit").checked=LIVE.split};
+// Zeitangaben wie am Tacho: „2:15“, „2.15“, „2,15“, „2h15“ oder Minuten („135“)
+function parseHM(v){
+  v=String(v||"").trim().toLowerCase().replace(/\s+/g,"").replace(/min$/,"");if(!v)return null;
+  let m=v.match(/^(\d{1,2})[:.,h](\d{1,2})$/);if(m){const mm=+m[2];if(mm>59)return NaN;return +m[1]*60+mm}
+  m=v.match(/^(\d{1,3})$/);if(m)return +m[1];
+  return NaN;
+}
+const hmStr=sec=>{const x=Math.max(0,Math.round(sec/60));return Math.floor(x/60)+":"+String(x%60).padStart(2,"0")};
+function openTacho(){
+  const f=$("#lvTachoForm");f.hidden=false;$("#lvRemind").hidden=true;$("#lvTachoErr").textContent="";
+  $("#lvTachoRest").value=hmStr(LIM-LIVE.driveSec);
+  $("#lvTachoDay").value=hmStr((+S.dayMax||540)*60-LIVE.daySec);
+  $("#lvTachoSplit").checked=LIVE.split;
+  setTimeout(()=>{try{$("#lvTachoRest").select()}catch(e){}},50);
+}
+$("#lvTacho").onclick=()=>{$("#lvTachoForm").hidden?openTacho():($("#lvTachoForm").hidden=true)};
 $("#lvTachoCancel").onclick=()=>{$("#lvTachoForm").hidden=true};
-$("#lvTachoSave").onclick=()=>{const m=+$("#lvTachoMin").value;if(m>=0){LIVE.driveSec=m*60;LIVE.split=$("#lvTachoSplit").checked;LIVE.block++;LIVE.breakNote="Mit Tacho abgeglichen";}$("#lvTachoForm").hidden=true;resim()};
+$("#lvTachoSave").onclick=()=>{
+  const rest=parseHM($("#lvTachoRest").value),day=parseHM($("#lvTachoDay").value),err=$("#lvTachoErr");
+  if(rest==null||isNaN(rest)||rest>270){err.textContent="Restlenkzeit bitte als Stunden:Minuten eingeben, z. B. 2:15 (höchstens 4:30).";return}
+  if(day!=null&&(isNaN(day)||day>600)){err.textContent="Tageslenkzeit bitte als Stunden:Minuten eingeben, z. B. 6:40 (höchstens 10:00).";return}
+  LIVE.driveSec=(270-rest)*60;
+  if(day!=null)LIVE.daySec=Math.max(0,((+S.dayMax||540)-day)*60);
+  LIVE.split=$("#lvTachoSplit").checked;LIVE.block++;
+  LIVE.breakNote=`Mit Tacho abgeglichen: noch ${hmStr(rest*60)} bis zur Pause`+(day!=null?`, ${hmStr(day*60)} Tageslenkzeit`:"");
+  $("#lvTachoForm").hidden=true;resim();
+};
+["#lvTachoRest","#lvTachoDay"].forEach(x=>$(x).addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#lvTachoSave").click()}}));
+$("#lvRemindYes").onclick=openTacho;
+$("#lvRemindNo").onclick=()=>{$("#lvRemind").hidden=true};
 $("#lvParkBtn").onclick=()=>liveParkSearch(true);
 async function liveParkSearch(manual){
   if(!R||!SIM||!LIVE.fix)return;
@@ -1514,7 +1554,7 @@ function startLive(){
   if(!window.isSecureContext){status("Live-Ortung funktioniert nur, wenn das Tool über einen https-Link geöffnet wird (nicht als Datei). Anleitung siehe Chat.","err");return}
   if(!R){status("Zuerst die Route berechnen.","info");return}
   Object.assign(LIVE,{active:true,fix:null,idx:0,off:0,lastT:null,driveSec:(S.driveStart||0)*60,daySec:(S.dayStart||0)*60,split:false,stillSince:null,pauseSince:null,block:0,parkBlock:-1,parkShown:false,follow:true,lastReroute:Date.now(),breakNote:""});
-  $("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");$("#lvPark").hidden=true;$("#lvTachoForm").hidden=true;
+  $("#lvPause").textContent="⏸ Pause starten";$("#lvPause").classList.remove("on");$("#lvPark").hidden=true;$("#lvTachoForm").hidden=true;$("#lvRemind").hidden=true;
   const ss=S.shiftStart?new Date(S.shiftStart).getTime():NaN;LIVE.shiftStart=isNaN(ss)?Date.now():ss;
   document.body.classList.add("livemode");$("#livePanel").hidden=false;
   ["#liveBtn","#liveBtn2"].forEach(x=>{$(x).textContent="■ Live beenden";$(x).classList.add("on")});
@@ -1656,7 +1696,8 @@ $("#phoneLink").onclick=()=>{
 $("#qrClose").onclick=()=>{$("#qrModal").hidden=true};
 $("#calc").onclick=calcRoute;
 
-fillForm();fillAvoid();renderStops();drawStops();calcRoute();
+fillForm();fillAvoid();$("#tachoRemind").checked=S.tachoRemind!==false;
+$("#tachoRemind").addEventListener("change",()=>{S.tachoRemind=$("#tachoRemind").checked;save()});renderStops();drawStops();calcRoute();
 })();
 </script>
 </body>

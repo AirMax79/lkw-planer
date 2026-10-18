@@ -447,7 +447,7 @@ body.livemode.showplan .planclose{display:block}
     </section>
 
     <div class="footer" data-tab="veh">
-      <b>TruckHub · Version 35 · 18.10.2026</b> – TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 36 · 18.10.2026</b> – Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -1560,7 +1560,7 @@ const parkLayer=L.layerGroup().addTo(map);
 const OVERPASS=["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter","https://overpass.private.coffee/api/interpreter"];
 /* Parkplätze: TomTom Search (Truck Stop, Rastplatz, Parkplatz) entlang der Route; OpenStreetMap als Ergänzung/Rückfall */
 function sideOf(lat,lng,bi,bd){
-  if(!(bd>35)||bi>=R.coords.length-1)return null;
+  if(!(bd>35)||bd>300||bi>=R.coords.length-1)return null; // weiter weg (Autohof an der Abfahrt): Seite nicht beurteilbar
   const a=R.coords[bi],b=R.coords[bi+1],k=Math.cos(a[0]*Math.PI/180);
   const cr=(b[1]-a[1])*k*(lat-a[0])-(b[0]-a[0])*(lng-a[1])*k;const lht=["GB","IE"].includes(R.cc[Math.min(bi,R.cc.length-1)]);return(cr<0)!==lht?"r":"l";
 }
@@ -1630,9 +1630,12 @@ async function findParking(vA,vB){
   let tt=[];if(S.ttKey){tt=await findParkingTomTom(vA,vB);diag.push(...(tt.diag||[]))}else diag.push("TomTom: kein Key hinterlegt");
   let osm=[];try{osm=await findParkingOSM(vA,vB);diag.push(`OpenStreetMap: ${osm.length} Treffer`)}catch(e){diag.push("OpenStreetMap: "+e.message);if(!tt.length&&!S.ttKey)throw e}
   // zusammenführen: TomTom-Treffer bevorzugt, OSM ergänzt Ausstattung und fehlende Plätze
-  const res=tt.slice();res.diag=diag;
-  osm.forEach(o=>{const d=res.find(r=>hav([r.lat,r.lng],[o.lat,o.lng])<250);
-    if(d){["rest","shower","wc","fuel","guard"].forEach(k=>{if(o[k])d[k]=true});if(o.fee)d.fee=o.fee;if(o.cap)d.cap=o.cap;if(!d.info)d.info=o.info}
+  const norm=n=>(n||"").toLowerCase().replace(/\b(autohof|rasthof|raststätte|rastplatz|rastst|parkplatz|lkw|truck|stop|24|total|shell|aral|omv|eni|bp|jet|avia)\b/g,"").replace(/[^a-zäöüß]/g,"");
+  const same=(a,b)=>{const d=hav([a.lat,a.lng],[b.lat,b.lng]);if(d<300)return a.side==null||b.side==null||a.side===b.side;const na=norm(a.name),nb=norm(b.name);return d<2500&&na.length>3&&(na===nb||na.includes(nb)||nb.includes(na))&&a.side===b.side};
+  const res=[];res.diag=diag;
+  tt.sort((a,b)=>b.score-a.score).concat(osm).forEach(o=>{const d=res.find(r=>same(r,o));
+    if(d){["rest","shower","wc","fuel","guard"].forEach(k=>{if(o[k])d[k]=true});if(o.fee&&!d.fee)d.fee=o.fee;if(o.cap)d.cap=o.cap;if(!d.info)d.info=o.info;if(!d.phone)d.phone=o.phone;if(!d.url)d.url=o.url;if(!d.addr)d.addr=o.addr;if(d.side==null)d.side=o.side;
+      if(d.kind==="LKW-Parkplatz"&&o.kind!=="LKW-Parkplatz")d.kind=o.kind;if((o.name||"").length>(d.name||"").length&&/autohof|rasthof|raststätte/i.test(o.name))d.name=o.name}
     else res.push(o)});
   res.forEach(p=>{const info=[];if(p.cap)info.push(p.cap+" LKW-Plätze");if(p.rest)info.push("🍽 Restaurant");if(p.shower)info.push("🚿 Dusche");if(p.wc)info.push("WC");if(p.fuel)info.push("⛽ Tankstelle");if(p.guard)info.push("bewacht");if(p.hours)info.push(p.hours);p.info=info.join(" · ")});
   res.sort((a,b)=>a.km-b.km);res.diag=diag;

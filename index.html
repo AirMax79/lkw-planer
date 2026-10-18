@@ -336,7 +336,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
           <label>Dienstbeginn (leer = Abfahrt)<input type="datetime-local" id="shiftStart"></label>
           <label>Tageslenkzeit max.<select id="dayMax"><option value="540">9 h</option><option value="600">10 h (2× pro Woche)</option></select></label>
           <label>Auto-Pause vor Grenze (min)<input type="number" id="buffer" min="0" max="60"></label>
-          <label>Parkplatz-Vorschläge ab … min vor 4,5 h<input type="number" id="parkLead" min="10" max="120" step="5"></label>
+          <label>Parkplatz-Suchbereich vor der Pause<select id="parkWin"><option value="30">letzte 30 min Lenkzeit</option><option value="60">letzte 60 min Lenkzeit</option><option value="90">letzte 90 min Lenkzeit</option></select></label>
         </div>
         <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="tachoRemind"> Nach jeder Pause an den Tacho-Abgleich erinnern</label>
         <label>TomTom API-Key (LKW-Routing + Live-Verkehr: Stau, Unfälle, Baustellen)<input type="password" id="ttKey" placeholder="empfohlen – kostenlos auf developer.tomtom.com" autocomplete="off"></label>
@@ -375,7 +375,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>TruckHub · Version 24 · 18.10.2026</b> – Parkplatz-Filter und eigene Bewertungen, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 25 · 18.10.2026</b> – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -449,11 +449,11 @@ function defaultState(){
     ],
     pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on", avoid:{motorways:false,toll:false,ferry:false},
     v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false},
-    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, tachoRemind:true, startGps:false, parkFilter:{fee:"all",wc:false,guard:false,fav:false}, parkRate:{}, orsKey:"", ttKey:""
+    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkWin:60, tachoRemind:true, startGps:false, parkFilter:{fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false}, parkRate:{}, orsKey:"", ttKey:""
   };
 }
 function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
-function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.parkFilter=Object.assign({fee:"all",wc:false,guard:false,fav:false},s.parkFilter||{});o.parkRate=s.parkRate||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.parkFilter=Object.assign({fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false},s.parkFilter||{});o.parkWin=+s.parkWin||60;o.parkRate=s.parkRate||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
 let S=load()||defaultState();
 // Keys per Link übernehmen (?tt=…&ors=…), danach aus der Adresszeile entfernen
@@ -636,7 +636,7 @@ $("#addStop").onclick=()=>{S.stops.splice(S.stops.length-1,0,{id:uid(),name:"",l
 $("#reverse").onclick=()=>{S.stops.reverse();S.pauses=[];renderStops();drawStops();calcRoute();};
 
 /* ---------- Einstellungen ---------- */
-const bind=[["#depart","depart"],["#banMode","banMode"],["#camMode","camMode"],["#driveStart","driveStart",1],["#dayStart","dayStart",1],["#dayMax","dayMax",1],["#shiftMax","shiftMax",1],["#shiftStart","shiftStart"],["#buffer","buffer",1],["#parkLead","parkLead",1],["#orsKey","orsKey"],["#ttKey","ttKey"]];
+const bind=[["#depart","depart"],["#banMode","banMode"],["#camMode","camMode"],["#driveStart","driveStart",1],["#dayStart","dayStart",1],["#dayMax","dayMax",1],["#shiftMax","shiftMax",1],["#shiftStart","shiftStart"],["#buffer","buffer",1],["#parkWin","parkWin",1],["#orsKey","orsKey"],["#ttKey","ttKey"]];
 const vbind=[["#v_weight","weight"],["#v_axle","axle"],["#v_height","height"],["#v_width","width"],["#v_length","length"],["#v_hazmat","hazmat"]];
 function fillForm(){
   bind.forEach(([sel,k])=>$(sel).value=S[k]);
@@ -1451,28 +1451,44 @@ async function findParking(vA,vB){
   const pts=[];let last=-1e9;for(let i=vA;i<=vB;i++){if(R.cumKm[i]-last>=step||i===vB){pts.push(R.coords[i]);last=R.cumKm[i]}}
   const poly=pts.map(p=>p[0].toFixed(5)+","+p[1].toFixed(5)).join(",");
   const A=`(around:400,${poly})`;
-  const q=`[out:json][timeout:25];(nwr${A}[highway~"^(rest_area|services)$"];nwr${A}[amenity=parking][hgv~"^(yes|designated)$"];nwr${A}[amenity=parking]["capacity:hgv"];);out center tags;`;
+  // Parkplätze, dazu Restaurants, Imbisse, WCs, Duschen und Tankstellen auf dem Gelände (in OSM meist eigene Punkte)
+  const q=`[out:json][timeout:40];(nwr${A}[highway~"^(rest_area|services)$"];nwr${A}[amenity=parking][hgv~"^(yes|designated)$"];nwr${A}[amenity=parking]["capacity:hgv"];)->.p;.p out center tags;(nwr(around.p:400)[amenity~"^(restaurant|fast_food|cafe|food_court|toilets|shower|fuel)$"];nwr(around.p:400)[shower~"^(yes|hot)$"];);out center tags;`;
   let j=null,err;
   for(const ep of OVERPASS){try{const r=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});if(r.ok){j=await r.json();break}err="HTTP "+r.status}catch(e){err=e.message}}
   if(!j)throw new Error("Parkplatzsuche nicht erreichbar ("+err+")");
+  const pos=el=>{const lat=el.lat!=null?el.lat:el.center&&el.center.lat,lng=el.lon!=null?el.lon:el.center&&el.center.lon;return lat==null?null:[lat,lng]};
+  const isPark=t=>/^(rest_area|services)$/.test(t.highway||"")||t.amenity==="parking";
+  const fac=[];
+  j.elements.forEach(el=>{const t=el.tags||{};if(isPark(t))return;const ps=pos(el);if(!ps)return;
+    fac.push({ps,rest:/^(restaurant|fast_food|cafe|food_court)$/.test(t.amenity||""),wc:t.amenity==="toilets"||t.toilets==="yes",shower:t.amenity==="shower"||/^(yes|hot)$/.test(t.shower||""),fuel:t.amenity==="fuel"})});
   const out=[];
   j.elements.forEach(el=>{
-    const t=el.tags||{};if(t.hgv==="no"||t.access==="private"||t.access==="no")return;
-    const lat=el.lat!=null?el.lat:el.center&&el.center.lat,lng=el.lon!=null?el.lon:el.center&&el.center.lon;if(lat==null)return;
+    const t=el.tags||{};if(!isPark(t))return;if(t.hgv==="no"||t.access==="private"||t.access==="no")return;
+    const ps=pos(el);if(!ps)return;const[lat,lng]=ps;
     let bi=vA,bd=Infinity;for(let i=Math.max(0,vA-5);i<=Math.min(R.coords.length-1,vB+5);i++){const d=hav(R.coords[i],[lat,lng]);if(d<bd){bd=d;bi=i}}
     const kind=t.highway==="services"?"Raststätte":t.highway==="rest_area"?"Rastplatz":"LKW-Parkplatz";
     // Fahrbahnseite (rechts = in Fahrtrichtung erreichbar, Linksverkehr in GB/IE umgekehrt)
     let side=null;if(bd>35&&bi<R.coords.length-1){const a=R.coords[bi],b=R.coords[bi+1],k=Math.cos(a[0]*Math.PI/180);
       const cr=(b[1]-a[1])*k*(lat-a[0])-(b[0]-a[0])*(lng-a[1])*k;const lht=["GB","IE"].includes(R.cc[Math.min(bi,R.cc.length-1)]);side=(cr<0)!==lht?"r":"l";}
+    const near=fac.filter(f=>hav(f.ps,ps)<=400);
+    const has=k=>near.some(f=>f[k]);
+    const svc=t.highway==="services";
+    const p={kind,lat,lng,km:R.cumKm[bi],vi:bi,side,
+      rest:has("rest")||svc||t.restaurant==="yes",
+      shower:has("shower")||/^(yes|hot)$/.test(t.shower||""),
+      wc:has("wc")||t.toilets==="yes"||svc,
+      fuel:has("fuel")||svc||t.fuel==="yes",
+      guard:t.supervised==="yes",
+      fee:t.fee==="yes"||(t.charge&&t.fee!=="no")?"paid":t.fee==="no"?"free":null};
+    p.name=t.name||t.operator||kind;
     const info=[];if(t["capacity:hgv"])info.push(t["capacity:hgv"]+" LKW-Plätze");else if(t.hgv==="designated")info.push("LKW-Stellplätze");
-    if(t.highway==="services")info.push("Tankstelle/Restaurant");if(t.toilets==="yes"||t.amenity==="toilets")info.push("WC");if(t.fee==="yes")info.push("gebührenpflichtig");if(t.fee==="no")info.push("kostenlos");if(t.supervised==="yes")info.push("bewacht");
-    if(t.shower==="yes")info.push("Dusche");if(t.lit==="yes")info.push("beleuchtet");
-    const fee=t.fee==="yes"||(t.charge&&t.fee!=="no")?"paid":t.fee==="no"?"free":null;
-    out.push({name:t.name||t.operator||kind,kind,lat,lng,km:R.cumKm[bi],vi:bi,side,fee,wc:t.toilets==="yes"||t.amenity==="toilets"||t.highway==="services",guard:t.supervised==="yes",
-      info:info.filter(x=>x!=="gebührenpflichtig"&&x!=="kostenlos").join(" · "),score:(t.name?2:0)+(t.highway?2:0)+(t["capacity:hgv"]?1:0)});
+    if(p.rest)info.push("🍽 Restaurant");if(p.shower)info.push("🚿 Dusche");if(p.wc)info.push("WC");if(p.fuel)info.push("⛽ Tankstelle");if(p.guard)info.push("bewacht");if(t.lit==="yes")info.push("beleuchtet");
+    p.info=info.join(" · ");p.score=(t.name?2:0)+(t.highway?2:0)+(t["capacity:hgv"]?1:0);
+    out.push(p);
   });
   out.sort((a,b)=>b.score-a.score);
-  const res=[];out.forEach(o=>{if(!res.some(r=>hav([r.lat,r.lng],[o.lat,o.lng])<300))res.push(o)});
+  const res=[];out.forEach(o=>{const d=res.find(r=>hav([r.lat,r.lng],[o.lat,o.lng])<300);
+    if(!d)res.push(o);else["rest","shower","wc","fuel","guard"].forEach(k=>{if(o[k])d[k]=true})});
   res.sort((a,b)=>a.km-b.km);
   return res;
 }
@@ -1483,29 +1499,50 @@ function parkFilterBar(c){
   const ch=(v,l)=>`<button type="button" data-pf="fee" data-v="${v}" aria-pressed="${f.fee===v}">${l}</button>`;
   const tg=(k,l)=>`<button type="button" class="tog" data-pf="${k}" aria-pressed="${!!f[k]}">${l}</button>`;
   return`<div class="pfilter"><span class="chips" role="group" aria-label="Gebühr">${ch("all","Alle")}${ch("free","Kostenlos")}${ch("paid","Kostenpflichtig")}</span>
-    ${tg("wc","WC")}${tg("guard","Bewacht")}${tg("fav","⭐ Meine Favoriten")}<span>${n<all?`${n} von ${all}`:`${all} gefunden`}</span></div>`;
+    ${tg("rest","🍽 Restaurant")}${tg("shower","🚿 Dusche")}${tg("wc","WC")}${tg("fuel","⛽ Tankstelle")}${tg("guard","Bewacht")}${tg("fav","⭐ Meine Favoriten")}</div>
+    <small class="hint">${esc(c.note||"")} · ${n} Vorschl${n===1?"ag":"äge"}</small>`;
 }
 function parkPass(p){
   const f=S.parkFilter,r=pkRate(p);
   if(f.fee==="free"&&p.fee==="paid")return false;
   if(f.fee==="paid"&&p.fee!=="paid")return false;
-  if(f.wc&&!p.wc)return false;
-  if(f.guard&&!p.guard)return false;
+  for(const k of["rest","shower","wc","fuel","guard"])if(f[k]&&!p[k])return false;
   if(f.fav&&!(r&&r.r>=4))return false;
   return true;
 }
+function parkScore(p){
+  const r=pkRate(p);let sc=0;
+  if(r)sc+=(r.r-3)*3;                                           // eigene Bewertung zählt am meisten
+  sc+=(p.rest?1:0)+(p.shower?1:0)+(p.wc?.5:0)+(p.kind!=="LKW-Parkplatz"?1:0);
+  if(p.minBefore!=null){if(p.minBefore<3)sc-=4;else sc-=p.minBefore/20}   // möglichst spät, aber nicht zu knapp
+  if(p.side==="l")sc-=6;                                        // vermutlich Gegenrichtung
+  return sc;
+}
 function renderPark(ctx){
   const c=PARK[ctx];if(!c||!c.box)return;
-  let l=c.all.filter(parkPass);if(c.max)l=l.slice(-c.max);c.list=l;
+  c.all.forEach(p=>{p.t=SIM&&SIM.timeAt[p.vi];p.minBefore=c.refT&&p.t?(c.refT-p.t)/60000:null;p.tag=null});
+  const inW=(p,w)=>p.minBefore==null||(c.isLimit?(p.minBefore>=-1&&p.minBefore<=w):(p.minBefore>=-10&&p.minBefore<=w));
+  const pass=c.all.filter(parkPass);
+  let w=c.win,l=pass.filter(p=>inW(p,w)),wid=0;
+  if(!l.length)for(const w2 of[c.win+30,c.fetchWin]){if(w2<=c.win)continue;const l2=pass.filter(p=>inW(p,w2));if(l2.length){l=l2;wid=w2;break}}
+  l.sort((a,b)=>parkScore(b)-parkScore(a));
+  if(l.length){l[0].tag="rec";
+    const rs=l.slice(1).filter(p=>p.minBefore!=null&&l[0].minBefore!=null&&p.minBefore>=l[0].minBefore+10).sort((a,b)=>b.minBefore-a.minBefore)[0];
+    if(rs)rs.tag="res";}
+  if(c.max)l=l.slice(0,c.max);
+  c.list=l;
+  const ref=c.isLimit?"der 4,5-h-Grenze":"der Pause";
+  c.note=wid?`Im ${c.win}-min-Bereich nichts Passendes – Suche auf ${wid} min vor ${ref} erweitert`:`Suchbereich: letzte ${c.win} min Lenkzeit vor ${ref}`;
   c.box.innerHTML=(c.all.length?parkFilterBar(c):"")+parkHtml(l,c.dur,c.limitT,ctx,c.all.length);
   showParkMarkers(l,ctx,c.dur);
 }
 function parkHtml(list,dur,limitT,ctx,total){
-  if(!list.length)return total?`<small class="hint">Kein Parkplatz passt zu diesem Filter – Filter lockern, um alle ${total} zu sehen.</small>`:`<small class="hint">Keine LKW-Parkplätze in OpenStreetMap entlang dieses Abschnitts gefunden.</small>`;
+  if(!list.length)return total?`<small class="hint">Auch mit erweitertem Bereich passt kein Parkplatz zu diesem Filter – Filter lockern, um alle ${total} zu sehen.</small>`:`<small class="hint">Keine LKW-Parkplätze in OpenStreetMap entlang dieses Abschnitts gefunden.</small>`;
   return list.map((p,ix)=>{const t=SIM&&SIM.timeAt[p.vi];const buf=t&&limitT?Math.round((limitT-t)/60000):null;const r=pkRate(p);
     const fee=p.fee==="free"?`<span class="fee free">kostenlos</span>`:p.fee==="paid"?`<span class="fee paid">€ kostenpflichtig</span>`:`<span class="fee unk">Gebühr unbekannt</span>`;
     const stars=[1,2,3,4,5].map(n=>`<button type="button" class="${r&&r.r>=n?"on":""}" data-rate="${n}" data-ix="${ix}" data-ctx="${ctx}" aria-label="${n} Sterne">★</button>`).join("");
-    return`<div class="pitem"><b>🅿 ${esc(p.name)}${fee}</b><small>${esc(p.kind)} · km ${p.km.toFixed(0)}${t?` · an ca. ${fmtT(t)}`:""}${buf!=null?` · ${buf} min vor Lenkzeitende`:""}</small>
+    const tag=p.tag==="rec"?`<span class="fee free">👍 Empfehlung</span>`:p.tag==="res"?`<span class="fee unk">🛟 Reserve (früher)</span>`:"";
+    return`<div class="pitem"><b>🅿 ${esc(p.name)}${fee}${tag}</b><small>${esc(p.kind)} · km ${p.km.toFixed(0)}${t?` · an ca. ${fmtT(t)}`:""}${buf!=null?` · ${buf} min vor Lenkzeitende`:""}</small>
     ${p.info?`<small>${esc(p.info)}</small>`:""}${p.side?`<small class="${p.side==="l"?"side-l":""}">${p.side==="r"?"In Fahrtrichtung":"Andere Straßenseite – evtl. Gegenrichtung, bitte prüfen"}</small>`:""}
     <div class="prate"><span>Deine Bewertung:</span><span class="stars">${stars}</span>${r?"":`<span>tippen zum Bewerten</span>`}</div>
     ${r&&r.r?`<div class="prate"><input type="text" placeholder="Notiz, z. B. „oft voll ab 18 Uhr“" value="${esc(r.n||"")}" data-note="${ix}" data-ctx="${ctx}" aria-label="Notiz zum Parkplatz"></div>`:""}
@@ -1551,11 +1588,12 @@ async function planParkSearch(btn){
   const li=btn.closest("li");const box=li.querySelector(".plist");
   const km=+btn.dataset.km,t=+btn.dataset.t,dur=+btn.dataset.dur;
   const vB=vertexAtKm(km);const i0=SIM&&SIM.items[0]?vertexAtKm(SIM.items[0].km):0;
-  const vA=Math.max(i0,vertexAtTime(t-(btn.dataset.pk==="pause"?75:90)*60000,i0));
+  const win=+S.parkWin||60,fetchWin=Math.max(90,win+30);
+  const vA=Math.max(i0,vertexAtTime(t-fetchWin*60000,i0));
   const vB2=btn.dataset.pk==="pause"?Math.min(R.coords.length-1,vertexAtTime(t+10*60000,vB)):vB;
   box.innerHTML=`<small class="hint">Suche LKW-Parkplätze …</small>`;btn.disabled=true;
   try{const list=await findParking(vA,vB2);const ctx="c"+uid();
-    PARK[ctx]={all:list,list:[],pauseId:btn.dataset.id||null,dur,limitT:btn.dataset.pk==="limit"?t:null,box,max:0};renderPark(ctx);
+    PARK[ctx]={all:list,list:[],pauseId:btn.dataset.id||null,dur,limitT:btn.dataset.pk==="limit"?t:null,refT:t,isLimit:btn.dataset.pk==="limit",win,fetchWin,box,max:0};renderPark(ctx);
     const sh=PARK[ctx].list.length?PARK[ctx].list:list;if(sh.length)map.fitBounds(L.latLngBounds(sh.map(p=>[p.lat,p.lng])).pad(0.3));}
   catch(e){box.innerHTML=`<small class="hint">${esc(e.message)}</small>`}
   btn.disabled=false;
@@ -1642,8 +1680,10 @@ async function liveParkSearch(manual){
   const dur=LIVE.split?30:45;
   box.innerHTML=`<b>🅿 Parkplätze bis ${lim?"zur 4,5-h-Grenze":"zur geplanten Pause"} (km ${tKm.toFixed(0)})</b><div class="plist"><small class="hint">Suche …</small></div><div class="live-btns" style="margin-top:6px"><button type="button" id="lvParkClose" class="ghost">Schließen</button></div>`;
   $("#lvParkClose").onclick=()=>{box.hidden=true;LIVE.parkShown=false;parkLayer.clearLayers()};
-  try{const list=await findParking(LIVE.idx,vertexAtKm(tKm));
-    const ctx="live";PARK[ctx]={all:list,list:[],pauseId:null,dur,limitT:lim?lim.t:null,box:box.querySelector(".plist"),max:6};renderPark(ctx);
+  const win=+S.parkWin||60,fetchWin=Math.max(90,win+30),refT=target?target.t:null;
+  const vA=refT?Math.max(LIVE.idx,vertexAtTime(refT-fetchWin*60000,LIVE.idx)):LIVE.idx;
+  try{const list=await findParking(vA,vertexAtKm(tKm));
+    const ctx="live";PARK[ctx]={all:list,list:[],pauseId:null,dur,limitT:lim?lim.t:null,refT,isLimit:!!lim,win,fetchWin,box:box.querySelector(".plist"),max:6};renderPark(ctx);
     if(PARK[ctx].list.length){const nx=PARK[ctx].list[0];natNotify("park"+LIVE.block,"🅿 Parkplätze vor Lenkzeitende",`${PARK[ctx].list.length} Vorschläge – z. B. ${nx.name} in ${Math.max(0,nx.km-R.cumKm[LIVE.idx]).toFixed(0)} km`);}
   }catch(e){box.querySelector(".plist").innerHTML=`<small class="hint">${esc(e.message)}</small>`}
 }
@@ -1778,7 +1818,7 @@ function renderLive(){
       if(nc){cw.hidden=false;const tm=camTruckMax(nc);cw.innerHTML=`📷 ${nc.kind==="section"?"Section Control":"Radar"} in ${Math.max(0,Math.round((nc.km-nowKm)*1000/50)*50)} m<small>${nc.max?`Limit ${nc.max}${tm&&tm<nc.max?` · LKW ${tm}`:""} km/h`:"Tempolimit beachten"}${nc.kind==="section"?` · Länge ${(nc.kmEnd-nc.km).toFixed(1)} km`:""}</small>`;}}
   }
   // Parkplatz-Vorschläge automatisch, wenn die Pause näher rückt
-  if(!LIVE.pauseSince&&LIVE.fix&&rest<=(+S.parkLead||30)*60&&LIVE.parkBlock!==LIVE.block)liveParkSearch(false);
+  if(!LIVE.pauseSince&&LIVE.fix&&rest<=(+S.parkWin||60)*60&&LIVE.parkBlock!==LIVE.block)liveParkSearch(false);
   const nx=SIM.items.find(x=>["stop","pause","limit","traffic","cam","ban","shiftWarn","border"].includes(x.type)&&x.km>=nowKm-0.05);
   const lab=x=>x.type==="stop"?`Stopp ${x.letter}: ${shortName(x.name)}`:x.type==="pause"?`Pause ${x.dur} min${x.atStop?" an Stopp "+x.atStop:""}`:x.type==="limit"?(x.shift?"Ende Einsatzzeit":x.day?"Tageslenkzeit erreicht":"4,5 h Lenkzeit erreicht"):x.type==="cam"?(x.c.kind==="section"?"📷 Section Control":"📷 "+x.c.name):x.type==="traffic"?`${x.label}${x.delay?" +"+Math.round(x.delay/60)+" min":""}`:x.type==="ban"?x.label:x.type==="border"?`Grenze ${cname(x.cc)}`:x.type==="shiftWarn"?"Noch 1 h Einsatzzeit":"";
   const extra=nx&&nx.type==="traffic"?[trafficWhere(nx.x),trafficDesc(nx.x)].filter(Boolean).join(" – "):"";

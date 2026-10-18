@@ -275,12 +275,13 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
         <button id="reverse" type="button" class="ghost">⇅ Umkehren</button>
       </div>
       <div class="grid2">
-        <label>Abfahrt<input type="datetime-local" id="depart"></label>
+        <label style="grid-column:1/-1">Abfahrt<span style="display:flex;gap:6px;min-width:0"><input type="datetime-local" id="depart" style="min-width:0;flex:1"><button type="button" id="departNow" class="icon" title="Abfahrt auf jetzt setzen">Jetzt</button></span></label>
         <label>Blitzer &amp; Section Control<select id="camMode">
           <option value="on">anzeigen (nur Österreich)</option><option value="off">aus</option></select></label>
         <label>Fahrverbots-Hinweise<select id="banMode">
           <option value="on">anzeigen</option><option value="off">aus</option></select></label>
       </div>
+      <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="startGps"> Beim Öffnen meinen aktuellen Standort als Start verwenden</label>
       <div class="avoid"><span>Meiden:</span><span class="chips" id="avoidChips" role="group" aria-label="Straßen meiden">
         <button type="button" data-av="motorways" aria-pressed="false">Autobahn</button><button type="button" data-av="toll" aria-pressed="false">Maut</button><button type="button" data-av="ferry" aria-pressed="false">Fähren</button></span></div>
       <div class="row">
@@ -361,7 +362,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>Version 21 · 18.10.2026</b> – App-Symbol mit Tacho-Ring und Pause, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>Version 22 · 18.10.2026</b> – aktueller Standort als Start, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -435,7 +436,7 @@ function defaultState(){
     ],
     pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on", avoid:{motorways:false,toll:false,ferry:false},
     v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false},
-    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, tachoRemind:true, orsKey:"", ttKey:""
+    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkLead:30, tachoRemind:true, startGps:false, orsKey:"", ttKey:""
   };
 }
 function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
@@ -539,6 +540,7 @@ function renderStops(){
         <div class="stop-line">
           <input type="text" id="q_${s.id}" value="${esc(s.name||"")}" placeholder="${s.via?"Über (ohne Halt)":first?"Start":last?"Ziel":"Zwischenstopp"} – Ort oder Adresse">
           <button class="icon" data-a="search" title="Suchen" type="button">🔍</button>
+          ${first?`<button class="icon" data-a="gps" title="Aktuellen Standort als Start verwenden" aria-label="Aktuellen Standort als Start verwenden" type="button">📍</button>`:""}
           ${!first?`<button class="icon ghost" data-a="up" title="Nach oben" type="button">↑</button>`:""}
           ${S.stops.length>2?`<button class="icon ghost" data-a="del" title="Entfernen" type="button">✕</button>`:""}
         </div>
@@ -561,10 +563,11 @@ function renderStops(){
       }catch(e){status(e.message,"err")}
     };
     inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();doSearch()}});
-    inp.addEventListener("change",()=>{s.name=inp.value;save()});
+    inp.addEventListener("change",()=>{s.name=inp.value;s.gps=false;save()});
     el.addEventListener("click",e=>{
       const a=e.target.dataset&&e.target.dataset.a;
       if(a==="search")doSearch();
+      if(a==="gps")useGpsStart(false);
       if(a==="up"){[S.stops[i-1],S.stops[i]]=[S.stops[i],S.stops[i-1]];renderStops();drawStops();calcRoute();}
       if(a==="del"){S.stops.splice(i,1);renderStops();drawStops();calcRoute();}
     });
@@ -573,6 +576,32 @@ function renderStops(){
     box.appendChild(el);
   });
   save();
+}
+/* ---------- Aktueller Standort als Start ---------- */
+function getPos(){
+  return new Promise((res,rej)=>{
+    if(!navigator.geolocation){rej(new Error("Dieses Gerät bietet keine Ortung an."));return}
+    if(!window.isSecureContext&&!window.lkwNative){rej(new Error("Standort geht nur, wenn der Planer über den https-Link geöffnet ist."));return}
+    let done=false;
+    const t=setTimeout(()=>{if(!done){done=true;rej(new Error("Kein GPS-Signal gefunden – bitte erneut versuchen."))}},20000);
+    navigator.geolocation.getCurrentPosition(p=>{if(done)return;done=true;clearTimeout(t);res(p)},
+      e=>{if(done)return;done=true;clearTimeout(t);
+        rej(new Error(e&&e.code===1?(window.lkwNative?"Standort nicht erlaubt – iPhone-Einstellungen › LKW-Planer › Standort erlauben.":"Standort nicht erlaubt – iPhone-Einstellungen › Datenschutz › Ortungsdienste › Safari-Websites erlauben."):"Standort gerade nicht verfügbar – bitte erneut versuchen."))},
+      {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+  });
+}
+async function useGpsStart(auto){
+  const s=S.stops[0];
+  const btn=document.querySelector('#stops [data-a="gps"]');if(btn)btn.disabled=true;
+  status("Aktueller Standort wird ermittelt …","info");
+  try{
+    const p=await getPos();
+    Object.assign(s,{lat:p.coords.latitude,lng:p.coords.longitude,name:"📍 Aktueller Standort",gps:true});
+    renderStops();drawStops();
+    if(S.stops.every(x=>x.lat!=null))calcRoute();else{map.setView([s.lat,s.lng],12);status("Start auf deinen Standort gesetzt – jetzt das Ziel eingeben.","info")}
+    const nm=await reverseGeocode(s.lat,s.lng);if(nm&&S.stops[0]===s&&s.gps){s.name="📍 "+nm;renderStops()}
+  }catch(e){status(e.message,"err");if(auto)calcRoute()}
+  const b2=document.querySelector('#stops [data-a="gps"]');if(b2)b2.disabled=false;
 }
 function closeResults(){document.querySelectorAll(".results").forEach(x=>x.remove())}
 document.addEventListener("click",e=>{if(!e.target.closest(".stop"))closeResults()});
@@ -1722,7 +1751,12 @@ $("#qrClose").onclick=()=>{$("#qrModal").hidden=true};
 $("#calc").onclick=calcRoute;
 
 fillForm();fillAvoid();$("#tachoRemind").checked=S.tachoRemind!==false;
-$("#tachoRemind").addEventListener("change",()=>{S.tachoRemind=$("#tachoRemind").checked;save()});renderStops();drawStops();calcRoute();
+$("#tachoRemind").addEventListener("change",()=>{S.tachoRemind=$("#tachoRemind").checked;save()});
+$("#startGps").checked=!!S.startGps;
+$("#startGps").addEventListener("change",()=>{S.startGps=$("#startGps").checked;save();if(S.startGps)useGpsStart(false)});
+$("#departNow").onclick=()=>{S.depart=toLocalInput(new Date());$("#depart").value=S.depart;save();resim()};
+renderStops();drawStops();
+if(S.startGps)useGpsStart(true);else calcRoute();
 })();
 </script>
 </body>

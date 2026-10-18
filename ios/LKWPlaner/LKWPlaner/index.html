@@ -447,7 +447,7 @@ body.livemode.showplan .planclose{display:block}
     </section>
 
     <div class="footer" data-tab="veh">
-      <b>TruckHub · Version 32 · 18.10.2026</b> – Parkplatzsuche robuster (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 33 · 18.10.2026</b> – Zwischenstopps ohne Sprung zur Karte, Parkplatzsuche robuster (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -765,7 +765,7 @@ async function calcRoute(opts){
     ALTS=[];showAlts();
     if(PARK.live){delete PARK.live;$("#lvPark").hidden=true;LIVE.parkShown=false;parkLayer.clearLayers()}
     if(S.camMode!=="off"){const rc=R;loadCams(rc).then(()=>{if(R===rc){drawCams();resim()}})}else drawCams();
-    if(!opts.live&&!opts.keepView){if(sheetOpen())closeSheet();map.fitBounds(routeLine.getBounds(),{padding:[30,30]});}
+    if(!opts.live&&!opts.keepView){if(opts.toMap&&sheetOpen())closeSheet();map.fitBounds(routeLine.getBounds(),{padding:[30,30]});}
     closeRouteAlts();
   }catch(e){if(my===reqId)status("Route konnte nicht berechnet werden: "+e.message,"err")}
 }
@@ -2146,7 +2146,7 @@ $("#phoneLink").onclick=()=>{
   $("#qrCopy").onclick=async()=>{try{await navigator.clipboard.writeText(url);$("#qrCopy").textContent="Kopiert"}catch(e){prompt("Link:",url)}};
 };
 $("#qrClose").onclick=()=>{$("#qrModal").hidden=true};
-$("#calc").onclick=calcRoute;
+$("#calc").onclick=()=>calcRoute({toMap:true});
 
 fillForm();fillAvoid();$("#tachoRemind").checked=S.tachoRemind!==false;
 $("#tachoRemind").addEventListener("change",()=>{S.tachoRemind=$("#tachoRemind").checked;save()});

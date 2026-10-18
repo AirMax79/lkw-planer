@@ -375,7 +375,7 @@ body.livemode.showplan aside{display:flex;position:fixed;inset:0 auto 0 0;width:
     </section>
 
     <div class="footer">
-      <b>TruckHub · Version 25 · 18.10.2026</b> – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 26 · 18.10.2026</b> – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="mapwrap"><div id="map"></div><div class="mapnote" id="mapnote" hidden></div>
@@ -453,7 +453,7 @@ function defaultState(){
   };
 }
 function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
-function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.parkFilter=Object.assign({fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false},s.parkFilter||{});o.parkWin=+s.parkWin||60;o.parkRate=s.parkRate||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.pauses=(s.pauses||[]).filter(x=>x&&Number.isFinite(+x.km)&&x.km>=0);o.parkFilter=Object.assign({fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false},s.parkFilter||{});o.parkWin=+s.parkWin||60;o.parkRate=s.parkRate||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
 let S=load()||defaultState();
 // Keys per Link übernehmen (?tt=…&ors=…), danach aus der Adresszeile entfernen
@@ -1226,7 +1226,7 @@ function simulate(o){
   };
   const items=[],bars=[],events=[],overRuns=[];
   const timeAt=new Array(n),driveAt=new Array(n);
-  const pausesAt={};S.pauses.forEach(p=>{if(p.km<km0-0.01)return;const vi=Math.min(n-1,vertexAtKm(p.km));(pausesAt[vi]=pausesAt[vi]||[]).push(p)});
+  const pausesAt={};S.pauses.forEach(p=>{if(!Number.isFinite(p.km)||p.km<km0-0.01)return;const vi=Math.min(n-1,vertexAtKm(p.km));(pausesAt[vi]=pausesAt[vi]||[]).push(p)});
   const stopAt={};R.legEnd.forEach((vi,k)=>{if(k>0&&vi>=i0)stopAt[vi]=k});
   const camsAt={};(S.camMode!=="off"?R.cams||[]:[]).forEach(c=>{if(c.i>=i0)(camsAt[c.i]=camsAt[c.i]||[]).push(c)});
   const trafficAt={};(R.traffic||[]).forEach(x=>{if(x.b>=i0)(trafficAt[Math.max(x.a,i0)]=trafficAt[Math.max(x.a,i0)]||[]).push(x)});
@@ -1378,14 +1378,22 @@ $("#clearPause").onclick=()=>{S.pauses=[];save();resim()};
 $("#autoPause").onclick=()=>{
   if(!R){status("Zuerst die Route berechnen.","info");return}
   S.pauses=S.pauses.filter(p=>!p.auto);
-  for(let g=0;g<30;g++){
-    const sim=simulate();const lim=sim.items.find(x=>x.type==="limit"&&!x.day);
+  let n=0;
+  for(let g=0;g<40;g++){
+    const sim=simulate();
+    // nur die 4,5-h-Grenze zählt – Tageslenkzeit und Einsatzzeit lassen sich nicht mit 45 min Pause lösen
+    const lim=sim.items.find(x=>x.type==="limit"&&!x.day&&!x.shift);
     if(!lim)break;
-    const km=Math.max(0,lim.preKm);
-    if(S.pauses.some(p=>Math.abs(p.km-km)<0.5)){S.pauses.push({id:uid(),km:lim.km,dur:45,auto:true})}
-    else S.pauses.push({id:uid(),km,dur:45,auto:true});
+    let km=Number.isFinite(lim.preKm)?Math.max(0,lim.preKm):lim.km;
+    if(!Number.isFinite(km))break;
+    if(S.pauses.some(p=>Math.abs(p.km-km)<0.5))km=lim.km;
+    if(S.pauses.some(p=>Math.abs(p.km-km)<0.5))break;   // Sicherheitsnetz gegen Endlosschleife
+    S.pauses.push({id:uid(),km,dur:45,auto:true});n++;
   }
-  save();resim();status("45-min-Pausen vor jeder 4,5-h-Grenze eingeplant. Auf der Karte oder in der Liste anpassbar, z. B. in 15 + 30 min aufteilen.","info");
+  save();resim();
+  const end=SIM.items.find(x=>x.type==="limit"&&(x.shift||x.day));
+  status(`${n} Pause${n===1?"":"n"} à 45 min vor jeder 4,5-h-Grenze eingeplant (anpassbar, z. B. in 15 + 30 min).`+
+    (end?` Achtung: ${end.shift?"Die Einsatzzeit":"Die Tageslenkzeit"} reicht für diese Strecke nicht – bei km ${end.km.toFixed(0)} ist eine tägliche Ruhezeit nötig.`:""),end?"err":"info");
 };
 $("#gmaps").onclick=()=>{
   const p=S.stops.filter(s=>s.lat!=null);if(p.length<2)return;

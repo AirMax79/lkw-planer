@@ -447,7 +447,7 @@ body.livemode.showplan .planclose{display:block}
     </section>
 
     <div class="footer" data-tab="veh">
-      <b>TruckHub · Version 36 · 18.10.2026</b> – Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 37 · 18.10.2026</b> – Belegungs-Knopf (AT/DE), LKW-Stellplatzzahlen deutscher Rastanlagen (Autobahn GmbH), Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -761,6 +761,7 @@ async function calcRoute(opts){
     if(R.geoErr)status("Ländergrenzen konnten nicht geladen werden – es gelten Standard-Tempolimits, keine Fahrverbots-Hinweise.","err");
     if(LIVE.active){LIVE.idx=0;LIVE.lastReroute=Date.now();}
     drawRoute();resim();
+    if(R.cc&&R.cc.some(c=>c==="DE"))autobahnLorry().catch(()=>{});
     if(R.src==="tomtom"){const rr=R;enrichTraffic(rr).then(()=>{if(R===rr){resim();if(!LIVE.active)planDetours()}})}
     ALTS=[];showAlts();
     if(PARK.live){delete PARK.live;$("#lvPark").hidden=true;LIVE.parkShown=false;parkLayer.clearLayers()}
@@ -1624,6 +1625,37 @@ async function ttCats(){
   return TTCAT=out;
 }
 function catId(code){return(TTCAT&&TTCAT[code])||{TRUCK_STOP:"7395",REST_AREA:"7395003",OPEN_PARKING_AREA:"7369"}[code]||""}
+/* Belegungsseiten (ohne Schnittstelle, nur zum Nachsehen): Österreich livetrafik (ASFINAG-Daten), Deutschland autobahn-baustellen.de (Toll-Collect-SID) */
+function pCountry(p){return R&&R.cc?R.cc[Math.min(p.vi,R.cc.length-1)]:null}
+function occLink(p){const cc=pCountry(p);
+  if(cc==="AT")return`<a href="https://livetrafik.com/at/parkplaetze" target="_blank" rel="noopener" title="Aktuelle Belegung (ASFINAG-Daten) auf livetrafik.com">🚦 Belegung</a>`;
+  if(cc==="DE")return`<a href="https://www.autobahn-baustellen.de/rastanlagen/" target="_blank" rel="noopener" title="Aktuelle Belegung (Toll-Collect-Daten) auf autobahn-baustellen.de">🚦 Belegung</a>`;
+  return"";}
+/* LKW-Stellplatzzahlen deutscher Rastanlagen – offene API der Autobahn GmbH (ohne Key), 14 Tage zwischengespeichert */
+let ABL=null,ABL_P=null;
+function autobahnLorry(){
+  if(ABL)return Promise.resolve(ABL);
+  try{const c=JSON.parse(localStorage.getItem("truckhub-abl")||"null");if(c&&c.l&&Date.now()-c.t<14*864e5)return Promise.resolve(ABL=c.l)}catch(e){}
+  if(ABL_P)return ABL_P;
+  const base="https://verkehr.autobahn.de/o/autobahn/";
+  ABL_P=(async()=>{
+    const r=await fetch(base);if(!r.ok)throw new Error("HTTP "+r.status);const roads=(await r.json()).roads||[];
+    const out=[];
+    for(let i=0;i<roads.length;i+=8){await Promise.all(roads.slice(i,i+8).map(async rd=>{try{
+      const x=await fetch(base+encodeURIComponent(rd)+"/services/parking_lorry");if(!x.ok)return;const j=await x.json();
+      (j.parking_lorry||[]).forEach(q=>{const co=q.coordinate||{};let lat=+co.lat,lng=+(co.long||co.lon||co.lng);
+        if(!(lat>0)&&Array.isArray(co.coordinates)){lng=+co.coordinates[0];lat=+co.coordinates[1]}
+        if(!(lat>0&&lng>-30))return;
+        const d=(q.description||[]).join(" ");const m=/LKW[^0-9]*(\d+)/i.exec(d);const pk=/PKW[^0-9]*(\d+)/i.exec(d);
+        out.push({n:(q.subtitle||q.title||"").replace(/\s*\|.*$/,"").trim(),r:rd,lat,lng,k:m?+m[1]:null,p:pk?+pk[1]:null,b:String(q.isBlocked)==="true"})});
+    }catch(e){}}))}
+    if(!out.length)throw new Error("keine Daten");
+    try{localStorage.setItem("truckhub-abl",JSON.stringify({t:Date.now(),l:out}))}catch(e){}
+    return ABL=out;
+  })();
+  ABL_P.catch(()=>{ABL_P=null});
+  return ABL_P;
+}
 async function findParking(vA,vB){
   vA=Math.max(0,vA);vB=Math.min(R.coords.length-1,vB);if(vB<=vA)return[];
   const diag=[];
@@ -1637,6 +1669,18 @@ async function findParking(vA,vB){
     if(d){["rest","shower","wc","fuel","guard"].forEach(k=>{if(o[k])d[k]=true});if(o.fee&&!d.fee)d.fee=o.fee;if(o.cap)d.cap=o.cap;if(!d.info)d.info=o.info;if(!d.phone)d.phone=o.phone;if(!d.url)d.url=o.url;if(!d.addr)d.addr=o.addr;if(d.side==null)d.side=o.side;
       if(d.kind==="LKW-Parkplatz"&&o.kind!=="LKW-Parkplatz")d.kind=o.kind;if((o.name||"").length>(d.name||"").length&&/autohof|rasthof|raststätte/i.test(o.name))d.name=o.name}
     else res.push(o)});
+  // Deutschland: Stellplatzzahlen der Autobahn GmbH ergänzen, fehlende Rastanlagen aufnehmen
+  if(R.cc&&R.cc.some(c=>c==="DE")){
+    try{const abl=await autobahnLorry();let hit=0,add=0;
+      abl.forEach(a=>{const{bi,bd}=nearestOn(a.lat,a.lng,vA,vB);if(bd>350||bi<vA||bi>vB)return;
+        const d=res.find(r=>hav([r.lat,r.lng],[a.lat,a.lng])<400);
+        if(d){if(a.k!=null&&!d.cap)d.cap=String(a.k);if(!d.name||/^(Rastplatz|Parkplatz|LKW-Parkplatz|Raststätte)$/.test(d.name))d.name=a.n;d.ab=a.r;hit++;return}
+        if(a.k===0||a.b)return;
+        res.push({src:"abl",name:a.n,kind:/^RA |Raststätte|Rasthof/i.test(a.n)?"Raststätte":"Rastanlage",lat:a.lat,lng:a.lng,km:R.cumKm[bi],vi:bi,side:sideOf(a.lat,a.lng,bi,bd),
+          cap:a.k!=null?String(a.k):null,rest:false,shower:false,wc:true,fuel:false,guard:false,fee:null,ab:a.r,score:1});add++});
+      diag.push(`Autobahn GmbH: ${hit} Stellplatzzahlen${add?", "+add+" Rastanlagen ergänzt":""}`);
+    }catch(e){diag.push("Autobahn GmbH: "+e.message)}
+  }
   res.forEach(p=>{const info=[];if(p.cap)info.push(p.cap+" LKW-Plätze");if(p.rest)info.push("🍽 Restaurant");if(p.shower)info.push("🚿 Dusche");if(p.wc)info.push("WC");if(p.fuel)info.push("⛽ Tankstelle");if(p.guard)info.push("bewacht");if(p.hours)info.push(p.hours);p.info=info.join(" · ")});
   res.sort((a,b)=>a.km-b.km);res.diag=diag;
   return res;
@@ -1752,10 +1796,10 @@ function parkHtml(list,dur,limitT,ctx,total){
         <div class="pico">${p.side==="l"?`<span class="side-l" title="Andere Straßenseite?">⚠</span>`:""}${ic||"🅿"}<span class="chev">${isOpen?"▴":"▾"}</span></div>
       </div>
       <div class="pbody" ${isOpen?"":"hidden"}>
-        <small>${esc(p.kind)}${p.brand?" · "+esc(p.brand):""}${p.addr?" · "+esc(p.addr):""} · Quelle: ${p.src==="tt"?"TomTom":"OpenStreetMap"}</small>
+        <small>${esc(p.kind)}${p.brand?" · "+esc(p.brand):""}${p.addr?" · "+esc(p.addr):""} · Quelle: ${p.src==="tt"?"TomTom":p.src==="abl"?"Autobahn GmbH":"OpenStreetMap"}${p.ab?" · "+esc(p.ab):""}</small>
         ${p.info?`<small>${esc(p.info)}</small>`:""}${p.side?`<small class="${p.side==="l"?"side-l":""}">${p.side==="r"?"In Fahrtrichtung":"Andere Straßenseite – evtl. Gegenrichtung, bitte prüfen"}</small>`:""}
         <div class="prate"><span class="stars">${stars}</span>${r&&r.r?`<input type="text" placeholder="Notiz, z. B. „oft voll ab 18 Uhr“" value="${esc(r.n||"")}" data-note="${ix}" data-ctx="${ctx}" aria-label="Notiz zum Parkplatz">`:`<span>Bewerten</span>`}</div>
-        <div class="pbtns"><button type="button" class="go" data-park="${ix}" data-ctx="${ctx}" data-dur="${dur}">${dur} min Pause hier</button><button type="button" data-show="${ix}" data-ctx="${ctx}">Karte</button><a href="https://maps.apple.com/?daddr=${p.lat},${p.lng}&dirflg=d" target="_blank" rel="noopener">Navi</a><a href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}" target="_blank" rel="noopener">⭐ Google</a>${p.phone?`<a href="tel:${esc(p.phone)}">📞</a>`:""}</div>
+        <div class="pbtns"><button type="button" class="go" data-park="${ix}" data-ctx="${ctx}" data-dur="${dur}">${dur} min Pause hier</button><button type="button" data-show="${ix}" data-ctx="${ctx}">Karte</button><a href="https://maps.apple.com/?daddr=${p.lat},${p.lng}&dirflg=d" target="_blank" rel="noopener">Navi</a><a href="https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}" target="_blank" rel="noopener">⭐ Google</a>${occLink(p)}${p.phone?`<a href="tel:${esc(p.phone)}">📞</a>`:""}</div>
       </div></div>`}).join("")+`<div class="pbtns" style="margin-top:6px"><button type="button" class="ghost" data-totop="1">↑ Zur Karte</button></div>`;
 }
 document.addEventListener("click",e=>{

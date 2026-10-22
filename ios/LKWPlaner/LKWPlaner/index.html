@@ -86,6 +86,9 @@ details .inner{padding:0 18px 14px;display:flex;flex-direction:column;gap:10px}
 .hint{font-size:12px;color:var(--muted);margin:0}
 .hint a{color:var(--route)}
 
+#tollTile{grid-column:1/-1}
+.tollbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.tollrows{display:flex;flex-wrap:wrap;gap:4px 14px}.tollrows small{color:var(--muted)}.tollsp{display:flex;flex-direction:column;color:var(--muted)}
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .summary div{background:var(--panel-2);padding:8px 8px 7px}
 .summary b{display:block;font:600 17px var(--f-mono)}
@@ -388,7 +391,11 @@ body.livemode.showplan .planclose{display:block}
           <label>Breite m<input type="number" id="v_width" step="0.05" min="2"></label>
           <label>Länge m<input type="number" id="v_length" step="0.5" min="5"></label>
           <label>Gefahrgut<select id="v_hazmat"><option value="0">nein</option><option value="1">ja (ADR)</option></select></label>
+          <label>Achsen (Zug gesamt)<select id="v_axles"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5 oder mehr</option></select></label>
+          <label>Schadstoffklasse<select id="v_euro"><option value="6">EURO VI</option><option value="5">EURO V / EEV</option><option value="4">EURO IV</option><option value="3">EURO III</option><option value="2">EURO II</option><option value="1">EURO I / 0</option><option value="9">emissionsfrei (E/H₂)</option></select></label>
+          <label>CO₂-Klasse (Maut)<select id="v_co2"><option value="1">1 (Standard)</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5 (emissionsfrei)</option></select></label>
         </div>
+        <p class="hint">Achsen, Schadstoff- und CO₂-Klasse bestimmen die Mautsätze (AT GO-Maut, DE Lkw-Maut). Die CO₂-Klasse steht im Mautkonto bzw. auf der CO₂-Klassen-Bescheinigung; ohne Nachweis gilt Klasse 1.</p>
         <label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="v_quiet"> Lärmarmes Fahrzeug (L-Kennzeichen, vom AT-Nachtfahrverbot ausgenommen)</label>
         <h2>Länder auf der Route</h2>
         <div id="ctyTable"><p class="hint">Nach der Routenberechnung erscheinen hier die durchfahrenen Länder mit LKW-Tempolimits (Autobahn / Freiland / Ort) und Fahrverboten. Die Werte sind änderbar.</p></div>
@@ -428,6 +435,7 @@ body.livemode.showplan .planclose{display:block}
         </div>
       </div>
       <div class="summary" id="summary"></div>
+      <div class="tollbox" id="tollBox" hidden></div>
       <div class="tacho">
         <div class="tacho-bar" id="tachoBar"></div>
         <div class="legend"><span><i class="k-drive"></i>Lenkzeit</span><span><i class="k-over"></i>über 4,5 h</span><span><i class="k-pause"></i>Pause</span><span><i class="k-stop"></i>Stopp</span></div>
@@ -447,7 +455,7 @@ body.livemode.showplan .planclose{display:block}
     </section>
 
     <div class="footer" data-tab="veh">
-      <b>TruckHub · Version 38 · 18.10.2026</b> – Belegungs-Knopf (AT/DE), LKW-Stellplatzzahlen deutscher Rastanlagen (Autobahn GmbH), Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
+      <b>TruckHub · Version 39 · 22.10.2026</b> – Mautschätzung (AT GO-Maut und DE Lkw-Maut 2026 exakt, Sondermautstrecken, übrige Länder Richtwerte, Live-Zwischenstand), – Belegungs-Knopf (AT/DE), LKW-Stellplatzzahlen deutscher Rastanlagen (Autobahn GmbH), Parkplätze zusammengeführt (keine Doppelnennungen), TomTom-Parkplatzsuche per Umkreissuche (20 km), neuer Zwischenstopp ans Ende, Zwischenstopps ohne Sprung zur Karte (Fehlerursache sichtbar), neue Handy-Oberfläche (Vollbild-Karte, Reiter unten, Seitenblatt), kompakte Parkplatzliste, – Fehler bei automatischen Pausen behoben, – Parkplätze mit Restaurant/Dusche, Suchbereich nach Lenkzeit, – iPhone-App-Unterstützung, Tacho-Abgleich mit Restlenkzeit, Route ändern (ziehen, Wegpunkte, Alternativen, Meiden), Umfahrungen, Blitzer AT, Parkplätze, Live-Tacho.<br>Lenkzeitregeln nach VO (EG) 561/2006: nach 4,5 h Lenkzeit 45 min Pause, teilbar in mind. 15 min + 30 min. Einsatzzeit: innerhalb von 24 h ab Dienstbeginn muss die tägliche Ruhezeit (11 h, max. 3× pro Woche auf 9 h reduziert) liegen – daraus ergeben sich max. 13 bzw. 15 h Einsatzzeit. Fahrverbots-Hinweise (Nacht, Wochenende, nationale Feiertage) für AT, DE, CH, LI, IT, FR, HU, SI, SK, CZ und PL sind Richtwerte – regionale Feiertage, Sektoral- und Saisonverbote (z. B. Tirol, Sommer-Samstage) sind nicht vollständig enthalten. Blitzer: fixe Anlagen und Section Control aus OpenStreetMap, nur für Österreich – mobile Kontrollen sind nicht enthalten. Ländergrenzen: Natural Earth. Kartendaten © OpenStreetMap-Mitwirkende, Kartenkacheln © Esri.
     </div>
   </aside>
   <div class="backdrop" id="backdrop"></div>
@@ -531,12 +539,12 @@ function defaultState(){
       {id:uid(),name:"München (Beispiel)",lat:48.1351,lng:11.5820,dwell:0,pause:0}
     ],
     pauses:[], depart:toLocalInput(d), banMode:"on", camMode:"on", avoid:{motorways:false,toll:false,ferry:false},
-    v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false},
-    spOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkWin:60, tachoRemind:true, startGps:false, parkFilter:{fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false}, parkRate:{}, orsKey:"", ttKey:""
+    v:{weight:40,axle:11.5,height:4,width:2.55,length:16.5,hazmat:0,quiet:false,axles:5,euro:6,co2:1},
+    spOv:{}, tollOv:{}, driveStart:0, dayStart:0, dayMax:540, shiftMax:900, shiftStart:"", buffer:10, parkWin:60, tachoRemind:true, startGps:false, parkFilter:{fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false}, parkRate:{}, orsKey:"", ttKey:""
   };
 }
 function toLocalInput(d){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
-function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.pauses=(s.pauses||[]).filter(x=>x&&Number.isFinite(+x.km)&&x.km>=0);o.parkFilter=Object.assign({fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false},s.parkFilter||{});o.parkWin=+s.parkWin||60;o.parkRate=s.parkRate||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
+function load(){try{const s=JSON.parse(localStorage.getItem(STORE));if(!s||!s.stops)return null;const d=defaultState();const o=Object.assign(d,s);o.spOv=s.spOv||{};o.pauses=(s.pauses||[]).filter(x=>x&&Number.isFinite(+x.km)&&x.km>=0);o.parkFilter=Object.assign({fee:"all",rest:false,shower:false,wc:false,fuel:false,guard:false,fav:false},s.parkFilter||{});o.parkWin=+s.parkWin||60;o.parkRate=s.parkRate||{};o.avoid=Object.assign({motorways:false,toll:false,ferry:false},s.avoid||{});o.v=Object.assign({axles:5,euro:6,co2:1},o.v||{});o.tollOv=s.tollOv||{};o.stops.forEach(x=>{if(x.pause==null){x.pause=x.isBreak?(x.dwell>=45?45:x.dwell>=30?30:x.dwell>=15?15:0):0;if(x.isBreak)x.dwell=0}delete x.isBreak});if(o.banMode!=="off")o.banMode="on";return o}catch(e){return null}}
 function save(){try{localStorage.setItem(STORE,JSON.stringify(S))}catch(e){}}
 let S=load()||defaultState();
 // Keys per Link übernehmen (?tt=…&ors=…), danach aus der Adresszeile entfernen
@@ -720,7 +728,7 @@ $("#reverse").onclick=()=>{S.stops.reverse();S.pauses=[];renderStops();drawStops
 
 /* ---------- Einstellungen ---------- */
 const bind=[["#depart","depart"],["#banMode","banMode"],["#camMode","camMode"],["#driveStart","driveStart",1],["#dayStart","dayStart",1],["#dayMax","dayMax",1],["#shiftMax","shiftMax",1],["#shiftStart","shiftStart"],["#buffer","buffer",1],["#parkWin","parkWin",1],["#orsKey","orsKey"],["#ttKey","ttKey"]];
-const vbind=[["#v_weight","weight"],["#v_axle","axle"],["#v_height","height"],["#v_width","width"],["#v_length","length"],["#v_hazmat","hazmat"]];
+const vbind=[["#v_weight","weight"],["#v_axle","axle"],["#v_height","height"],["#v_width","width"],["#v_length","length"],["#v_hazmat","hazmat"],["#v_axles","axles"],["#v_euro","euro"],["#v_co2","co2"]];
 function fillForm(){
   bind.forEach(([sel,k])=>$(sel).value=S[k]);
   vbind.forEach(([sel,k])=>$(sel).value=S.v[k]);
@@ -728,7 +736,7 @@ function fillForm(){
 }
 bind.forEach(([sel,k,num])=>$(sel).addEventListener("change",()=>{S[k]=num?(+$(sel).value||0):$(sel).value;save();if(k==="camMode"){if(R){R.cams=[];if(S.camMode!=="off"){const rr=R;loadCams(rr).then(()=>{if(R===rr){drawCams();resim()}})}else{drawCams();resim()}}return}
   if(k==="orsKey"||k==="ttKey"){if(k==="ttKey")setupOverlays();calcRoute();}else resim();}));
-vbind.forEach(([sel,k])=>$(sel).addEventListener("change",()=>{S.v[k]=+$(sel).value;save();if(S.orsKey||S.ttKey)calcRoute();}));
+vbind.forEach(([sel,k])=>$(sel).addEventListener("change",()=>{S.v[k]=+$(sel).value;save();if(["axles","euro","co2"].includes(k)){resim();return}if(S.orsKey||S.ttKey)calcRoute();}));
 $("#v_quiet").addEventListener("change",()=>{S.v.quiet=$("#v_quiet").checked;save();resim();});
 
 function status(msg,kind){const el=$("#status");el.textContent=msg||"";el.className="status"+(msg?" show "+(kind||"info"):"");if(msg&&!/wird berechnet/.test(msg))toast(msg,kind);}
@@ -776,6 +784,7 @@ function ttParams(live){
     sectionType:"traffic",instructionsType:"coded",routeRepresentation:"polyline",vehicleCommercial:"true",vehicleMaxSpeed:"80",
     vehicleWeight:String(Math.round(v.weight*1000)),vehicleAxleWeight:String(Math.round(v.axle*1000)),
     vehicleLength:String(v.length),vehicleWidth:String(v.width),vehicleHeight:String(v.height)});
+  q.append("sectionType","tollRoad");
   if(+v.hazmat)q.set("vehicleLoadType","otherHazmatGeneral");
   if(S.avoid.motorways)q.append("avoid","motorways");if(S.avoid.toll)q.append("avoid","tollRoads");if(S.avoid.ferry)q.append("avoid","ferries");
   const dep=new Date(S.depart);if(!live&&!LIVE.active&&!isNaN(dep)&&dep.getTime()>Date.now()+60000)q.set("departAt",dep.toISOString().replace(/\.\d+Z$/,"Z"));
@@ -800,13 +809,14 @@ function parseTT(rt){
   for(let m=1;m<marks.length;m++){const[a,ta]=marks[m-1],[b,tb]=marks[m];let tot=0;for(let i=a;i<b;i++)tot+=dist[i];
     for(let i=a;i<b;i++)dur[i]=tot>0?(tb-ta)*dist[i]/tot:(tb-ta)/(b-a);}
   const traffic=(rt.sections||[]).filter(x=>x.sectionType==="TRAFFIC").map(x=>({a:x.startPointIndex,b:x.endPointIndex,cat:x.simpleCategory,mag:x.magnitudeOfDelay,delay:x.delayInSeconds||0,speed:x.effectiveSpeedInKmh,cause:x.tec&&x.tec.causes&&x.tec.causes[0]&&x.tec.causes[0].mainCauseCode}));
-  return{coords,dist,dur,legEnd,traffic,time:rt.summary.travelTimeInSeconds,len:rt.summary.lengthInMeters,trafficDelay:rt.summary.trafficDelayInSeconds||0};
+  const tollSeg=new Array(n-1).fill(false);(rt.sections||[]).filter(x=>x.sectionType==="TOLL_ROAD").forEach(x=>{for(let i=x.startPointIndex;i<Math.min(x.endPointIndex,n-1);i++)tollSeg[i]=true});
+  return{coords,dist,dur,legEnd,traffic,tollSeg,time:rt.summary.travelTimeInSeconds,len:rt.summary.lengthInMeters,trafficDelay:rt.summary.trafficDelayInSeconds||0};
 }
 async function routeTomTom(pts,live){
   const j=await ttFetch(pts,ttParams(live));
   const p=parseTT(j.routes[0]);
   const res=finishRoute(p.coords,p.dist,p.dur,p.legEnd,"tomtom");
-  res.trafficDelay=p.trafficDelay;res.traffic=p.traffic;
+  res.trafficDelay=p.trafficDelay;res.traffic=p.traffic;res.tollSeg=p.tollSeg;
   return res;
 }
 
@@ -858,6 +868,8 @@ async function replaceRange(a,b,p,ro){
   nr.stops=old.stops;nr.lbl=old.lbl;
   nr.traffic=(old.traffic||[]).filter(x=>x.b<a||x.a>b).map(x=>x.a>b?Object.assign({},x,{a:x.a+d,b:x.b+d}):x).concat(p.traffic.map(x=>Object.assign({},x,{a:x.a+a,b:x.b+a})));
   nr.trafficDelay=nr.traffic.reduce((s,x)=>s+(x.delay||0),0);
+  if(old.tollSeg||p.tollSeg){const ts=[];for(let i=0;i<Math.max(0,a-1);i++)ts.push(!!(old.tollSeg||[])[i]);if(a>0)ts.push(!!(old.tollSeg||[])[a-1]);
+    p.dist.forEach((x,i)=>ts.push(!!(p.tollSeg||[])[i]));if(b<old.coords.length-1){ts.push(!!(old.tollSeg||[])[b]);for(let i=b+1;i<old.dist.length;i++)ts.push(!!(old.tollSeg||[])[i])}nr.tollSeg=ts}
   try{await detectCountries(nr)}catch(e){nr.cc=new Array(nr.dist.length).fill(old.cc[0]||"??")}
   if(R!==old)return false;
   const kA=old.cumKm[a],kB=old.cumKm[b],nkB=nr.cumKm[b+d],nkA=nr.cumKm[a];
@@ -1013,14 +1025,14 @@ function spFor(cc){const base=(C[cc]&&C[cc].sp)||DEF_SP;return Object.assign({},
 function applySpeeds(r){
   // Geschwindigkeit pro Abschnitt auf das LKW-Limit des jeweiligen Landes begrenzen; Straßentyp aus der Routing-Geschwindigkeit abgeleitet
   // TomTom (truck) und ORS (driving-hgv) liefern bereits LKW-Fahrzeiten – nur das Nachttempo (AT Freiland 60) wird ergänzt
-  r.durN=[];const cache={};const hgv=r.src==="tomtom"||r.src==="ors";
+  r.durN=[];r.cls=[];const cache={};const hgv=r.src==="tomtom"||r.src==="ors";
   for(let i=0;i<r.dist.length;i++){
     const d=r.dist[i],t=r.baseDur[i];
-    if(!(t>0)||!(d>0)){r.dur[i]=r.durN[i]=t||0;continue}
+    if(!(t>0)||!(d>0)){r.dur[i]=r.durN[i]=t||0;r.cls[i]="ort";continue}
     const cc=r.cc[i];const sp=cache[cc]||(cache[cc]=spFor(cc));
     const v=d/t*3.6;
     // OSRM rechnet mit Pkw-Tempo (maxspeed×0,8): Autobahn ≥78, Freiland 45–78, Ort darunter
-    const cls=hgv?(v>=75?"ab":v>=45?"land":"ort"):(v>=78?"ab":v>=45?"land":"ort");
+    const cls=hgv?(v>=75?"ab":v>=45?"land":"ort"):(v>=78?"ab":v>=45?"land":"ort");r.cls[i]=cls;
     r.dur[i]=hgv?t:d/(Math.min(v,sp[cls])/3.6);
     const vEff=d/r.dur[i]*3.6;
     r.durN[i]=cls==="land"&&sp.landN&&vEff>sp.landN?d/(sp.landN/3.6):r.dur[i];
@@ -1299,13 +1311,14 @@ async function detectCountries(r){
 function renderCountries(){
   const box=$("#ctyTable");if(!R)return;
   const seen=[];R.cc.forEach(c=>{if(!seen.includes(c))seen.push(c)});
-  box.innerHTML=`<div class="ctywrap"><table class="cty"><thead><tr><th>Land</th><th>AB</th><th>Freiland</th><th>Ort</th></tr></thead><tbody>${seen.map(cc=>{const sp=spFor(cc);
+  box.innerHTML=`<div class="ctywrap"><table class="cty"><thead><tr><th>Land</th><th>AB</th><th>Freiland</th><th>Ort</th><th>Maut €/km</th></tr></thead><tbody>${seen.map(cc=>{const sp=spFor(cc);
     return `<tr><td><span class="cc">${esc(cc.length===2?cc:"–")}</span>${esc(cname(cc))}${C[cc]&&C[cc].info?`<div class="ban">${esc(C[cc].info)}</div>`:""}</td>
       <td><input type="number" id="sp_${cc}_ab" data-cc="${cc}" data-k="ab" value="${sp.ab}"></td>
       <td><input type="number" id="sp_${cc}_land" data-cc="${cc}" data-k="land" value="${sp.land}">${sp.landN?`<div class="ban">nachts ${sp.landN}</div>`:""}</td>
-      <td><input type="number" id="sp_${cc}_ort" data-cc="${cc}" data-k="ort" value="${sp.ort}"></td></tr>`}).join("")}</tbody></table></div>`;
+      <td><input type="number" id="sp_${cc}_ort" data-cc="${cc}" data-k="ort" value="${sp.ort}"></td>
+      <td>${cc==="AT"||cc==="DE"||cc==="CH"?`<span title="${cc==="CH"?"LSVA nach Gesamtgewicht":"Tarif nach Achsen/Klassen"}">${tollRate(cc).toFixed(3)}</span>`:`<input type="number" step="0.01" min="0" data-cc="${cc}" data-k="toll" value="${rateOther(cc).toFixed(2)}" title="${esc((TOLL_OTHER[cc]||{}).note||"Richtwert, bitte prüfen")}">`}</td></tr>`}).join("")}</tbody></table></div>`;
 }
-$("#ctyTable").addEventListener("change",e=>{const cc=e.target.dataset.cc,k=e.target.dataset.k;if(!cc)return;const v=+e.target.value;if(!(v>0))return;(S.spOv[cc]=S.spOv[cc]||{})[k]=v;save();if(R){applySpeeds(R);resim();}});
+$("#ctyTable").addEventListener("change",e=>{const cc=e.target.dataset.cc,k=e.target.dataset.k;if(!cc)return;const v=+e.target.value;if(k==="toll"){if(v>=0){S.tollOv[cc]=v;save();resim()}return}if(!(v>0))return;(S.spOv[cc]=S.spOv[cc]||{})[k]=v;save();if(R){applySpeeds(R);resim();}});
 function resim(){if(!R)return;SIM=simulate(LIVE.active&&LIVE.fix?liveOpts():{});renderAll();if(LIVE.active)renderLive();}
 function simulate(o){
   o=o||{};
@@ -1418,6 +1431,89 @@ function fmtT(ms){return TF.format(new Date(ms))}
 function fmtD(ms){return DF.format(new Date(ms))}
 function fmtDur(s){s=Math.round(s/60);const h=Math.floor(s/60),m=s%60;return h?`${h}:${String(m).padStart(2,"0")} h`:`${m} min`}
 
+
+/* ---------- Mautschätzung (exkl. USt) ---------- */
+// Österreich GO-Maut 2026 (€/km, exkl. 20 % USt), Spalten: 2 / 3 / 4+ Achsen – Quelle go-maut.at, gültig ab 1.1.2026
+const TOLL_AT={
+  z:[0.0587,0.0806,0.1189],                                   // CO₂-Klasse 5 (emissionsfrei)
+  e6:{4:[0.2486,0.3440,0.5091],3:[0.2724,0.3788,0.5625],2:[0.2740,0.3810,0.5657],1:[0.2774,0.3856,0.5724]},
+  e5:[0.2924,0.4086,0.6024],e4:[0.3114,0.4296,0.6324],e3:[0.3274,0.4536,0.6654],
+  infra:{z:[0.0547,0.0766,0.1149],x:[0.2186,0.3060,0.4591]}  // Infrastrukturanteil (für A12-Unterinntal +25 %)
+};
+// Streckenmaut 2026 je Fahrt (€ exkl. USt), Zeilen: z5, c4, c3, c2, c1, e5, e4, e3 · Spalten 2 / 3 / 4+ Achsen
+const TOLL_AT_SPECIAL=[
+  {id:"brenner",name:"A13 Brenner (Innsbruck – Staatsgrenze)",a:[47.2585,11.4245],b:[47.0049,11.5078],night:true,
+   day:[[6.53,9.09,13.54],[26.60,37.03,55.38],[27.45,38.21,57.30],[27.51,38.30,57.41],[27.63,38.46,57.65],[28.17,39.21,58.72],[28.86,40.17,59.82],[29.42,40.96,61.01]],
+   nightT:[[9.07,15.1,26.71],[37.07,61.3,108.05],[38.32,62.7,109.98],[38.41,62.8,110.10],[38.57,63.0,110.34],[39.40,64.0,111.43],[40.17,65.0,112.49],[41.04,66.0,113.68]]},
+  {id:"tauern",name:"A10 Tauern (Flachau – Rennweg)",a:[47.3450,13.3900],b:[47.0205,13.6105],
+   day:[[5.48,7.60,11.31],[22.57,31.41,46.79],[23.68,33.03,49.28],[23.75,33.14,49.43],[23.90,33.35,49.74],[24.61,34.42,51.14],[25.48,35.39,52.52],[26.24,36.50,54.05]]},
+  {id:"gleinalm",name:"A9 Gleinalm (St. Michael – Übelbach)",a:[47.3385,15.0165],b:[47.2275,15.2335],
+   day:[[3.12,4.32,6.43],[12.80,17.82,26.56],[13.38,18.67,27.87],[13.42,18.73,27.95],[13.51,18.84,28.11],[13.87,19.40,28.85],[14.34,19.92,29.58],[14.73,20.51,30.39]]},
+  {id:"bosruck",name:"A9 Bosruck (Spital/Pyhrn – Ardning)",a:[47.6625,14.3335],b:[47.5725,14.3655],
+   day:[[1.28,1.77,2.64],[5.26,7.32,10.91],[5.49,7.67,11.44],[5.51,7.69,11.47],[5.54,7.74,11.54],[5.70,7.97,11.84],[5.89,8.18,12.15],[6.05,8.42,12.48]]},
+  {id:"karawanken",name:"A11 Karawanken (St. Jakob – Staatsgrenze)",a:[46.5435,14.0335],b:[46.4975,14.0825],
+   day:[[2.40,3.34,4.99],[9.72,13.58,20.30],[9.96,13.91,20.81],[9.97,13.93,20.84],[10.00,13.98,20.91],[10.15,14.20,21.20],[10.33,14.41,21.49],[10.49,14.64,21.81]]},
+  {id:"arlberg",name:"S16 Arlberg (St. Anton – Langen)",a:[47.1300,10.2730],b:[47.1340,10.1215],
+   day:[[2.40,3.33,4.97],[9.82,13.68,20.41],[10.20,14.24,21.27],[10.23,14.28,21.32],[10.28,14.35,21.43],[10.52,14.72,21.91],[10.83,15.06,22.39],[11.08,15.44,22.92]]}
+];
+// Deutschland Lkw-Maut (Cent/km, seit 1.12.2023 / 1.7.2024; keine USt) – Zeilen je CO₂-Klasse 1–4, Spalten EURO 0/I, II, III, IV, V/EEV, VI
+const TOLL_DE={
+  "7.5":{1:[24.8,24.4,22.5,20.1,18.9,15.1],2:[23.8,23.4,21.5,19.1,17.9,14.7],3:[23.5,23.1,21.2,18.8,17.6,14.4],4:[20.5,20.1,18.2,15.8,14.6,11.4]},
+  "12": {1:[27.7,27.6,25.1,22.2,20.6,17.8],2:[27.3,27.2,24.7,21.8,20.2,17.4],3:[26.9,26.8,24.3,21.4,19.8,17.0],4:[23.7,23.6,21.1,18.2,16.6,13.8]},
+  "18": {1:[35.2,35.0,33.0,28.8,27.7,24.0],2:[34.4,34.2,32.2,28.4,27.3,23.6],3:[33.8,33.6,31.6,27.8,26.7,23.0],4:[29.8,29.6,27.6,23.8,22.7,19.0]},
+  "18_3":{1:[48.6,46.1,43.1,37.3,35.5,30.5],2:[44.6,44.1,41.1,35.7,33.9,29.9],3:[43.9,43.4,40.4,35.0,33.2,29.2],4:[39.1,38.6,35.6,30.2,28.4,24.4]},
+  "18_4":{1:[51.2,48.7,45.4,38.8,36.3,32.4],2:[48.2,47.7,44.4,38.2,35.7,31.8],3:[47.4,46.9,43.6,37.4,34.9,31.0],4:[42.2,41.7,38.4,32.2,29.7,25.8]},
+  "18_5":{1:[51.6,51.1,47.8,41.4,38.9,34.8],2:[50.4,49.9,46.6,40.4,37.9,34.0],3:[49.6,49.1,45.8,39.6,37.1,33.2],4:[43.3,42.8,39.5,33.3,30.8,26.9]}
+};
+// Übrige Länder: Richtwert €/km für Sattelzug 4+ Achsen EURO VI (2026), im Länder-Reiter änderbar. basis: ab = Autobahn/Schnellstraße, all = alle Straßen
+const TOLL_OTHER={
+  CH:{r:null,basis:"all",note:"LSVA ca. 2,4 Rp. je Tonnenkilometer (zGG), alle Straßen"},
+  IT:{r:0.26,note:"Konzessionsautobahnen, Klasse 5 (Mittelwert)"},FR:{r:0.35,note:"Konzessionsautobahnen, Klasse 4 (Mittelwert)"},
+  SI:{r:0.52,note:"DarsGo R4"},HU:{r:0.72,note:"HU-GO J4, auch Hauptstraßen"},CZ:{r:0.24,note:"Mýto CZ"},SK:{r:0.21,note:"Mýto SK"},PL:{r:0.19,note:"e-TOLL"},
+  BE:{r:0.20,note:"Viapass"},NL:{r:0.19,note:"Vrachtwagenheffing ab 1.7.2026"},ES:{r:0.25,note:"Mautautobahnen (AP)"},HR:{r:0.30,note:"Autobahnen, Gruppe IV"},
+  LI:{r:0,note:"keine Lkw-Maut"},LU:{r:0,note:"Eurovignette (pauschal)"},DK:{r:0,note:"Kilometerabgabe seit 2025, Richtwert fehlt"}
+};
+const CO2_ROW={5:0,4:1,3:2,2:3,1:4};
+function tollRowAT(){const v=S.v;if(+v.euro===9||+v.co2===5)return 0;if(+v.euro>=6)return CO2_ROW[Math.min(4,Math.max(1,+v.co2||1))];if(+v.euro===5)return 5;if(+v.euro===4)return 6;return 7}
+function axCol(){const a=+S.v.axles||5;return a<=2?0:a===3?1:2}
+function rateAT(){const v=S.v,c=axCol();if(+v.euro===9||+v.co2===5)return TOLL_AT.z[c];if(+v.euro>=6)return TOLL_AT.e6[Math.min(4,Math.max(1,+v.co2||1))][c];if(+v.euro===5)return TOLL_AT.e5[c];if(+v.euro===4)return TOLL_AT.e4[c];return TOLL_AT.e3[c]}
+function rateDE(){const v=S.v,w=+v.weight||40,ax=+v.axles||5;const k=w<7.5?"7.5":w<12?"12":w<=18?"18":ax<=3?"18_3":ax===4?"18_4":"18_5";
+  const eu=+v.euro>=6||+v.euro===9?5:+v.euro===5?4:+v.euro===4?3:+v.euro===3?2:+v.euro===2?1:0;
+  if(+v.euro===9||+v.co2===5)return TOLL_DE[k][4][5]*0.25/100; // emissionsfrei: seit 2026 25 % des Satzes (Schätzung)
+  return TOLL_DE[k][Math.min(4,Math.max(1,+v.co2||1))][eu]/100}
+function rateOther(cc){if(S.tollOv[cc]!=null)return+S.tollOv[cc];const o=TOLL_OTHER[cc];if(!o)return 0;if(cc==="CH")return 0.0257*(+S.v.weight||40);const f=axCol()===0?0.5:axCol()===1?0.7:1;return o.r*f}
+function tollBasis(cc){return cc==="CH"?"all":"ab"}
+function tollRate(cc){return cc==="AT"?rateAT():cc==="DE"?rateDE():rateOther(cc)}
+function tollSegOn(i){const cc=R.cc[i];if(!cc||cc==="??")return false;const b=tollBasis(cc);if(b==="all")return true;
+  if(R.tollSeg&&R.tollSeg[i])return true;return R.cls&&R.cls[i]==="ab"}
+function tollEstimate(upTo){
+  if(!R||!R.cc||!R.cls)return null;const n=R.dist.length;const end=Math.min(upTo==null?n:upTo,n);
+  const by={},sp=[];let total=0,unknown=false;
+  const skip=new Array(n).fill(false);
+  // Sondermautstrecken Österreich: Route führt an beiden Enden vorbei → Streckenmaut statt km-Satz
+  TOLL_AT_SPECIAL.forEach(sx=>{let ia=-1,ib=-1,da=1500,db=1500;
+    for(let i=0;i<n;i+=1){const c=R.coords[i];const d1=hav(c,sx.a);if(d1<da){da=d1;ia=i}const d2=hav(c,sx.b);if(d2<db){db=d2;ib=i}}
+    if(ia<0||ib<0)return;const lo=Math.min(ia,ib),hi=Math.max(ia,ib);if(hi-lo<3)return;
+    for(let i=lo;i<hi;i++)skip[i]=true;if(lo>=end)return;
+    const row=tollRowAT(),c=axCol();let tab=sx.day,night=false;
+    if(sx.night&&SIM&&SIM.timeAt&&SIM.timeAt[lo]!=null){const h=new Date(SIM.timeAt[lo]).getHours();night=h>=22||h<5;if(night)tab=sx.nightT}
+    const cost=tab[row][c];total+=cost;sp.push({name:sx.name+(night?" – Nachttarif":""),cost,km:R.cumKm[lo]});
+    (by.AT=by.AT||{km:0,cost:0,special:0}).special+=cost;by.AT.cost+=cost});
+  for(let i=0;i<end;i++){const cc=R.cc[i];if(!cc||cc==="??")continue;if(skip[i])continue;if(!tollSegOn(i))continue;
+    const km=R.dist[i]/1000;let r=tollRate(cc);
+    if(cc==="AT"&&R.cls[i]==="ab"){const c=R.coords[i];if(c[0]>47.22&&c[0]<47.66&&c[1]>11.40&&c[1]<12.21)r+=0.25*(+S.v.euro===9||+S.v.co2===5?TOLL_AT.infra.z:TOLL_AT.infra.x)[axCol()]} // A12 Unterinntal +25 % Infrastruktur
+    if(!(cc==="AT"||cc==="DE"||TOLL_OTHER[cc]||S.tollOv[cc]!=null))unknown=true;
+    const o=by[cc]=by[cc]||{km:0,cost:0,special:0};o.km+=km;o.cost+=km*r;total+=km*r}
+  return{total,by,special:sp,unknown,est:!(R.tollSeg)};
+}
+function fmtEur(x){return (Math.round(x*100)/100).toLocaleString("de-AT",{minimumFractionDigits:0,maximumFractionDigits:0})+" €"}
+function renderToll(){
+  const box=$("#tollBox");const t=tollEstimate();if(!t||!Object.keys(t.by).length){box.hidden=true;return{total:0}}
+  const rows=Object.entries(t.by).sort((a,b)=>b[1].cost-a[1].cost).map(([cc,o])=>`<span><b>${esc(cname(cc))}</b> ${fmtEur(o.cost)}<small> · ${o.km.toFixed(0)} km${cc==="AT"||cc==="DE"?"":" · Richtwert"}</small></span>`).join("");
+  const spc=t.special.map(x=>`<small>${esc(x.name)}: ${fmtEur(x.cost)}</small>`).join("");
+  box.innerHTML=`<div class="tollrows">${rows}</div>${spc?`<div class="tollsp">${spc}</div>`:""}<small class="hint">Mautschätzung exkl. USt – AT GO-Maut und DE Lkw-Maut nach Tarif 2026 (${["2","3","4+"][axCol()]} Achsen, ${+S.v.euro===9?"emissionsfrei":"EURO "+["0/I","I/0","II","III","IV","V","VI"][Math.min(6,+S.v.euro||6)]}, CO₂-Klasse ${+S.v.co2||1}); ${t.est?"Mautstrecken aus Straßenklasse geschätzt (ohne TomTom-Key)":"Mautstrecken laut TomTom"}; übrige Länder Richtwerte, im Länder-Reiter änderbar.</small>`;
+  box.hidden=false;return t;
+}
 function renderAll(){
   const sim=SIM;renderCountries();renderStrip();
   // Zusammenfassung
@@ -1427,7 +1523,9 @@ function renderAll(){
     <div><b>${sim.totalPause} min</b><span>Pausen</span></div>
     <div class="${sim.shiftFlag?"alert":""}"><b>${fmtDur(sim.shiftUsed/1000)}</b><span>Einsatzzeit / ${S.shiftMax/60} h</span></div>
     <div class="${sim.driveEnd>=LIM?"alert":""}"><b>${fmtDur(Math.max(0,LIM-sim.driveEnd))}</b><span>Rest bis Pause</span></div>
-    <div><b>${fmtT(sim.arrival)}</b><span>Ankunft ${fmtD(sim.arrival)}</span></div>`;
+    <div><b>${fmtT(sim.arrival)}</b><span>Ankunft ${fmtD(sim.arrival)}</span></div>
+    <div id="tollTile"><b>–</b><span>Maut ca.</span></div>`;
+  const tl0=renderToll();if(tl0&&tl0.total>0){$("#tollTile").innerHTML=`<b>${fmtEur(tl0.total)}</b><span>Maut ca. (exkl. USt)</span>`}else $("#tollTile").hidden=true;
   const tot=sim.bars.reduce((a,b)=>a+b.d,0)||1;
   $("#tachoBar").innerHTML=sim.bars.map(b=>`<i class="k-${b.k}" style="width:${(b.d/tot*100).toFixed(3)}%" title="${({drive:"Lenkzeit",over:"Über 4,5 h",pause:"Pause",stop:"Stopp"})[b.k]} ${fmtDur(b.d)}"></i>`).join("");
   // Zeitleiste
@@ -2181,7 +2279,7 @@ function renderLive(){
   const extra=nx&&nx.type==="traffic"?[trafficWhere(nx.x),trafficDesc(nx.x)].filter(Boolean).join(" – "):"";
   $("#lvNext").innerHTML=nx?`<b>${esc(lab(nx))}</b>${extra?`<small>${esc(extra)}</small>`:""}<small>in ${(nx.km-nowKm).toFixed(0)} km · ca. ${fmtT(nx.t)}</small>`:"";
   const last=R.stops[R.stops.length-1];
-  $("#lvDest").innerHTML=`<b>Ziel: ${esc(shortName(last.name||""))}</b><small>${(R.cumKm[R.cumKm.length-1]-nowKm).toFixed(0)} km · an ${fmtT(SIM.arrival)}${fmtD(SIM.arrival)!==fmtD(Date.now())?" "+fmtD(SIM.arrival):""} · Einsatz ${fmtDur(SIM.shiftUsed/1000)}${SIM.shiftFlag?" ⚠":""}</small>`;
+  $("#lvDest").innerHTML=`<b>Ziel: ${esc(shortName(last.name||""))}</b><small>${(R.cumKm[R.cumKm.length-1]-nowKm).toFixed(0)} km · an ${fmtT(SIM.arrival)}${fmtD(SIM.arrival)!==fmtD(Date.now())?" "+fmtD(SIM.arrival):""} · Einsatz ${fmtDur(SIM.shiftUsed/1000)}${SIM.shiftFlag?" ⚠":""}${(()=>{const t=tollEstimate(),u=tollEstimate(LIVE.idx);return t&&t.total>0?` · Maut bisher ca. ${fmtEur(u?u.total:0)} / gesamt ${fmtEur(t.total)}`:""})()}</small>`;
 }
 setInterval(()=>{if(LIVE.active){if(LIVE.lastT&&Date.now()-LIVE.lastT>8000)LIVE.speed=0;renderLive()}},15000);
 setInterval(()=>{if(LIVE.active){natState();
